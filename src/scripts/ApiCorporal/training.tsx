@@ -13,10 +13,10 @@ export default class TrainingSystem {
     }
     getActual(): Promise<DetailsTrainings> {
         return new Promise(async(resolve, reject)=>{
-            try {
-                AsyncStorage.getItem('account_session').then((value)=>{;
-                    var datas: storageData = JSON.parse(decode(String(value)));
-                    axios.post(`${this.urlBase}/index.php`, qs.stringify({ getAllTraining: true, email: datas.email, password: datas.password }), this.header_access).then((value)=>{
+            AsyncStorage.getItem('account_session').then((value)=>{;
+                var datas: storageData = JSON.parse(decode(String(value)));
+                axios.post(`${this.urlBase}/index.php`, qs.stringify({ getAllTraining: true, email: datas.email, password: datas.password }), this.header_access).then((value)=>{
+                    try {
                         var datas: trainingData = value.data;
                         if (datas.ok) {
                             var trainings: any = datas.trainings;
@@ -34,19 +34,19 @@ export default class TrainingSystem {
                         } else {
                             return reject({ cause: datas.cause, error: datas.ok });
                         }
-                    });
-                }).catch((error)=>reject({ cause: 'Ocurrió un error al intentar consultar a los datos de sesión.', error }));
-            } catch (error) {
-                reject({ cause: 'Ocurrió un error inesperadamente.', error });
-            }
+                    } catch (error) {
+                        reject({ cause: 'Ocurrió un error inesperadamente.', error });
+                    }
+                }).catch((error)=>reject({ cause: 'Error de conexión.', error }));
+            }).catch((error)=>reject({ cause: 'Ocurrió un error al intentar consultar a los datos de sesión.', error }));
         });
     }
     getAllOne(get: number): Promise<statisticData> {
         return new Promise((resolve, reject)=>{
-            try {
-                AsyncStorage.getItem('account_session').then((value)=>{;
-                    var datas: storageData = JSON.parse(decode(String(value)));
-                    axios.post(`${this.urlBase}/index.php`, qs.stringify({ getAllTraining: true, email: datas.email, password: datas.password }), this.header_access).then((value)=>{
+            AsyncStorage.getItem('account_session').then((value)=>{;
+                var datas: storageData = JSON.parse(decode(String(value)));
+                axios.post(`${this.urlBase}/index.php`, qs.stringify({ getAllTraining: true, email: datas.email, password: datas.password }), this.header_access).then((value)=>{
+                    try {
                         var datas: trainingsData = value.data;
                         if (datas.ok) {
                             var labels: string[] = [];
@@ -64,11 +64,11 @@ export default class TrainingSystem {
                         } else {
                             return reject({ cause: datas.cause, error: datas.ok });
                         }
-                    });
-                }).catch((error)=>reject({ cause: 'Ocurrió un error al intentar consultar a los datos de sesión.', error }));
-            } catch (error) {
-                reject({ cause: 'Ocurrió un error inesperadamente.', error });
-            }
+                    } catch (error) {
+                        reject({ cause: 'Ocurrió un error inesperadamente.', error });
+                    }
+                }).catch((error)=>reject({ cause: 'Error de conexión.', error }));
+            }).catch((error)=>reject({ cause: 'Ocurrió un error al intentar consultar a los datos de sesión.', error }));
         });
     }
     calculate(name: string, past: number | undefined, actual: number | undefined) {

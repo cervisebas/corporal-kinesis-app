@@ -7,6 +7,7 @@ import Logo from '../assets/logo3.svg';
 type IProps = {
     visible: boolean;
     textShow: string;
+    showAnimText: boolean;
 };
 type IState = {
     overflowText: string;
@@ -29,7 +30,7 @@ export class VerifyScreen extends Component<IProps, IState> {
                                 <Logo width={'70%'} />
                             </View>
                             <View style={{ ...styles.contentIndicator, width: Dimensions.get('window').width }}>
-                                <Text style={styles.textIndicator}>{this.props.textShow}{this.state.overflowText}</Text>
+                                <Text style={styles.textIndicator}>{this.props.textShow}{(this.props.showAnimText) && this.state.overflowText}</Text>
                             </View>
                         </ImageBackground>
                     </View>

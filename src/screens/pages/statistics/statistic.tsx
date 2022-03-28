@@ -1,10 +1,11 @@
 import React, { Component } from "react";
-import { Dimensions, FlatList, Modal, StyleSheet, View } from "react-native";
+import { Dimensions, FlatList, Modal, StatusBar, StyleSheet, View } from "react-native";
 import { Appbar, Colors, Divider, List, Provider as PaperProvider, Text, Title } from 'react-native-paper';
 import { LineChart } from "react-native-chart-kit";
 import CombinedTheme from "../../../Theme";
 import { statisticData } from "../../../scripts/ApiCorporal/types";
 import { getNavigationBarHeight } from "react-native-android-navbar-height";
+import { Alert } from "../../../assets/icons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -64,7 +65,7 @@ export class Statistics extends Component<IProps, IState> {
                         <Appbar.BackAction onPress={() =>this.props.close()} />
                         <Appbar.Content title={this.props.title} />
                     </Appbar>
-                    <View style={styles.content}>
+                    {(this.props.datas.singles.length !== 0)? <View style={styles.content}>
                         <LineChart
                             data={{
                                 labels: this.props.datas.separate.labels.slice(0, 6),
@@ -95,7 +96,12 @@ export class Statistics extends Component<IProps, IState> {
                                 />}
                             />
                         </List.Section>
-                    </View>
+                    </View> : <View style={{ ...styles.contentError, width: width, height: (height - 56 - parseFloat(String(StatusBar.currentHeight)) - this.state.navBarHeight) }}>
+                        <View style={styles.contentError}>
+                            <Alert height={128} width={128} />
+                            <Text style={{ fontSize: 18, marginLeft: 16, marginRight: 16, marginTop: 16, textAlign: 'center' }}>No se han encontrado estadísticas disponibles</Text>
+                        </View>
+                    </View>}
                 </View>
             </PaperProvider>
         </Modal>);
@@ -105,5 +111,10 @@ export class Statistics extends Component<IProps, IState> {
 const styles = StyleSheet.create({
     content: {
         paddingTop: 24
+    },
+    contentError: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'column'
     }
 });

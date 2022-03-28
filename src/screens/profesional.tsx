@@ -5,7 +5,7 @@ type IProps = {};
 
 const Profesional = (props: IProps) => {
     return(<View>
-
+        
     </View>);
 }
 export default Profesional;

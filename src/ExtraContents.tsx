@@ -13,6 +13,7 @@ type IProps = {
     // Verify
     showVerify: boolean;
     textVerify: string;
+    animTextVerify: boolean;
 };
 type IState = {
     // Loading
@@ -42,6 +43,7 @@ export class ExtraContents extends Component<IProps, IState> {
             <VerifyScreen
                 visible={this.props.showVerify}
                 textShow={this.props.textVerify}
+                showAnimText={this.props.animTextVerify}
             />
             <Global
                 loadingView={this.state.viewLoading}

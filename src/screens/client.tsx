@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { View } from "react-native";
-import { BottomNavigation } from "react-native-paper";
+import { StyleSheet, View } from "react-native";
+import { BottomNavigation, FAB } from "react-native-paper";
 import LoadingController from "../components/loading/loading-controller";
 import { Global } from "../scripts/Global";
 import { Tab1 } from "./pages/Tab1";
@@ -48,7 +48,21 @@ const Client = (props: IProps) => {
             renderScene={renderScene}
             barStyle={{ backgroundColor: '#1663AB' }}
         />
+        <FAB
+            style={styles.fab}
+            icon={'account-lock'}
+            onPress={()=>props.navigation.navigate('p')}
+        />
     </View>);
 };
+
+const styles = StyleSheet.create({
+    fab: {
+      position: 'absolute',
+      margin: 16,
+      right: 0,
+      bottom: 56,
+    },
+});
 
 export default Client;

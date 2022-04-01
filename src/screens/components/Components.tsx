@@ -1,7 +1,8 @@
 import React, { PureComponent } from "react";
 import { StyleProp, View, ViewStyle } from "react-native";
-import { Avatar, Card, Colors, Text, IconButton, Paragraph, Title } from "react-native-paper";
-import { NoComment } from "../../assets/icons";
+import { Avatar, Card, Colors, Text, IconButton, Paragraph, Title, List } from "react-native-paper";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CombinedTheme from "../../Theme";
 
 type IProps0 = {
@@ -51,21 +52,96 @@ class CustomCardComments extends PureComponent<IProps1> {
         </Card>);
     }
 }
-type IProps2 = { message: string; style?: StyleProp<ViewStyle> };
+type IProps2 = { message: string; icon: any; style?: StyleProp<ViewStyle> };
 class EmptyListComments extends PureComponent<IProps2> {
-    constructor(props: IProps2) {
+    constructor(props: IProps2) { super(props); }
+    render(): React.ReactNode {
+        return(<View style={[this.props.style, { width: '100%', paddingTop: 32, paddingBottom: 16, justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }]}>
+            {this.props.icon}
+            <Title style={{ marginTop: 12 }}>{this.props.message}</Title>
+        </View>);
+    }
+}
+type IProps3 = { value: string; label: string; icon: string; color: string; loading: boolean; };
+type IState3 = { mount: boolean; };
+class CustomItemList extends PureComponent<IProps3, IState3> {
+    constructor(props: IProps3) {
+        super(props);
+        this.state = { mount: false };
+    }
+    componentDidMount() { this.setState({ mount: true }); }
+    componentWillUnmount() { this.setState({ mount: false }); }
+    render(): React.ReactNode {
+        return(<View>
+            {(this.state.mount)? (!this.props.loading)? <List.Item
+                style={{ paddingLeft: 16 }}
+                title={this.props.label}
+                titleStyle={{ fontSize: 12, color: '#727272' }}
+                left={()=><View style={{ width: (this.props.value.length < 2)? 24 : 16 * this.props.value.length, height: 48, alignItems: 'center', justifyContent: 'center' }}><Title>{this.props.value}</Title></View>}
+                right={()=><List.Icon color={this.props.color} icon={this.props.icon} />}
+            />: <CustomItemListLoading />: <></>}
+        </View>);
+    }
+}
+type IState4 = { mount: boolean; value: number; };
+class CustomItemListLoading extends PureComponent<any, IState4> {
+    constructor(props: any) {
+        super(props);
+        this.state = {
+            mount: false,
+            value: this.numbers[Math.floor(Math.random() * (this.numbers.length - 0)) + 0]
+        };
+    }
+    private numbers: number[] = [48, 64, 80, 96];
+    componentDidMount() { this.setState({ mount: true }); }
+    componentWillUnmount() { this.setState({ mount: false }); }
+    render(): React.ReactNode {
+        return(<View>
+            {(this.state.mount)? <List.Item
+                style={{ paddingLeft: 16 }}
+                title={()=><SkeletonPlaceholder backgroundColor={'#1F1F1F'} highlightColor={'#727272'}><SkeletonPlaceholder.Item width={90} height={12} borderRadius={2} /></SkeletonPlaceholder>}
+                titleStyle={{ color: '#727272' }}
+                left={()=><View style={{ height: 48, alignItems: 'center', justifyContent: 'center' }}><SkeletonPlaceholder backgroundColor={'#111111'} highlightColor={'#F2F2F2'}><SkeletonPlaceholder.Item width={this.state.value} height={36} borderRadius={4} /></SkeletonPlaceholder></View>}
+                right={()=><List.Icon color={Colors.yellow500} icon={'chart-timeline-variant'} />}
+            />: <></>}
+        </View>);
+    }
+}
+
+type IProps5 = { onPress: ()=>any; style?: StyleProp<ViewStyle>; title: string; icon: string; };
+class CustomCard2 extends PureComponent<IProps5> {
+    constructor(props: IProps5) { super(props); }
+    render(): React.ReactNode {
+        return(<Card style={this.props.style} accessible={true} onPress={()=>this.props.onPress()}>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%', position: 'relative' }}>
+                <Icon size={36} color={'#FFFFFF'} name={this.props.icon} />
+                <Title style={{ marginLeft: 8 }}>{this.props.title}</Title>
+            </View>
+        </Card>);
+    }
+}
+
+type IProps6 = {
+    title: string;
+};
+class CustomItemList2 extends PureComponent<IProps6> {
+    constructor(props: IProps6) {
         super(props);
     }
     render(): React.ReactNode {
-        return(<View style={[this.props.style, { width: '100%', paddingTop: 16, paddingBottom: 16, justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }]}>
-            <NoComment width={96} height={96} />
-            <Title style={{ marginTop: 12 }}>{this.props.message}</Title>
-        </View>);
+        return(<List.Item
+            left={(props)=><Avatar.Image {...props} size={48} source={require('../../assets/profile.png')} />}
+            title={this.props.title}
+            right={()=><IconButton icon={'dots-vertical'} />}
+        />);
     }
 }
 
 export {
     CustomCard1,
     CustomCardComments,
-    EmptyListComments
+    EmptyListComments,
+    CustomItemList,
+    CustomCard2,
+    CustomItemList2
 };

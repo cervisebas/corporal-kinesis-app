@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SystemNavigationBar from "react-native-system-navigation-bar";
-import { Alert, LogBox, StatusBar, View } from 'react-native';
+import { LogBox, StatusBar, View } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import Client from './screens/client';
 import Profesional from './screens/profesional';
@@ -14,6 +14,7 @@ import { setLoadNow } from './scripts/Global';
 import DeviceInfo from "react-native-device-info";
 import { decode } from 'base-64';
 import { getNavigationBarHeight } from 'react-native-android-navbar-height';
+import 'react-native-gesture-handler';
 
 const App = ()=>{
     const [openSession, setOpenSession] = useState(false);
@@ -52,9 +53,9 @@ const App = ()=>{
                     textVerify={textVerify}
                     animTextVerify={textAnimVerify}
                 />
-                <Stack.Navigator initialRouteName="h" screenOptions={{ headerShown: false, animation: 'slide_from_bottom', gestureEnabled: false }} >
-                    <Stack.Screen name="h" component={Client} />
-                    <Stack.Screen name="n" component={Profesional} />
+                <Stack.Navigator initialRouteName="c" screenOptions={{ headerShown: false, animation: 'fade_from_bottom', gestureEnabled: false }} >
+                    <Stack.Screen name="c" component={Client} />
+                    <Stack.Screen name="p" component={Profesional} />
                 </Stack.Navigator>
             </NavigationContainer>
         </PaperProvider>

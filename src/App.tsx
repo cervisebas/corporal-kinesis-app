@@ -23,7 +23,7 @@ const App = ()=>{
     const [showVerify, setShowVerify] = useState(true);
     const [textVerify, setTextVerify] = useState('Cargando');
     const [textAnimVerify, setTextAnimVerify] = useState(true);
-    LogBox.ignoreAllLogs();
+    LogBox.ignoreLogs(["[react-native-gesture-handler] Seems like you\'re using an old API with gesture components, check out new Gestures system!"]);
     setTimeout(()=>SplashScreen.hide(), 128);
     const Stack = createNativeStackNavigator();
     SystemNavigationBar.setNavigationColor('#0f4577', true);

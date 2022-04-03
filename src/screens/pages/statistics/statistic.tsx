@@ -7,6 +7,7 @@ import { getNavigationBarHeight } from "react-native-android-navbar-height";
 import { Alert, NoList } from "../../../assets/icons";
 import Graphic from "./graphics";
 import { CustomItemList, EmptyListComments } from "../../components/Components";
+import Settings from "../../../Settings";
 
 const { width, height } = Dimensions.get("window");
 
@@ -34,6 +35,7 @@ export class Statistics extends Component<IProps, IState> {
         };
     }
     private flatListRef: React.RefObject<FlatList>;
+    static contextType = Settings;
 
     loadData() {
         this.setState({ dataView: this.props.datas.singles.map(()=>({ label: '', value: '', icon: '', color: '' })) }, ()=>{
@@ -63,8 +65,9 @@ export class Statistics extends Component<IProps, IState> {
     listEmptyComponent(props: { isLoading: boolean }) { return(<View>{(!props.isLoading)? <EmptyListComments icon={<NoList width={96} height={96} />} message={'La lista esta vacía'} />: <View><ProgressBar indeterminate={true} /></View>}</View>); }
 
     render(): React.ReactNode {
+        const { getSettings } = this.context;
         this.getNavBarHeight();
-        return(<Modal visible={this.props.visible} transparent={false} hardwareAccelerated={true} animationType={'none'} onShow={()=>this.loadData()} onRequestClose={()=>this.resetDataAndClose()}>
+        return(<Modal visible={this.props.visible} transparent={false} hardwareAccelerated={true} animationType={getSettings.animations} onShow={()=>this.loadData()} onRequestClose={()=>this.resetDataAndClose()}>
             <PaperProvider theme={CombinedTheme}>
                 <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background, height, width }}>
                     <Appbar style={{ backgroundColor: '#1663AB', height: 56 }}>

@@ -67,14 +67,12 @@ export class Tab1 extends Component<IProps, IState> {
                     <Menu.Item onPress={() => {}} title="¿Qué es esto?" icon={'information-outline'} />
                 </Menu>
             </Appbar.Header>
-            <List.Section style={{ flex: 2 }}>
-                <FlatList
-                    data={[].constructor(25)}
-                    ListHeaderComponent={<HeaderStatistics dataShow={this.state.dataShow} showLoading={this.state.showLoading} goStatistics={(data, title)=>this.goStatistics(data, title)} />}
-                    ListEmptyComponent={()=><EmptyListComments message={'No hay comentarios para mostrar'} icon={<NoComment width={96} height={96} />} style={{ marginTop: 32 }} />}
-                    renderItem={({ index })=><CustomCardComments key={index} accountName="Nombre y apellido" date="12/05/2022 15:23 hs" comment="Proident veniam labore anim dolore eiusmod enim esse non ipsum consequat officia pariatur pariatur. Enim in dolor laboris deserunt duis. Nisi dolor incididunt eu ullamco est magna minim et officia enim dolore esse. Lorem sint officia minim minim. Ad consectetur aliqua ut proident nostrud elit excepteur cupidatat deserunt incididunt." />}
-                />
-            </List.Section>
+            <FlatList
+                data={[].constructor(25)}
+                ListHeaderComponent={<HeaderStatistics dataShow={this.state.dataShow} showLoading={this.state.showLoading} goStatistics={(data, title)=>this.goStatistics(data, title)} />}
+                ListEmptyComponent={()=><EmptyListComments message={'No hay comentarios para mostrar'} icon={<NoComment width={96} height={96} />} style={{ marginTop: 32 }} />}
+                renderItem={({ index })=><CustomCardComments key={index} accountName="Nombre y apellido" date="12/05/2022 15:23 hs" comment="Proident veniam labore anim dolore eiusmod enim esse non ipsum consequat officia pariatur pariatur. Enim in dolor laboris deserunt duis. Nisi dolor incididunt eu ullamco est magna minim et officia enim dolore esse. Lorem sint officia minim minim. Ad consectetur aliqua ut proident nostrud elit excepteur cupidatat deserunt incididunt." />}
+            />
             <Statistics
                 visible={this.state.visibleStatistics}
                 datas={this.state.statistics}

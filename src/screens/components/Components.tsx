@@ -114,8 +114,8 @@ class CustomCard2 extends PureComponent<IProps5> {
     render(): React.ReactNode {
         return(<Card style={this.props.style} accessible={true} onPress={()=>this.props.onPress()}>
             <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%', position: 'relative' }}>
-                <Icon size={36} color={'#FFFFFF'} name={this.props.icon} />
-                <Title style={{ marginLeft: 8 }}>{this.props.title}</Title>
+                <Icon size={28} color={'#FFFFFF'} name={this.props.icon} />
+                <Title style={{ marginLeft: 8, fontSize: 18 }}>{this.props.title}</Title>
             </View>
         </Card>);
     }

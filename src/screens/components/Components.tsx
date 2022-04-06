@@ -1,8 +1,10 @@
+import { decode } from "base-64";
 import React, { PureComponent } from "react";
 import { StyleProp, View, ViewStyle } from "react-native";
-import { Avatar, Card, Colors, Text, IconButton, Paragraph, Title, List } from "react-native-paper";
+import { Avatar, Card, Colors, Text, IconButton, Paragraph, Title, List, Menu, Divider, TouchableRipple } from "react-native-paper";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { HostServer } from "../../scripts/ApiCorporal";
 import CombinedTheme from "../../Theme";
 
 type IProps0 = {
@@ -121,19 +123,44 @@ class CustomCard2 extends PureComponent<IProps5> {
     }
 }
 
-type IProps6 = {
-    title: string;
-};
-class CustomItemList2 extends PureComponent<IProps6> {
+type IProps6 = { title: string; image: string; onPress: ()=>any; };
+type IState6 = { viewMenu: boolean; };
+class CustomItemList2 extends PureComponent<IProps6, IState6> {
     constructor(props: IProps6) {
         super(props);
+        this.state = {
+            viewMenu: false
+        };
     }
     render(): React.ReactNode {
-        return(<List.Item
-            left={(props)=><Avatar.Image {...props} size={48} source={require('../../assets/profile.png')} />}
-            title={this.props.title}
-            right={()=><IconButton icon={'dots-vertical'} />}
-        />);
+        return(<TouchableRipple onPress={()=>this.props.onPress()}>
+            <List.Item
+                left={(props)=><Avatar.Image {...props} size={48} source={(!this.props.image)? require('../../assets/profile.png'): { uri: `${HostServer}/images/accounts/${decode(this.props.image)}` }} />}
+                title={this.props.title}
+                right={()=><Menu
+                    visible={this.state.viewMenu}
+                    onDismiss={()=>this.setState({ viewMenu: false })}
+                    anchor={<IconButton onPress={()=>this.setState({ viewMenu: true })} icon={'dots-vertical'} />}>
+                    <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.onPress())} title={"Ver perfil"} />
+                    <Menu.Item onPress={()=>{}} title={"Dejar comentario"} />
+                    <Menu.Item style={{ backgroundColor: Colors.red500 }} onPress={()=>{}} title={"Eliminar"} />
+                </Menu>}
+            />
+        </TouchableRipple>);
+    }
+}
+
+type IProps7 = {
+    message: string;
+    style?: StyleProp<ViewStyle>;
+};
+class CustomShowError extends PureComponent<IProps7> {
+    constructor(props: IProps7) { super(props); }
+    render(): React.ReactNode {
+        return(<View style={[this.props.style, { width: '100%', justifyContent: 'center', alignItems: 'center', flex: 1, flexDirection: 'column' }]}>
+            <Icon name={'alert-circle-outline'} size={96} color={'#FFFFFF'} />
+            <Title style={{ marginTop: 12 }}>{this.props.message}</Title>
+        </View>);
     }
 }
 
@@ -143,5 +170,6 @@ export {
     EmptyListComments,
     CustomItemList,
     CustomCard2,
-    CustomItemList2
+    CustomItemList2,
+    CustomShowError
 };

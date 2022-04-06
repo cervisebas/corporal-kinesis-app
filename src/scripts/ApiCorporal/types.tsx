@@ -100,6 +100,33 @@ type statisticData = {
         value: string;
     }[]
 };
+type listUsers = {
+    ok?: boolean;
+    cause?: string;
+    data?: dataListUsers[]
+};
+type dataListUsers = {
+    id: string;
+    name: string;
+    experience: string;
+    email: string;
+    image: string;
+};
+type getUserData = {
+    ok?: boolean;
+    cause?: string;
+    data?: userData[];
+};
+type userData = {
+    id: string;
+    name: string;
+    email: string;
+    birthday: string;
+    dni: string;
+    phone: string;
+    experience: string;
+    image: string;
+};
 
 export type {
     tipical,
@@ -109,5 +136,9 @@ export type {
     trainingsData,
     trainings,
     statisticData,
-    DetailsTrainings
+    DetailsTrainings,
+    listUsers,
+    dataListUsers,
+    getUserData,
+    userData
 };

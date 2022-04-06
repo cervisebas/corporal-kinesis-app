@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, PureComponent } from "react";
 import { View, FlatList } from "react-native";
 import { Appbar, Divider, List, Menu } from "react-native-paper";
 import { NoComment } from "../../assets/icons";
@@ -82,4 +82,3 @@ export class Tab1 extends Component<IProps, IState> {
         </View>);
     }
 };
-

@@ -9,7 +9,9 @@ const keyAccess: string = encode('pFQVXt&yC%aa8e-^&cY4FRtXm&s87$6%3+6D+REGK4bQNL
 const Account = new AccountSystem(host, keyAccess);
 const Training = new TrainingSystem(host, keyAccess);
 
+const HostServer = host;
 export {
+    HostServer,
     Account,
     Training
 };

@@ -1,8 +1,8 @@
-import { decode } from "base-64";
+import { decode, encode } from "base-64";
 import axios from "axios";
 import qs from 'qs';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { DetailsTrainings, statisticData, storageData, trainingData, trainings, trainingsData } from "./types";
+import { DetailsTrainings, statisticData, storageData, tipical, trainingData, trainings, trainingsData } from "./types";
 
 export default class TrainingSystem {
     private urlBase: string = '';
@@ -10,6 +10,33 @@ export default class TrainingSystem {
     constructor(setUrl: string, setHeaderAccess: string) {
         this.urlBase = setUrl;
         this.header_access.headers.Authorization = setHeaderAccess;
+    }
+    create(idUser: string, date: string, rds: string, rpe: string, pulse: string, repetitions: string, kilage: string, tonnage: string): Promise<tipical> {
+        return new Promise((resolve, reject)=>{
+            AsyncStorage.getItem('account_session').then((value)=>{
+                var datas: storageData = JSON.parse(decode(String(value)));
+                var dataPost = {
+                    email: datas.email,
+                    password: datas.password,
+                    idUser,
+                    date: encode(date),
+                    rds: encode(rds),
+                    rpe: encode(rpe),
+                    pulse: encode(pulse),
+                    repetitions: encode(repetitions),
+                    kilage: encode(kilage),
+                    tonnage: encode(tonnage)
+                };
+                axios.post(`${this.urlBase}/index.php`, qs.stringify(dataPost), this.header_access).then((html)=>{
+                    try {
+                        var result: tipical = html.data;
+                        if (result.ok) resolve(result); else reject({ cause: (result.cause?.length !== undefined && result.cause?.length !== 0)? result.cause: 'Ocurrió un error inesperadamente.', error: false });
+                    } catch (error) {
+                        reject({ cause: 'Ocurrió un error inesperadamente.', error });
+                    }
+                }).catch((error)=>reject({ cause: 'Error de conexión.', error }));
+            }).catch((error)=>reject({ cause: 'Ocurrió un error al intentar consultar a los datos de sesión.', error }));
+        });
     }
     getActual(): Promise<DetailsTrainings> {
         return new Promise(async(resolve, reject)=>{

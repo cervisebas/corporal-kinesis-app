@@ -1,10 +1,11 @@
 import React, { Component, PureComponent } from "react";
 import { View, FlatList } from "react-native";
-import { Appbar, Divider, List, Menu } from "react-native-paper";
+import { Appbar, Button, Dialog, Divider, List, Menu, Portal, Snackbar, Text } from "react-native-paper";
 import { NoComment } from "../../assets/icons";
 import { Training } from "../../scripts/ApiCorporal";
 import { DetailsTrainings, statisticData } from "../../scripts/ApiCorporal/types";
 import { LoadNow } from "../../scripts/Global";
+import CombinedTheme from "../../Theme";
 import { CustomCardComments, EmptyListComments } from "../components/Components";
 import HeaderStatistics from "./elements/HeaderStatistics";
 import { Statistics } from "./statistics/statistic";
@@ -19,6 +20,10 @@ type IState = {
     visibleStatistics: boolean;
     titleStatistics: string;
     statistics: statisticData;
+
+    // Dialog Error
+    dialogShow: boolean;
+    messageDialog: string;
 };
 
 export class Tab1 extends Component<IProps, IState> {
@@ -30,10 +35,24 @@ export class Tab1 extends Component<IProps, IState> {
             dataShow: { date: { value: '', status: -1 }, session_number: { value: '', status: -1 }, rds: { value: '', status: -1 }, rpe: { value: '', status: -1 }, pulse: { value: '', status: -1 }, repetitions: { value: '', status: -1 }, kilage: { value: '', status: -1 }, tonnage: { value: '', status: -1 } },
             visibleStatistics: false,
             titleStatistics: '',
-            statistics: { singles: [], separate: { labels: [], values: [] } }
+            statistics: { singles: [], separate: { labels: [], values: [] } },
+            dialogShow: false,
+            messageDialog: ''
         };
     }
     private loading = setInterval(()=>{ if (LoadNow) setTimeout(()=>this.goLoading(), 256) }, 512);
+    componentWillUnmount() {
+        this.setState({
+            visiblemenu: false,
+            showLoading: true,
+            dataShow: { date: { value: '', status: -1 }, session_number: { value: '', status: -1 }, rds: { value: '', status: -1 }, rpe: { value: '', status: -1 }, pulse: { value: '', status: -1 }, repetitions: { value: '', status: -1 }, kilage: { value: '', status: -1 }, tonnage: { value: '', status: -1 } },
+            visibleStatistics: false,
+            titleStatistics: '',
+            statistics: { singles: [], separate: { labels: [], values: [] } },
+            dialogShow: false,
+            messageDialog: ''
+        });
+    }
     goStatistics(data: number, titleStatistics: string) {
         this.props.showLoading(true, 'Cargando estadísticas...');
         Training.getAllOne(data).then((value)=>{
@@ -43,6 +62,9 @@ export class Tab1 extends Component<IProps, IState> {
                 titleStatistics: titleStatistics,
                 statistics: value
             });
+        }).catch((error)=>{
+            this.props.showLoading(false, '');
+            this.setState({ dialogShow: true, messageDialog: error.cause });
         });
     }
     goLoading() {
@@ -50,9 +72,14 @@ export class Tab1 extends Component<IProps, IState> {
             var reserve = { date: { value: '-', status: -1 }, session_number: { value: '-', status: -1 }, rds: { value: '-', status: -1 }, rpe: { value: '-', status: -1 }, pulse: { value: '-', status: -1 }, repetitions: { value: '-', status: -1 }, kilage: { value: '-', status: -1 }, tonnage: { value: '-', status: -1 } };
             this.setState({ dataShow: (value)? { date: value.date, session_number: value.session_number, rds: value.rds, rpe: value.rpe, pulse: value.pulse, repetitions: value.repetitions, kilage: value.kilage, tonnage: value.tonnage }: reserve, showLoading: false });
             clearInterval(this.loading);
-        }).catch(()=>{
+        }).catch((error)=>{
             var reserve = { date: { value: 'n/a', status: -1 }, session_number: { value: 'n/a', status: -1 }, rds: { value: 'n/a', status: -1 }, rpe: { value: 'n/a', status: -1 }, pulse: { value: 'n/a', status: -1 }, repetitions: { value: 'n/a', status: -1 }, kilage: { value: 'n/a', status: -1 }, tonnage: { value: 'n/a', status: -1 } };
-            this.setState({ dataShow: reserve, showLoading: false });
+            this.setState({
+                dataShow: reserve,
+                showLoading: false,
+                dialogShow: true,
+                messageDialog: error.cause
+            });
             clearInterval(this.loading);
         });
     }
@@ -79,6 +106,14 @@ export class Tab1 extends Component<IProps, IState> {
                 title={this.state.titleStatistics}
                 close={()=>this.setState({ visibleStatistics: false })}
             />
+            <Snackbar
+                visible={this.state.dialogShow}
+                theme={CombinedTheme}
+                duration={7000}
+                onDismiss={()=>this.setState({ dialogShow: false })}
+                action={{ label: 'Aceptar', onPress: ()=>this.setState({ dialogShow: false }) }}>
+                <Text>{this.state.messageDialog}</Text>
+            </Snackbar>
         </View>);
     }
 };

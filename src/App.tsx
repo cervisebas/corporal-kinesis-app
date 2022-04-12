@@ -15,6 +15,7 @@ import DeviceInfo from "react-native-device-info";
 import { decode } from 'base-64';
 import { getNavigationBarHeight } from 'react-native-android-navbar-height';
 import 'react-native-gesture-handler';
+import moment from 'moment';
 
 const App = ()=>{
     const [openSession, setOpenSession] = useState(false);
@@ -40,6 +41,8 @@ const App = ()=>{
           setMarginBottom(await getNavigationBarHeight());
         }
     });
+
+    console.log(moment(new Date()).format('DD/MM/YYYY'));
 
     return(<View style={{ flex: 1, marginTop, marginBottom }}>
         <StatusBar barStyle={'light-content'} backgroundColor={'#0f4577'} />

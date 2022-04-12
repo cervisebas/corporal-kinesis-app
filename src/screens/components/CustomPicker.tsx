@@ -9,6 +9,7 @@ type IProps = {
     onChange: (value: string)=>any;
     value: string;
     title: string;
+    disabled?: boolean;
 };
 type IState = {
     colorsClick: string[];
@@ -26,16 +27,22 @@ export class CustomPicker1 extends PureComponent<IProps, IState> {
     }
     private ref: Picker<string> | null = null;
     render(): React.ReactNode {
-        return(<TouchableRipple onPress={()=>this.ref?.focus()} onPressIn={()=>this.setState({ indexColors: 1 })} onPressOut={()=>this.setState({ indexColors: 0 })} style={[this.props.style, { borderRadius: 4, borderColor: this.state.colorsClick[this.state.indexColors], borderWidth: 1.5, paddingTop: 8 }]}>
+        return(<TouchableRipple
+                disabled={this.props.disabled}
+                onPress={()=>(!this.props.disabled)? this.ref?.focus(): null}
+                onPressIn={()=>(!this.props.disabled)? this.setState({ indexColors: 1 }): null}
+                onPressOut={()=>(!this.props.disabled)? this.setState({ indexColors: 0 }): null}
+                style={[this.props.style, { borderRadius: 4, borderColor: (!this.props.disabled)? this.state.colorsClick[this.state.indexColors]: 'rgba(255, 255, 255, 0.30)', borderWidth: 1.5, paddingTop: 8 }]}>
             <View>
-                <Text style={{ marginLeft: 8, color: '#FFFFFF' }}>{this.props.title}</Text>
+                <Text style={{ marginLeft: 8, color: (!this.props.disabled)? '#FFFFFF': 'rgba(255, 255, 255, 0.30)' }}>{this.props.title}</Text>
                 <Picker
                     ref={(ref)=>this.ref = ref}
-                    style={{ width: "100%", height: 52, color: '#FFFFFF' }}
+                    style={{ width: "100%", height: 52, color: (!this.props.disabled)? '#FFFFFF': 'rgba(255, 255, 255, 0.30)' }}
                     selectedValue={this.props.value}
+                    enabled={!this.props.disabled}
                     onValueChange={(itemValue)=>this.props.onChange(itemValue)}
                     mode={'dropdown'}
-                    dropdownIconColor={this.state.borderClick[this.state.indexColors]}
+                    dropdownIconColor={(!this.props.disabled)? this.state.borderClick[this.state.indexColors]: 'rgba(255, 255, 255, 0.30)'}
                     dropdownIconRippleColor={'rgba(0,0,0,0)'}
                 >
                     <Picker.Item label="5" value="5" />
@@ -75,16 +82,22 @@ export class CustomPicker2 extends PureComponent<IProps, IState2> {
     }
     private ref: Picker<string> | null = null;
     render(): React.ReactNode {
-        return(<TouchableRipple onPress={()=>this.ref?.focus()} onPressIn={()=>this.setState({ indexColors: 1 })} onPressOut={()=>this.setState({ indexColors: 0 })} style={[this.props.style, { borderRadius: 4, borderColor: this.state.colorsClick[this.state.indexColors], borderWidth: 1.5 }]}>
+        return(<TouchableRipple
+                onPress={()=>(!this.props.disabled)? this.ref?.focus(): null}
+                disabled={this.props.disabled}
+                onPressIn={()=>(!this.props.disabled)? this.setState({ indexColors: 1 }): null}
+                onPressOut={()=>(!this.props.disabled)? this.setState({ indexColors: 0 }): null}
+                style={[this.props.style, { borderRadius: 4, borderColor: (!this.props.disabled)? this.state.colorsClick[this.state.indexColors]: 'rgba(255, 255, 255, 0.25)', borderWidth: 1.5 }]}>
             <View onLayout={(layout)=>this.setState({ widthMax: layout.nativeEvent.layout.width })} style={{ flex: 3, flexDirection: 'row', alignItems: 'center' }}>
-                <Text onLayout={(layout)=>this.setState({ widthText: layout.nativeEvent.layout.width })} style={{ marginLeft: 8, marginRight: 12, color: '#FFFFFF' }}>{this.props.title}</Text>
+                <Text onLayout={(layout)=>this.setState({ widthText: layout.nativeEvent.layout.width })} style={{ marginLeft: 8, marginRight: 12, color: (!this.props.disabled)? '#FFFFFF': 'rgba(255, 255, 255, 0.25)' }}>{this.props.title}</Text>
                 <Picker
                     ref={(ref)=>this.ref = ref}
-                    style={{ width: (this.state.widthMax - this.state.widthText - 16), height: 52, color: '#FFFFFF' }}
+                    style={{ width: (this.state.widthMax - this.state.widthText - 16), height: 52, color: (!this.props.disabled)? '#FFFFFF': 'rgba(255, 255, 255, 0.25)' }}
                     selectedValue={this.props.value}
+                    enabled={!this.props.disabled}
                     onValueChange={(itemValue)=>this.props.onChange(itemValue)}
                     mode={'dialog'}
-                    dropdownIconColor={this.state.borderClick[this.state.indexColors]}
+                    dropdownIconColor={(!this.props.disabled)? this.state.borderClick[this.state.indexColors]: 'rgba(255, 255, 255, 0.30)'}
                     dropdownIconRippleColor={'rgba(0,0,0,0)'}
                 >
                     {this.props.children}

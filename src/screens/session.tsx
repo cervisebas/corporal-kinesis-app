@@ -307,7 +307,7 @@ export class Session extends Component<IProps, IState> {
                     </View>
                 </KeyboardAvoidingView>
                 <Portal>
-                    <Dialog visible={this.state.viewModalDate} dismissable={false}>
+                    <Dialog visible={this.state.viewModalDate} dismissable={true} onDismiss={()=>this.setState({ viewModalDate: false })}>
                         <Dialog.Title>Fecha de nacimiento</Dialog.Title>
                         <Dialog.Content>
                             <DatePicker

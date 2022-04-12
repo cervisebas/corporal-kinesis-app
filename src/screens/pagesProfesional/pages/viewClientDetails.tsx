@@ -2,7 +2,7 @@ import { decode } from "base-64";
 import moment from "moment";
 import React, { Component, PureComponent, ReactNode } from "react";
 import { Dimensions, Image, Linking, Modal, StyleSheet, View } from "react-native";
-import { Appbar, Provider as PaperProvider, Divider, Text, Card, IconButton, Title } from "react-native-paper";
+import { Appbar, Provider as PaperProvider, Divider, Text, Card, IconButton, Title, Button } from "react-native-paper";
 import { HostServer } from "../../../scripts/ApiCorporal";
 import { userData } from "../../../scripts/ApiCorporal/types";
 import Settings from "../../../Settings";
@@ -72,13 +72,16 @@ export default class ViewClietDetails extends Component<IProps, IState> {
                                 <Card.Title title="Medios de contacto:" />
                                 <Card.Content>
                                     <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 12 }}>
-                                        <IconButton animated icon={'phone'} style={{ marginLeft: 8, marginRight: 8 }} onPress={()=>Linking.openURL(`tel:+549${decode(this.props.userData.phone)}`)}/>
-                                        <IconButton animated icon={'message'} style={{ marginLeft: 8, marginRight: 8 }} onPress={()=>Linking.openURL(`sms:+549${decode(this.props.userData.phone)}`)}/>
-                                        <IconButton animated icon={'whatsapp'} style={{ marginLeft: 8, marginRight: 8 }} onPress={()=>Linking.openURL(`whatsapp://send?phone=+549${decode(this.props.userData.phone)}`)}/>
-                                        <IconButton animated icon={'email'} style={{ marginLeft: 8, marginRight: 8 }} onPress={()=>Linking.openURL(`mailto:${decode(this.props.userData.email)}`)}/>
+                                        <IconButton animated icon={'phone'} style={styles.buttonsContacts} onPress={()=>Linking.openURL(`tel:+549${decode(this.props.userData.phone)}`)}/>
+                                        <IconButton animated icon={'message'} style={styles.buttonsContacts} onPress={()=>Linking.openURL(`sms:+549${decode(this.props.userData.phone)}`)}/>
+                                        <IconButton animated icon={'whatsapp'} style={styles.buttonsContacts} onPress={()=>Linking.openURL(`whatsapp://send?phone=+549${decode(this.props.userData.phone)}`)}/>
+                                        <IconButton animated icon={'email'} style={styles.buttonsContacts} onPress={()=>Linking.openURL(`mailto:${decode(this.props.userData.email)}`)}/>
                                     </View>
                                 </Card.Content>
                             </Card>
+                            <Button icon={'dumbbell'} mode={'contained'} style={{ marginLeft: 16, marginRight: 16 }} labelStyle={{ color: '#FFFFFF' }}>
+                                Ver rendimiento
+                            </Button>
                         </View>
                     </View>
                 </View>
@@ -106,6 +109,10 @@ const styles = StyleSheet.create({
         flex: 3,
         paddingLeft: 16,
         paddingTop: 18
+    },
+    buttonsContacts: {
+        marginLeft: 12,
+        marginRight: 12
     }
 });
 

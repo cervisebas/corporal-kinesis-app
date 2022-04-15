@@ -1,15 +1,16 @@
 import React, { Component, PureComponent } from "react";
 import { Dimensions, View, Modal, StyleSheet } from "react-native";
-import { Appbar, Button, Text, TextInput, TouchableRipple, Provider as PaperProvider, Portal, Dialog } from "react-native-paper";
+import { Appbar, Button, Text, TextInput, TouchableRipple, Provider as PaperProvider, Portal, Dialog, Snackbar } from "react-native-paper";
 import { Picker } from '@react-native-picker/picker';
 import Settings from "../../../Settings";
 import CombinedTheme from "../../../Theme";
 import { ScrollView } from "react-native-gesture-handler";
 import { CustomPicker1, CustomPicker2 } from "../../components/CustomPicker";
 import { dataListUsers } from "../../../scripts/ApiCorporal/types";
-import { decode } from "base-64";
+import { decode, encode } from "base-64";
 import DatePicker from "react-native-date-picker";
 import moment from "moment";
+import { Training } from "../../../scripts/ApiCorporal";
 
 const { width, height } = Dimensions.get('window');
 
@@ -30,6 +31,9 @@ type IState = {
     dateActual: string;
     viewDialogDate: boolean;
     isSendResults: boolean;
+    showError: boolean;
+    messageError: string;
+    successShow: boolean;
 };
 export default class AddTraining extends Component<IProps, IState> {
     constructor(props: IProps) {
@@ -45,7 +49,10 @@ export default class AddTraining extends Component<IProps, IState> {
             date: new Date(),
             dateActual: moment(new Date()).format('DD/MM/YYYY'),
             viewDialogDate: false,
-            isSendResults: false
+            isSendResults: false,
+            showError: false,
+            messageError: '',
+            successShow: false
         };
     }
     startCalculate() {
@@ -76,7 +83,23 @@ export default class AddTraining extends Component<IProps, IState> {
     }
     sendResults() {
         this.setState({ isSendResults: true });
-        setTimeout(()=>this.setState({ isSendResults: false }), 5000);
+        Training.create(this.state.clientId, this.state.dateActual, this.state.rds, this.state.rpe, this.state.pulse, this.state.repetitions, this.state.kilage, this.state.tonnage).then((value)=>this.setState({
+            isSendResults: false,
+            successShow: true,
+            rds: '5',
+            rpe: '5',
+            pulse: '0',
+            repetitions: '0',
+            kilage: '0',
+            tonnage: '0',
+            clientId: '1',
+            date: new Date(),
+            dateActual: moment(new Date()).format('DD/MM/YYYY')
+        })).catch((error)=>this.setState({
+            isSendResults: false,
+            showError: true,
+            messageError: error.cause
+        }));
     }
     static contextType = Settings;
     render(): React.ReactNode {
@@ -163,7 +186,19 @@ export default class AddTraining extends Component<IProps, IState> {
                             <Button onPress={()=>this.setState({ dateActual: moment(this.state.date).format('DD/MM/YYYY'), viewDialogDate: false })}>Aceptar</Button>
                         </Dialog.Actions>
                     </Dialog>
+                    <Dialog visible={this.state.showError} dismissable={true} onDismiss={()=>this.setState({ showError: false })}>
+                        <Dialog.Title>Ocurrio un error</Dialog.Title>
+                        <Dialog.Content>
+                            <Text>{this.state.messageError}</Text>
+                        </Dialog.Content>
+                        <Dialog.Actions>
+                            <Button onPress={()=>this.setState({ showError: false })}>Aceptar</Button>
+                        </Dialog.Actions>
+                    </Dialog>
                 </Portal>
+                <Snackbar visible={this.state.successShow} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ successShow: false })} duration={3000}>
+                    <Text>Carga realizada correctamente.</Text>
+                </Snackbar>
             </PaperProvider>
         </Modal>);
     }

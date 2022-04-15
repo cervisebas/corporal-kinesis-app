@@ -3,7 +3,7 @@ import { stringify } from "qs";
 import React, { PureComponent } from "react";
 import { Component, ReactNode } from "react";
 import { Dimensions, FlatList, RefreshControl, StyleProp, StyleSheet, ToastAndroid, View, ViewStyle } from "react-native";
-import { ActivityIndicator, Appbar, List, Portal } from "react-native-paper";
+import { ActivityIndicator, Appbar, List, Portal, TouchableRipple } from "react-native-paper";
 import { Account } from "../../scripts/ApiCorporal";
 import { dataListUsers, userData } from "../../scripts/ApiCorporal/types";
 import { Global } from "../../scripts/Global";
@@ -89,6 +89,7 @@ export default class Page1 extends Component<IProps, IState> {
                     refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={this.state.refreshing} onRefresh={()=>this.setState({ refreshing: true }, ()=>this.loadData())} />}
                     ListEmptyComponent={(this.state.isLoading)? <ShowLoading />: (this.state.isError)? <CustomShowError message={this.state.messageError} />: <></>}
                     ListHeaderComponent={<ButtonsHeaderList load={(this.state.isError)? false: !this.state.isLoading} click1={()=>this.setState({ showAddTraining: true })} click2={()=>this.setState({ showSearchClient: true })}/>}
+                    ListFooterComponent={<TouchableRipple onPress={()=>console.log('more')}><List.Item title={'Añadir nuevo usuario'} left={(props)=><List.Icon {...props} icon="account-plus" />} /></TouchableRipple>}
                     renderItem={({ item, index })=><CustomItemList2 key={index} image={item.image} title={decode(item.name)} onPress={()=>this.goDetailsClient(item.id)} />}
                 />
             </View>

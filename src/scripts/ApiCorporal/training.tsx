@@ -16,6 +16,7 @@ export default class TrainingSystem {
             AsyncStorage.getItem('account_session').then((value)=>{
                 var datas: storageData = JSON.parse(decode(String(value)));
                 var dataPost = {
+                    setTraining: true,
                     email: datas.email,
                     password: datas.password,
                     idUser,

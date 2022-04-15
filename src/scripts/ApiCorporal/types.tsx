@@ -128,6 +128,19 @@ type userData = {
     image: string;
 };
 
+type commentsData = {
+    id: string;
+    id_training: string;
+    id_issuer: string;
+    comment: string;
+    date: string;
+};
+type getCommentsAll = {
+    ok?: boolean;
+    cause?: string;
+    data?: commentsData[]
+};
+
 export type {
     tipical,
     openAccount,
@@ -140,5 +153,7 @@ export type {
     listUsers,
     dataListUsers,
     getUserData,
-    userData
+    userData,
+    commentsData,
+    getCommentsAll
 };

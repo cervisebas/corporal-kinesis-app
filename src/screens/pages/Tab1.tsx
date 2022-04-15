@@ -1,9 +1,9 @@
 import React, { Component, PureComponent } from "react";
 import { View, FlatList } from "react-native";
-import { Appbar, Button, Dialog, Divider, List, Menu, Portal, Snackbar, Text } from "react-native-paper";
+import { Appbar, Button, Dialog, Divider, List, Menu, Portal, ProgressBar, Snackbar, Text } from "react-native-paper";
 import { NoComment } from "../../assets/icons";
 import { Training } from "../../scripts/ApiCorporal";
-import { DetailsTrainings, statisticData } from "../../scripts/ApiCorporal/types";
+import { commentsData, DetailsTrainings, statisticData } from "../../scripts/ApiCorporal/types";
 import { LoadNow } from "../../scripts/Global";
 import CombinedTheme from "../../Theme";
 import { CustomCardComments, EmptyListComments } from "../components/Components";
@@ -24,6 +24,10 @@ type IState = {
     // Dialog Error
     dialogShow: boolean;
     messageDialog: string;
+
+    // Comments
+    commentsLoading: boolean;
+    dataComments: commentsData[];
 };
 
 export class Tab1 extends Component<IProps, IState> {
@@ -37,7 +41,9 @@ export class Tab1 extends Component<IProps, IState> {
             titleStatistics: '',
             statistics: { singles: [], separate: { labels: [], values: [] } },
             dialogShow: false,
-            messageDialog: ''
+            messageDialog: '',
+            commentsLoading: true,
+            dataComments: []
         };
     }
     private loading = setInterval(()=>{ if (LoadNow) setTimeout(()=>this.goLoading(), 256) }, 512);
@@ -95,9 +101,9 @@ export class Tab1 extends Component<IProps, IState> {
                 </Menu>
             </Appbar.Header>
             <FlatList
-                data={[].constructor(25)}
+                data={this.state.dataComments}
                 ListHeaderComponent={<HeaderStatistics dataShow={this.state.dataShow} showLoading={this.state.showLoading} goStatistics={(data, title)=>this.goStatistics(data, title)} />}
-                ListEmptyComponent={()=><EmptyListComments message={'No hay comentarios para mostrar'} icon={<NoComment width={96} height={96} />} style={{ marginTop: 32 }} />}
+                ListEmptyComponent={()=>(!this.state.commentsLoading)? <EmptyListComments message={'No hay comentarios para mostrar'} icon={<NoComment width={96} height={96} />} style={{ marginTop: 32 }} />: <View><ProgressBar indeterminate={true} /></View>}
                 renderItem={({ index })=><CustomCardComments key={index} accountName="Nombre y apellido" date="12/05/2022 15:23 hs" comment="Proident veniam labore anim dolore eiusmod enim esse non ipsum consequat officia pariatur pariatur. Enim in dolor laboris deserunt duis. Nisi dolor incididunt eu ullamco est magna minim et officia enim dolore esse. Lorem sint officia minim minim. Ad consectetur aliqua ut proident nostrud elit excepteur cupidatat deserunt incididunt." />}
             />
             <Statistics
@@ -110,6 +116,7 @@ export class Tab1 extends Component<IProps, IState> {
                 visible={this.state.dialogShow}
                 theme={CombinedTheme}
                 duration={7000}
+                style={{ backgroundColor: '#1663AB' }}
                 onDismiss={()=>this.setState({ dialogShow: false })}
                 action={{ label: 'Aceptar', onPress: ()=>this.setState({ dialogShow: false }) }}>
                 <Text>{this.state.messageDialog}</Text>

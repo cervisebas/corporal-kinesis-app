@@ -42,8 +42,6 @@ const App = ()=>{
         }
     });
 
-    console.log(moment(new Date()).format('DD/MM/YYYY'));
-
     return(<View style={{ flex: 1, marginTop, marginBottom }}>
         <StatusBar barStyle={'light-content'} backgroundColor={'#0f4577'} />
         <PaperProvider theme={CombinedTheme}>

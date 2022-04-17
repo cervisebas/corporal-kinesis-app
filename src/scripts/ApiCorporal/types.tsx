@@ -126,6 +126,7 @@ type userData = {
     phone: string;
     experience: string;
     image: string;
+    type: string;
 };
 
 type commentsData = {
@@ -139,6 +140,11 @@ type getCommentsAll = {
     ok?: boolean;
     cause?: string;
     data?: commentsData[]
+};
+type getPermission = {
+    ok?: boolean;
+    cause?: string;
+    permission?: string;
 };
 
 export type {
@@ -155,5 +161,6 @@ export type {
     getUserData,
     userData,
     commentsData,
-    getCommentsAll
+    getCommentsAll,
+    getPermission
 };

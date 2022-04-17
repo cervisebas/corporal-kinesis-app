@@ -1,13 +1,13 @@
 import React, { Component, ReactNode } from "react";
 import { decode } from "base-64";
-import { Modal, View } from "react-native";
+import { View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import { Appbar, Searchbar, Provider as PaperProvider } from "react-native-paper";
 import { dataListUsers } from "../../../scripts/ApiCorporal/types";
-import Settings from "../../../Settings";
 import CombinedTheme from "../../../Theme";
 import { CustomItemList2 } from "../../components/Components";
 import filter from 'lodash.filter';
+import CustomModal from "../../components/CustomModal";
 
 type IProps = {
     show: boolean;
@@ -27,7 +27,6 @@ export default class SearchClient extends Component<IProps, IState> {
             listUsers: []
         };
     }
-    static contextType = Settings;
     onChangeSearch(Query: string) {
         const formattedQuery = Query.toLowerCase();
         const data = filter(this.props.listUsers, (user)=>this.contains(decode(user.name).toLowerCase(), formattedQuery));
@@ -41,8 +40,7 @@ export default class SearchClient extends Component<IProps, IState> {
     }
     loadData() { this.setState({ listUsers: this.props.listUsers }); }
     render(): ReactNode {
-        const { getSettings } = this.context;
-        return(<Modal visible={this.props.show} transparent={false} hardwareAccelerated={true} animationType={getSettings.animations} onShow={()=>this.loadData()} onRequestClose={()=>this.props.close()}>
+        return(<CustomModal visible={this.props.show} onShow={()=>this.loadData()} onRequestClose={()=>this.props.close()}>
             <PaperProvider theme={CombinedTheme}>
                 <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background }}>
                     <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
@@ -68,6 +66,6 @@ export default class SearchClient extends Component<IProps, IState> {
                     </View>
                 </View>
             </PaperProvider>
-        </Modal>);
+        </CustomModal>);
     }
 }

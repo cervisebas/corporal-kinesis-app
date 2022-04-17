@@ -1,17 +1,18 @@
 import { decode } from "base-64";
-import { stringify } from "qs";
 import React, { PureComponent } from "react";
 import { Component, ReactNode } from "react";
-import { Dimensions, FlatList, RefreshControl, StyleProp, StyleSheet, ToastAndroid, View, ViewStyle } from "react-native";
-import { ActivityIndicator, Appbar, List, Portal, TouchableRipple } from "react-native-paper";
-import { Account } from "../../scripts/ApiCorporal";
+import { DeviceEventEmitter, Dimensions, FlatList, RefreshControl, StyleProp, StyleSheet, ToastAndroid, View, ViewStyle } from "react-native";
+import { ActivityIndicator, Appbar, Button, Dialog, List, Paragraph, Portal, Snackbar, Text, TouchableRipple } from "react-native-paper";
+import { Account, Comment } from "../../scripts/ApiCorporal";
 import { dataListUsers, userData } from "../../scripts/ApiCorporal/types";
 import { Global } from "../../scripts/Global";
 import CombinedTheme from "../../Theme";
 import { CustomCard2, CustomItemList2, CustomShowError } from "../components/Components";
 import DialogError from "../components/DialogError";
+import AddNewAccount from "./pages/addNewAccount";
 import AddTraining from "./pages/addTraining";
 import SearchClient from "./pages/searchClient";
+import SetCommentUser from "./pages/setCommentUser";
 import ViewClietDetails from "./pages/viewClientDetails";
 
 const { width } = Dimensions.get('window');
@@ -36,6 +37,13 @@ type IState = {
     errorMessage: string;
     detailsClientView: boolean;
     detailsClientData: userData;
+    showAddNewUser: boolean;
+    showSnackBar: boolean;
+    textSnackBar: string;
+    idActualDeleteClient: string;
+    showQuestionDeleteUser: boolean;
+    showSendComment: boolean;
+    idActualSendComment: string;
 };
 
 export default class Page1 extends Component<IProps, IState> {
@@ -55,16 +63,40 @@ export default class Page1 extends Component<IProps, IState> {
             errorTitle: '',
             errorMessage: '',
             detailsClientView: false,
-            detailsClientData: this.detailsClientDataDefault
+            detailsClientData: this.detailsClientDataDefault,
+            showAddNewUser: false,
+            showSnackBar: false,
+            textSnackBar: '',
+            idActualDeleteClient: '',
+            showQuestionDeleteUser: false,
+            showSendComment: false,
+            idActualSendComment: ''
         };
     }
-    private detailsClientDataDefault = { id: '', name: '', email: '', birthday: '', dni: '', phone: '', experience: '', image: '' };
-    componentDidMount() { this.loadData(); }
+    private detailsClientDataDefault = { id: '', name: '', email: '', birthday: '', dni: '', phone: '', experience: '', image: '', type: '' };
+    componentDidMount() {
+        this.loadData();
+        DeviceEventEmitter.addListener('adminPage1Reload', ()=>this.loadData());
+    }
     componentWillUnmount() { this.setState({ showAddTraining: false, showSearchClient: false, isLoading: true, isError: false, messageError: '', userList: [], refreshing: false, loadingView: false, loadingText: '', }); }
     goDetailsClient(idClient: string) {
         this.setState({ loadingView: true, loadingText: 'Cargando datos del usuario...' }, ()=>
             Account.admin_getUserData(idClient)
                 .then((dataUser)=>this.setState({ loadingView: false, loadingText: '', detailsClientView: true, detailsClientData: dataUser }))
+                .catch((error)=>this.setState({ loadingView: false, loadingText: '', errorView: true, errorTitle: 'Ocurrio un error', errorMessage: error.cause }))
+        );
+    }
+    deleteClient(idClient: string) {
+        this.setState({ loadingView: true, loadingText: 'Borrando información del cliente...' }, ()=>
+            Account.admin_delete(idClient)
+                .then(()=>this.setState({ loadingView: false, loadingText: '', showSnackBar: true, textSnackBar: 'Usuario borrado correctamente.', idActualDeleteClient: '' }, ()=>this.loadData()))
+                .catch((error)=>this.setState({ loadingView: false, loadingText: '', errorView: true, errorTitle: 'Ocurrio un error', errorMessage: error.cause }))
+        );
+    }
+    sendComment(comment: string) {
+        this.setState({ loadingView: true, loadingText: 'Enviando mensaje...' }, ()=>
+            Comment.admin_create(this.state.idActualSendComment, comment)
+                .then(()=>this.setState({ loadingView: false, loadingText: '', showSnackBar: true, textSnackBar: 'Comentario enviado correctamente.', idActualDeleteClient: '' }))
                 .catch((error)=>this.setState({ loadingView: false, loadingText: '', errorView: true, errorTitle: 'Ocurrio un error', errorMessage: error.cause }))
         );
     }
@@ -89,15 +121,41 @@ export default class Page1 extends Component<IProps, IState> {
                     refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={this.state.refreshing} onRefresh={()=>this.setState({ refreshing: true }, ()=>this.loadData())} />}
                     ListEmptyComponent={(this.state.isLoading)? <ShowLoading />: (this.state.isError)? <CustomShowError message={this.state.messageError} />: <></>}
                     ListHeaderComponent={<ButtonsHeaderList load={(this.state.isError)? false: !this.state.isLoading} click1={()=>this.setState({ showAddTraining: true })} click2={()=>this.setState({ showSearchClient: true })}/>}
-                    ListFooterComponent={<TouchableRipple onPress={()=>console.log('more')}><List.Item title={'Añadir nuevo usuario'} left={(props)=><List.Icon {...props} icon="account-plus" />} /></TouchableRipple>}
-                    renderItem={({ item, index })=><CustomItemList2 key={index} image={item.image} title={decode(item.name)} onPress={()=>this.goDetailsClient(item.id)} />}
+                    ListFooterComponent={(!this.state.isLoading)? <TouchableRipple onPress={()=>this.setState({ showAddNewUser: true })}><List.Item title={'Añadir nuevo usuario'} left={(props)=><List.Icon {...props} icon="account-plus" />} /></TouchableRipple>: <></>}
+                    renderItem={({ item, index })=><CustomItemList2
+                        key={index}
+                        image={item.image}
+                        title={decode(item.name)}
+                        onPress={()=>this.goDetailsClient(item.id)}
+                        actionDelete={()=>this.setState({ idActualDeleteClient: item.id, showQuestionDeleteUser: true })}
+                        actionComment={()=>this.setState({ idActualSendComment: item.id, showSendComment: true })}
+                    />}
                 />
+                <AddNewAccount show={this.state.showAddNewUser} close={()=>this.setState({ showAddNewUser: false })} />
+                <Snackbar visible={this.state.showSnackBar} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ showSnackBar: false })}><Text>{this.state.textSnackBar}</Text></Snackbar>
+                <DialogError show={this.state.errorView} close={()=>this.setState({ errorView: false })} title={this.state.errorTitle} message={this.state.errorMessage} />
+                <AddTraining show={this.state.showAddTraining} listUsers={this.state.userList} close={()=>this.setState({ showAddTraining: false })} />
+                <SearchClient show={this.state.showSearchClient} listUsers={this.state.userList} goDetailsClient={(idClient)=>this.goDetailsClient(idClient)} close={()=>this.setState({ showSearchClient: false })} />
+                <Global loadingView={this.state.loadingView} loadingText={this.state.loadingText} />
+                <ViewClietDetails show={this.state.detailsClientView} close={()=>this.setState({ detailsClientView: false })} completeClose={()=>this.setState({ detailsClientData: this.detailsClientDataDefault })} userData={this.state.detailsClientData} />
+                <Portal>
+                    <Dialog visible={this.state.showQuestionDeleteUser}>
+                        <Dialog.Title>¡¡Advertencia!!</Dialog.Title>
+                        <Dialog.Content>
+                            <Paragraph>{'¿Estás de acuerdo que quieres borrar este usuario junto a toda su información?\n\nEsta acción no se podrá deshacer luego de una vez realizada.'}</Paragraph>
+                        </Dialog.Content>
+                        <Dialog.Actions>
+                            <Button onPress={()=>this.setState({ showQuestionDeleteUser: false })}>Cancelar</Button>
+                            <Button onPress={()=>this.setState({ showQuestionDeleteUser: false }, ()=>this.deleteClient(this.state.idActualDeleteClient))}>Aceptar</Button>
+                        </Dialog.Actions>
+                    </Dialog>
+                    <SetCommentUser
+                        visible={this.state.showSendComment}
+                        close={()=>this.setState({ showSendComment: false, idActualSendComment: '' })}
+                        send={(text)=>this.setState({ showSendComment: false }, ()=>this.sendComment(text))}
+                    />
+                </Portal>
             </View>
-            <DialogError show={this.state.errorView} close={()=>this.setState({ errorView: false })} title={this.state.errorTitle} message={this.state.errorMessage} />
-            <AddTraining show={this.state.showAddTraining} listUsers={this.state.userList} close={()=>this.setState({ showAddTraining: false })} />
-            <SearchClient show={this.state.showSearchClient} listUsers={this.state.userList} goDetailsClient={(idClient)=>this.goDetailsClient(idClient)} close={()=>this.setState({ showSearchClient: false })} />
-            <Global loadingView={this.state.loadingView} loadingText={this.state.loadingText} />
-            <ViewClietDetails show={this.state.detailsClientView} close={()=>this.setState({ detailsClientView: false, detailsClientData: this.detailsClientDataDefault })} userData={this.state.detailsClientData} />
         </View>);
     }
 };

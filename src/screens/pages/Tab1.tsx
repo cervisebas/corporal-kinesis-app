@@ -1,8 +1,10 @@
-import React, { Component, PureComponent } from "react";
+import { decode, encode } from "base-64";
+import moment from "moment";
+import React, { Component } from "react";
 import { View, FlatList } from "react-native";
-import { Appbar, Button, Dialog, Divider, List, Menu, Portal, ProgressBar, Snackbar, Text } from "react-native-paper";
+import { Appbar, Divider, Menu, ProgressBar, Snackbar, Text } from "react-native-paper";
 import { NoComment } from "../../assets/icons";
-import { Training } from "../../scripts/ApiCorporal";
+import { Comment, Training } from "../../scripts/ApiCorporal";
 import { commentsData, DetailsTrainings, statisticData } from "../../scripts/ApiCorporal/types";
 import { LoadNow } from "../../scripts/Global";
 import CombinedTheme from "../../Theme";
@@ -12,6 +14,7 @@ import { Statistics } from "./statistics/statistic";
 
 type IProps = {
     showLoading: (show: boolean, text: string)=>any;
+    openOptions: ()=>any;
 };
 type IState = {
     visiblemenu: boolean;
@@ -46,8 +49,11 @@ export class Tab1 extends Component<IProps, IState> {
             dataComments: []
         };
     }
-    private loading = setInterval(()=>{ if (LoadNow) setTimeout(()=>this.goLoading(), 256) }, 512);
+    private timeLoad: number = 512;
+    private loading = setInterval(()=>{ if (LoadNow == true) setTimeout(()=>this.goLoading(), 256) }, this.timeLoad);
+    private _isMount: boolean = true;
     componentWillUnmount() {
+        this._isMount = false;
         this.setState({
             visiblemenu: false,
             showLoading: true,
@@ -56,7 +62,9 @@ export class Tab1 extends Component<IProps, IState> {
             titleStatistics: '',
             statistics: { singles: [], separate: { labels: [], values: [] } },
             dialogShow: false,
-            messageDialog: ''
+            messageDialog: '',
+            commentsLoading: true,
+            dataComments: []
         });
     }
     goStatistics(data: number, titleStatistics: string) {
@@ -80,22 +88,24 @@ export class Tab1 extends Component<IProps, IState> {
             clearInterval(this.loading);
         }).catch((error)=>{
             var reserve = { date: { value: 'n/a', status: -1 }, session_number: { value: 'n/a', status: -1 }, rds: { value: 'n/a', status: -1 }, rpe: { value: 'n/a', status: -1 }, pulse: { value: 'n/a', status: -1 }, repetitions: { value: 'n/a', status: -1 }, kilage: { value: 'n/a', status: -1 }, tonnage: { value: 'n/a', status: -1 } };
-            this.setState({
-                dataShow: reserve,
-                showLoading: false,
-                dialogShow: true,
-                messageDialog: error.cause
-            });
+            this.setState({ dataShow: reserve, showLoading: false, dialogShow: true, messageDialog: error.cause });
             clearInterval(this.loading);
+            var loadNow = LoadNow;
+            this.timeLoad *= 2;
+            this.loading = setInterval(()=>{ if (loadNow = true) setTimeout(()=>this.goLoading(), 256) }, this.timeLoad);
+        });
+        Comment.getAll().then((value)=>this.setState({ commentsLoading: false, dataComments: value })).catch((error)=>{
+            var commentError: commentsData[] = [{ id: '-1', id_training: '0', id_issuer: '1', comment: encode('Al parecer ocurrió un error al cargar los comentarios :(\n\nPor favor, vuelve a intentarlo actualizando la sección de estadísticas en el botón de tres puntos ubicado en la parte de arriba en la derecha de la aplicación, si el problema persiste comunícate con el equipo de Corporal Kinesis o vuelve a intentarlo más tarde.'), date: encode(moment(new Date()).format('DD/MM/YYYY')) }];
+            this.setState({ dialogShow: true, messageDialog: error.cause, dataComments: commentError, commentsLoading: false });
         });
     }
     render(): React.ReactNode {
-        return(<View style={{ flex: 2 }}>
+        return((this._isMount)? <View style={{ flex: 2 }}>
             <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
                 <Appbar.Content title="Estadísticas" />
                 <Menu visible={this.state.visiblemenu} onDismiss={()=>this.setState({ visiblemenu: false })} anchor={<Appbar.Action icon="dots-vertical" color={'#FFFFFF'} onPress={()=>this.setState({ visiblemenu: true })} />} >
-                    <Menu.Item onPress={()=>this.setState({ showLoading: true, visiblemenu: false }, ()=>this.goLoading())} title="Actualizar" icon={'refresh'} />
-                    <Menu.Item onPress={() => {}} title="Opciones" icon={'cog'} />
+                    <Menu.Item onPress={()=>this.setState({ showLoading: true, commentsLoading: true, visiblemenu: false }, ()=>this.goLoading())} title="Actualizar" icon={'refresh'} />
+                    <Menu.Item onPress={()=>this.setState({ visiblemenu: false }, ()=>this.props.openOptions())} title="Opciones" icon={'cog'} />
                     <Divider />
                     <Menu.Item onPress={() => {}} title="¿Qué es esto?" icon={'information-outline'} />
                 </Menu>
@@ -104,7 +114,12 @@ export class Tab1 extends Component<IProps, IState> {
                 data={this.state.dataComments}
                 ListHeaderComponent={<HeaderStatistics dataShow={this.state.dataShow} showLoading={this.state.showLoading} goStatistics={(data, title)=>this.goStatistics(data, title)} />}
                 ListEmptyComponent={()=>(!this.state.commentsLoading)? <EmptyListComments message={'No hay comentarios para mostrar'} icon={<NoComment width={96} height={96} />} style={{ marginTop: 32 }} />: <View><ProgressBar indeterminate={true} /></View>}
-                renderItem={({ index })=><CustomCardComments key={index} accountName="Nombre y apellido" date="12/05/2022 15:23 hs" comment="Proident veniam labore anim dolore eiusmod enim esse non ipsum consequat officia pariatur pariatur. Enim in dolor laboris deserunt duis. Nisi dolor incididunt eu ullamco est magna minim et officia enim dolore esse. Lorem sint officia minim minim. Ad consectetur aliqua ut proident nostrud elit excepteur cupidatat deserunt incididunt." />}
+                renderItem={({ item, index })=><CustomCardComments
+                    key={index}
+                    accountName={'Equipo Corporal Kinesis'}
+                    date={decode(item.date)}
+                    comment={decode(item.comment)}
+                />}
             />
             <Statistics
                 visible={this.state.visibleStatistics}
@@ -121,6 +136,6 @@ export class Tab1 extends Component<IProps, IState> {
                 action={{ label: 'Aceptar', onPress: ()=>this.setState({ dialogShow: false }) }}>
                 <Text>{this.state.messageDialog}</Text>
             </Snackbar>
-        </View>);
+        </View>: <></>);
     }
 };

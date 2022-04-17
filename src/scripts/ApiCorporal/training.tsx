@@ -48,6 +48,10 @@ export default class TrainingSystem {
                         var datas: trainingData = value.data;
                         if (datas.ok) {
                             var trainings: any = datas.trainings;
+                            if (trainings.length == 0) {
+                                var results = { date: { value: 'Sin datos', status: -1 }, session_number: { value: 'Sin datos', status: -1 }, rds: { value: 'Sin datos', status: -1 }, rpe: { value: 'Sin datos', status: -1 }, pulse: { value: 'Sin datos', status: -1 }, repetitions: { value: 'Sin datos', status: -1 }, kilage: { value: 'Sin datos', status: -1 }, tonnage: { value: 'Sin datos', status: -1 } };
+                                return resolve(results);
+                            }
                             var results: DetailsTrainings = {
                                 date: { value: decode(trainings[trainings.length - 1].date), status: -1 },
                                 session_number: { value: decode(trainings[trainings.length - 1].session_number), status: -1 },

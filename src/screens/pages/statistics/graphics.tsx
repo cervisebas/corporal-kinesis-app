@@ -11,7 +11,7 @@ type IProps = {
 };
 type IState = {};
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 export default class Graphic extends PureComponent<IProps, IState> {
     constructor(props: IProps) {

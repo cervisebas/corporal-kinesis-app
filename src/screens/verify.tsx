@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { View, Modal, ImageBackground, StyleSheet, Dimensions } from "react-native";
-import { Text, Provider as PaperProvider, ActivityIndicator } from "react-native-paper";
+import { Text, Provider as PaperProvider } from "react-native-paper";
 import CombinedTheme from "../Theme";
 import Logo from '../assets/logo3.svg';
 
@@ -20,7 +20,14 @@ export class VerifyScreen extends Component<IProps, IState> {
             overflowText: ''
         };
     }
-    private animOverText = setInterval(()=>this.setState({ overflowText: (this.state.overflowText.length == 0)? '.': (this.state.overflowText.length == 1)? '..': (this.state.overflowText.length == 2)? '...': '' }), 512);
+    private animOverText: any = 0;
+    componentDidMount() {
+        this.animOverText = setInterval(()=>this.setState({ overflowText: (this.state.overflowText.length == 0)? '.': (this.state.overflowText.length == 1)? '..': (this.state.overflowText.length == 2)? '...': '' }), 512);
+    }
+    componentWillUnmount() {
+        clearInterval(this.animOverText);
+        this.setState({ overflowText: '' });
+    }
     render(): React.ReactNode {
         return(<Modal visible={this.props.visible} animationType={'none'} hardwareAccelerated={true} transparent={false}>
             <PaperProvider theme={CombinedTheme}>

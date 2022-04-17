@@ -2,7 +2,6 @@ import { Picker } from "@react-native-picker/picker";
 import React, { PureComponent } from "react";
 import { View, Text, StyleProp, ViewStyle } from "react-native";
 import { TouchableRipple } from "react-native-paper";
-import Animated from "react-native-reanimated";
 
 type IProps = {
     style?: StyleProp<ViewStyle>;
@@ -32,7 +31,7 @@ export class CustomPicker1 extends PureComponent<IProps, IState> {
                 onPress={()=>(!this.props.disabled)? this.ref?.focus(): null}
                 onPressIn={()=>(!this.props.disabled)? this.setState({ indexColors: 1 }): null}
                 onPressOut={()=>(!this.props.disabled)? this.setState({ indexColors: 0 }): null}
-                style={[this.props.style, { borderRadius: 4, borderColor: (!this.props.disabled)? this.state.colorsClick[this.state.indexColors]: 'rgba(255, 255, 255, 0.30)', borderWidth: 1.5, paddingTop: 8 }]}>
+                style={[this.props.style, { borderRadius: 4, borderColor: (!this.props.disabled)? this.state.colorsClick[this.state.indexColors]: 'rgba(255, 255, 255, 0.30)', borderWidth: 1.5, paddingTop: 8, overflow: 'hidden' }]}>
             <View>
                 <Text style={{ marginLeft: 8, color: (!this.props.disabled)? '#FFFFFF': 'rgba(255, 255, 255, 0.30)' }}>{this.props.title}</Text>
                 <Picker
@@ -87,7 +86,7 @@ export class CustomPicker2 extends PureComponent<IProps, IState2> {
                 disabled={this.props.disabled}
                 onPressIn={()=>(!this.props.disabled)? this.setState({ indexColors: 1 }): null}
                 onPressOut={()=>(!this.props.disabled)? this.setState({ indexColors: 0 }): null}
-                style={[this.props.style, { borderRadius: 4, borderColor: (!this.props.disabled)? this.state.colorsClick[this.state.indexColors]: 'rgba(255, 255, 255, 0.25)', borderWidth: 1.5 }]}>
+                style={[this.props.style, { borderRadius: 4, borderColor: (!this.props.disabled)? this.state.colorsClick[this.state.indexColors]: 'rgba(255, 255, 255, 0.25)', borderWidth: 1.5, overflow: 'hidden' }]}>
             <View onLayout={(layout)=>this.setState({ widthMax: layout.nativeEvent.layout.width })} style={{ flex: 3, flexDirection: 'row', alignItems: 'center' }}>
                 <Text onLayout={(layout)=>this.setState({ widthText: layout.nativeEvent.layout.width })} style={{ marginLeft: 8, marginRight: 12, color: (!this.props.disabled)? '#FFFFFF': 'rgba(255, 255, 255, 0.25)' }}>{this.props.title}</Text>
                 <Picker

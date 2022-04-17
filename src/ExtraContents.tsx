@@ -29,8 +29,11 @@ export class ExtraContents extends Component<IProps, IState> {
             textLoading: ''
         };
     }
-    showLoading() {
-
+    componentWillUnmount() {
+        this.setState({
+            viewLoading: false,
+            textLoading: ''
+        });
     }
     render(): React.ReactNode {
         return(<View>

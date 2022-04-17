@@ -1,18 +1,18 @@
-import React, { Component, PureComponent } from "react";
-import { Dimensions, View, Modal, StyleSheet } from "react-native";
-import { Appbar, Button, Text, TextInput, TouchableRipple, Provider as PaperProvider, Portal, Dialog, Snackbar } from "react-native-paper";
+import React, { Component } from "react";
+import { Dimensions, View, StyleSheet, ToastAndroid, Pressable } from "react-native";
+import { Appbar, Button, Text, TextInput, Provider as PaperProvider, Portal, Dialog, Snackbar, Paragraph } from "react-native-paper";
 import { Picker } from '@react-native-picker/picker';
-import Settings from "../../../Settings";
 import CombinedTheme from "../../../Theme";
 import { ScrollView } from "react-native-gesture-handler";
 import { CustomPicker1, CustomPicker2 } from "../../components/CustomPicker";
 import { dataListUsers } from "../../../scripts/ApiCorporal/types";
-import { decode, encode } from "base-64";
+import { decode } from "base-64";
 import DatePicker from "react-native-date-picker";
 import moment from "moment";
 import { Training } from "../../../scripts/ApiCorporal";
+import CustomModal from "../../components/CustomModal";
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 type IProps = {
     show: boolean;
@@ -71,6 +71,7 @@ export default class AddTraining extends Component<IProps, IState> {
         }
     }
     closeModal() {
+        if (this.state.isSendResults) return ToastAndroid.show('Espere...', ToastAndroid.SHORT);
         this.setState({
             rds: '5',
             rpe: '5',
@@ -83,7 +84,7 @@ export default class AddTraining extends Component<IProps, IState> {
     }
     sendResults() {
         this.setState({ isSendResults: true });
-        Training.create(this.state.clientId, this.state.dateActual, this.state.rds, this.state.rpe, this.state.pulse, this.state.repetitions, this.state.kilage, this.state.tonnage).then((value)=>this.setState({
+        Training.create(this.state.clientId, this.state.dateActual, this.state.rds, this.state.rpe, this.state.pulse, this.state.repetitions, this.state.kilage, this.state.tonnage).then(()=>this.setState({
             isSendResults: false,
             successShow: true,
             rds: '5',
@@ -101,10 +102,8 @@ export default class AddTraining extends Component<IProps, IState> {
             messageError: error.cause
         }));
     }
-    static contextType = Settings;
     render(): React.ReactNode {
-        const { getSettings } = this.context;
-        return(<Modal visible={this.props.show} transparent={false} hardwareAccelerated={true} animationType={getSettings.animations} onRequestClose={()=>this.closeModal()}>
+        return(<CustomModal visible={this.props.show} onRequestClose={()=>this.closeModal()}>
             <PaperProvider theme={CombinedTheme}>
                 <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background }}>
                     <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
@@ -117,15 +116,16 @@ export default class AddTraining extends Component<IProps, IState> {
                                 style={styles.textInput}
                                 mode={'outlined'}
                                 label={'Fecha de carga'}
-                                disabled
+                                disabled={this.state.isSendResults}
+                                editable={false}
                                 right={<TextInput.Icon name="calendar-range" disabled={this.state.isSendResults} onPress={()=>this.setState({ viewDialogDate: true })} />}
                                 value={this.state.dateActual}/>
-                            <CustomPicker2 disabled={this.state.isSendResults} style={{ width: Math.floor(width - 24), margin: 8, marginTop: 0 }} title={"Cliente:"} value={this.state.clientId} onChange={(value)=>this.setState({ clientId: value })}>
+                            <CustomPicker2 disabled={this.state.isSendResults} style={{ width: Math.floor(width - 24), margin: 8 }} title={"Cliente:"} value={this.state.clientId} onChange={(value)=>this.setState({ clientId: value })}>
                                 {this.props.listUsers.map((value, index)=>{
-                                    return(<Picker.Item label={decode(value.name)} value={value.id} key={index} />);
+                                    return(<Picker.Item label={`${index+1} - ${decode(value.name)}`} value={value.id} key={index} />);
                                 })}
                             </CustomPicker2>
-                            <View style={{ flexDirection: 'row' }}>
+                            <View style={{ flexDirection: 'row', marginTop: 8, marginBottom: 8 }}>
                                 <CustomPicker1 disabled={this.state.isSendResults} title={'RDS'} value={this.state.rds} onChange={(value)=>this.setState({ rds: value })} style={{ width: Math.floor((width / 2) - 20), marginLeft: 8, marginRight: 8 }} />
                                 <CustomPicker1 disabled={this.state.isSendResults} title={'RPE'} value={this.state.rpe} onChange={(value)=>this.setState({ rpe: value })} style={{ width: Math.floor((width / 2) - 20), marginLeft: 8, marginRight: 8 }} />
                             </View>
@@ -153,17 +153,20 @@ export default class AddTraining extends Component<IProps, IState> {
                                 value={this.state.kilage}
                                 disabled={this.state.isSendResults}
                                 onChangeText={(text)=>this.setState({ kilage: (text.length == 0)? '0': text.replace(/\ /gi, '') }, ()=>this.startCalculate())} />
-                            <TextInput
-                                style={styles.textInput}
-                                mode={'outlined'}
-                                label={'Tonelaje'}
-                                disabled
-                                value={this.state.tonnage} />
+                            <Pressable onPress={()=>ToastAndroid.show('Este campo es automático, no hace falta editarlo.', ToastAndroid.SHORT)}>
+                                <TextInput
+                                    style={styles.textInput}
+                                    mode={'outlined'}
+                                    label={'Tonelaje'}
+                                    disabled={this.state.isSendResults}
+                                    editable={false}
+                                    value={this.state.tonnage} />
+                            </Pressable>
                             <Button
                                 loading={this.state.isSendResults}
-                                mode={'contained'} 
+                                mode={'contained'}
                                 style={{ width: (width / 2), marginTop: 8 }}
-                                onPress={()=>this.sendResults()}>Guardar</Button>
+                                onPress={()=>(!this.state.isSendResults)? this.sendResults(): ToastAndroid.show('Espere...', ToastAndroid.SHORT)}>Guardar</Button>
                             {(this.state.isSendResults) && <Text style={{ marginTop: 16 }}>Enviando resultados...</Text>}
                         </View>
                     </ScrollView>
@@ -189,7 +192,7 @@ export default class AddTraining extends Component<IProps, IState> {
                     <Dialog visible={this.state.showError} dismissable={true} onDismiss={()=>this.setState({ showError: false })}>
                         <Dialog.Title>Ocurrio un error</Dialog.Title>
                         <Dialog.Content>
-                            <Text>{this.state.messageError}</Text>
+                            <Paragraph>{this.state.messageError}</Paragraph>
                         </Dialog.Content>
                         <Dialog.Actions>
                             <Button onPress={()=>this.setState({ showError: false })}>Aceptar</Button>
@@ -200,7 +203,7 @@ export default class AddTraining extends Component<IProps, IState> {
                     <Text>Carga realizada correctamente.</Text>
                 </Snackbar>
             </PaperProvider>
-        </Modal>);
+        </CustomModal>);
     }
 };
 

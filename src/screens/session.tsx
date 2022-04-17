@@ -1,13 +1,15 @@
 import { decode } from "base-64";
 import moment from "moment";
 import React, { Component } from "react";
-import { Dimensions, KeyboardAvoidingView, Modal, StyleSheet, View } from "react-native";
+import { DeviceEventEmitter, Dimensions, KeyboardAvoidingView, Modal, StyleSheet, View } from "react-native";
 import DatePicker from "react-native-date-picker";
 import { Button, Dialog, Paragraph, Portal, Provider as PaperProvider, Text, TextInput } from "react-native-paper";
 import SplashScreen from "react-native-splash-screen";
 import { Logo } from "../assets/icons";
 import { Account } from "../scripts/ApiCorporal";
+import { setLoadNow } from "../scripts/Global";
 import CombinedTheme from "../Theme";
+import CustomModal from "./components/CustomModal";
 
 type IProps = {
     visible: boolean;
@@ -189,12 +191,14 @@ export class Session extends Component<IProps, IState> {
             setTimeout(()=>{
                 this.props.setLoading(true, `Accediendo como "${email.slice(0, 5)}...${email.slice(email.indexOf('@'), email.length)}"...`);
                 SplashScreen.show();
+                setLoadNow(true);
+                DeviceEventEmitter.emit('nowVerify');
+                setTimeout(()=>{
+                    this.props.setLoading(false, '');
+                    this.props.close();
+                    setTimeout(()=>SplashScreen.hide(), 128);
+                }, 2048);
             }, 128);
-            setTimeout(()=>{
-                this.props.setLoading(false, '');
-                this.props.close();
-                setTimeout(()=>SplashScreen.hide(), 128);
-            }, 2176);
         }).catch((data)=>{
             this.props.setLoading(false, '');
             this.setState({
@@ -205,9 +209,9 @@ export class Session extends Component<IProps, IState> {
         });
     }
     render(): React.ReactNode {
-        return(<Modal visible={this.props.visible} onDismiss={()=>this.closeModal()} onRequestClose={()=>this.props.close()} animationType={'none'} hardwareAccelerated={true} transparent={false}>
+        return(<CustomModal visible={this.props.visible} animationIn={'fadeIn'} animationOut={'fadeOut'}>
             <PaperProvider theme={CombinedTheme}>
-                <KeyboardAvoidingView behavior={'height'} keyboardVerticalOffset={0}>
+                <KeyboardAvoidingView style={{ flex: 1 }} behavior={'height'} keyboardVerticalOffset={0}>
                     <View style={styles.contain}>
                         {(this.state.viewPanel == 1)? <View style={styles.card}>
                             <Logo width={128} height={128} />
@@ -350,7 +354,7 @@ export class Session extends Component<IProps, IState> {
                     </Dialog>
                 </Portal>
             </PaperProvider>
-        </Modal>);
+        </CustomModal>);
     }
 }
 

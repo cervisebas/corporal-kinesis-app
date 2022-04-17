@@ -123,7 +123,7 @@ class CustomCard2 extends PureComponent<IProps5> {
     }
 }
 
-type IProps6 = { title: string; image: string; onPress: ()=>any; };
+type IProps6 = { title: string; image: string; onPress: ()=>any; actionDelete: ()=>any; actionComment: ()=>any; };
 type IState6 = { viewMenu: boolean; };
 class CustomItemList2 extends PureComponent<IProps6, IState6> {
     constructor(props: IProps6) {
@@ -142,8 +142,8 @@ class CustomItemList2 extends PureComponent<IProps6, IState6> {
                     onDismiss={()=>this.setState({ viewMenu: false })}
                     anchor={<IconButton onPress={()=>this.setState({ viewMenu: true })} icon={'dots-vertical'} />}>
                     <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.onPress())} title={"Ver perfil"} />
-                    <Menu.Item onPress={()=>{}} title={"Dejar comentario"} />
-                    <Menu.Item style={{ backgroundColor: Colors.red500 }} onPress={()=>{}} title={"Eliminar"} />
+                    <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionComment())} title={"Dejar comentario"} />
+                    <Menu.Item style={{ backgroundColor: Colors.red500 }} onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionDelete())} title={"Eliminar"} />
                 </Menu>}
             />
         </TouchableRipple>);

@@ -1,5 +1,7 @@
 import { encode } from "base-64";
 import AccountSystem from "./ApiCorporal/accounts";
+import CommentSystem from "./ApiCorporal/comments";
+import PermissionSystem from "./ApiCorporal/permissions";
 import TrainingSystem from "./ApiCorporal/training";
 
 const HostServer: string = 'http://192.168.1.36/CorporalKinesisApi';
@@ -8,9 +10,13 @@ const keyAccess: string = encode('pFQVXt&yC%aa8e-^&cY4FRtXm&s87$6%3+6D+REGK4bQNL
 
 const Account = new AccountSystem(HostServer, keyAccess);
 const Training = new TrainingSystem(HostServer, keyAccess);
+const Permission = new PermissionSystem(HostServer, keyAccess);
+const Comment = new CommentSystem(HostServer, keyAccess);
 
 export {
     HostServer,
     Account,
-    Training
+    Training,
+    Permission,
+    Comment
 };

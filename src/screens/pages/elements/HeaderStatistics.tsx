@@ -11,7 +11,6 @@ type IProps = {
 };
 type IState = {
     loadAnimation: string;
-    unmount: boolean;
 };
 
 const { width } = Dimensions.get('window');
@@ -21,15 +20,24 @@ export default class HeaderStatistics extends PureComponent<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
-            loadAnimation: 'Cargando',
-            unmount: false
+            loadAnimation: 'Cargando'
         };
-        setInterval(()=>this.setState({ loadAnimation: (this.state.loadAnimation.length == 8)? 'Cargando.': (this.state.loadAnimation.length == 9)? 'Cargando..': (this.state.loadAnimation.length == 10)? 'Cargando...': 'Cargando' }), 256);
     }
+    private animText: any = 0;
     private styleCard: StyleProp<ViewStyle> = { width: percent(width, 50) - 18, marginTop: 18, backgroundColor: '#ED7035', height: 96 };
+    private _isMount: boolean = true;
+    componentDidMount() {
+        this._isMount = true;
+        this.animText = setInterval(()=>this.setState({ loadAnimation: (this.state.loadAnimation.length == 8)? 'Cargando.': (this.state.loadAnimation.length == 9)? 'Cargando..': (this.state.loadAnimation.length == 10)? 'Cargando...': 'Cargando' }), 256);
+    }
+    componentWillUnmount() {
+        this._isMount = false;
+        clearInterval(this.animText);
+        this.setState({ loadAnimation: 'Cargando' });
+    }
     render(): ReactNode {
         return(<>
-            {(!this.state.unmount)?<View style={{ flexDirection: 'column' }}>
+            {(this._isMount)?<View style={{ flexDirection: 'column' }}>
                 <View style={{ ...styles.cardRowContent, width: width }}>
                     <View style={styles.cardContents}>
                         <CustomCard1 style={this.styleCard} title={'RDS'} status={(this.props.showLoading)? -5: this.props.dataShow.rds.status} value={(this.props.showLoading)? this.state.loadAnimation: this.props.dataShow.rds.value} onPress={()=>this.props.goStatistics(3, 'RDS')} />

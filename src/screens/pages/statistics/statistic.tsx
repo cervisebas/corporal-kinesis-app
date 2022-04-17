@@ -1,13 +1,13 @@
 import React, { Component } from "react";
-import { Dimensions, FlatList, Modal, StatusBar, StyleSheet, View } from "react-native";
-import { Appbar, Colors, List, ProgressBar, Provider as PaperProvider, Text, Title } from 'react-native-paper';
+import { Dimensions, FlatList, StatusBar, StyleSheet, View } from "react-native";
+import { Appbar, Colors, ProgressBar, Provider as PaperProvider, Text } from 'react-native-paper';
 import CombinedTheme from "../../../Theme";
 import { statisticData } from "../../../scripts/ApiCorporal/types";
 import { getNavigationBarHeight } from "react-native-android-navbar-height";
 import { Alert, NoList } from "../../../assets/icons";
 import Graphic from "./graphics";
 import { CustomItemList, EmptyListComments } from "../../components/Components";
-import Settings from "../../../Settings";
+import CustomModal from "../../components/CustomModal";
 
 const { width, height } = Dimensions.get("window");
 
@@ -26,7 +26,6 @@ type IState = {
 export class Statistics extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
-        this.flatListRef = React.createRef();
         this.state = {
             navBarHeight: 0,
             dataView: [],
@@ -34,9 +33,15 @@ export class Statistics extends Component<IProps, IState> {
             isLoadingGraphics: true
         };
     }
-    private flatListRef: React.RefObject<FlatList>;
-    static contextType = Settings;
 
+    componentWillUnmount() {
+        this.setState({
+            navBarHeight: 0,
+            dataView: [],
+            isLoading: true,
+            isLoadingGraphics: true
+        });
+    }
     loadData() {
         this.setState({ dataView: this.props.datas.singles.map(()=>({ label: '', value: '', icon: '', color: '' })) }, ()=>{
             var datas: { label: string; value: string; icon: string; color: string; }[] = [];
@@ -65,9 +70,8 @@ export class Statistics extends Component<IProps, IState> {
     listEmptyComponent(props: { isLoading: boolean }) { return(<View>{(!props.isLoading)? <EmptyListComments icon={<NoList width={96} height={96} />} message={'La lista esta vacía'} />: <View><ProgressBar indeterminate={true} /></View>}</View>); }
 
     render(): React.ReactNode {
-        const { getSettings } = this.context;
         this.getNavBarHeight();
-        return(<Modal visible={this.props.visible} transparent={false} hardwareAccelerated={true} animationType={getSettings.animations} onShow={()=>this.loadData()} onRequestClose={()=>this.resetDataAndClose()}>
+        return(<CustomModal visible={this.props.visible} onShow={()=>this.loadData()} onRequestClose={()=>this.resetDataAndClose()}>
             <PaperProvider theme={CombinedTheme}>
                 <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background, height, width }}>
                     <Appbar style={{ backgroundColor: '#1663AB', height: 56 }}>
@@ -79,7 +83,6 @@ export class Statistics extends Component<IProps, IState> {
                             data={this.state.dataView}
                             ListHeaderComponent={<Graphic datas={this.props.datas} isLoading={this.state.isLoadingGraphics} />}
                             ListEmptyComponent={<this.listEmptyComponent isLoading={this.state.isLoading} />}
-                            ref={this.flatListRef}
                             renderItem={({ item, index })=><CustomItemList key={index} value={item.value} label={item.label} icon={item.icon} color={item.color} loading={this.state.isLoading} />}
                         />
                     </View> : <View style={{ ...styles.contentError, width: width, height: (height - 56 - parseFloat(String(StatusBar.currentHeight)) - this.state.navBarHeight) }}>
@@ -90,7 +93,7 @@ export class Statistics extends Component<IProps, IState> {
                     </View>}
                 </View>
             </PaperProvider>
-        </Modal>);
+        </CustomModal>);
     }
 };
 

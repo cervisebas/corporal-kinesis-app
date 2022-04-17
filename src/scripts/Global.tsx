@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-import { View } from "react-native";
-import { Button, Dialog, Paragraph, Portal, Text } from "react-native-paper";
 import LoadingController from "../components/loading/loading-controller";
 import CombinedTheme from "../Theme";
 

@@ -1,12 +1,12 @@
 import { decode } from "base-64";
 import moment from "moment";
 import React, { Component, PureComponent, ReactNode } from "react";
-import { Dimensions, Image, Linking, Modal, StyleSheet, View } from "react-native";
-import { Appbar, Provider as PaperProvider, Divider, Text, Card, IconButton, Title, Button } from "react-native-paper";
+import { Dimensions, Image, Linking, StyleSheet, View } from "react-native";
+import { Appbar, Provider as PaperProvider, Divider, Text, Card, IconButton, Button } from "react-native-paper";
 import { HostServer } from "../../../scripts/ApiCorporal";
 import { userData } from "../../../scripts/ApiCorporal/types";
-import Settings from "../../../Settings";
 import CombinedTheme from "../../../Theme";
+import CustomModal from "../../components/CustomModal";
 
 const { width } = Dimensions.get('window');
 
@@ -14,16 +14,13 @@ type IProps = {
     show: boolean;
     close: ()=>any;
     userData: userData;
+    completeClose: ()=>any;
 };
 type IState = {};
 
 export default class ViewClietDetails extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
-    }
-    static contextType = Settings;
-    closeModal() {
-        this.props.close();
     }
     calcYears(date: string): string {
         var dateNow = new Date();
@@ -34,12 +31,11 @@ export default class ViewClietDetails extends Component<IProps, IState> {
         return String(years);
     }
     render(): ReactNode {
-        const { getSettings } = this.context;
-        return(<Modal visible={this.props.show} transparent={false} hardwareAccelerated={true} animationType={getSettings.animations} onRequestClose={()=>this.closeModal()}>
+        return(<CustomModal visible={this.props.show} onClose={()=>this.props.completeClose()} onRequestClose={()=>this.props.close()}>
             <PaperProvider theme={CombinedTheme}>
                 <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background }}>
                     <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
-                        <Appbar.BackAction onPress={()=>this.closeModal()} />
+                        <Appbar.BackAction onPress={()=>this.props.close()} />
                         <Appbar.Content title={decode(this.props.userData.name)} />
                     </Appbar.Header>
                     <View style={{ flex: 2 }}>
@@ -68,7 +64,7 @@ export default class ViewClietDetails extends Component<IProps, IState> {
                         </View>
                         <Divider />
                         <View>
-                            <Card style={{ margin: 16 }}>
+                            <Card style={{ margin: 16, display: (this.props.userData.type == '1')? 'flex': 'none' }}>
                                 <Card.Title title="Medios de contacto:" />
                                 <Card.Content>
                                     <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 12 }}>
@@ -79,14 +75,14 @@ export default class ViewClietDetails extends Component<IProps, IState> {
                                     </View>
                                 </Card.Content>
                             </Card>
-                            <Button icon={'dumbbell'} mode={'contained'} style={{ marginLeft: 16, marginRight: 16 }} labelStyle={{ color: '#FFFFFF' }}>
+                            <Button icon={'dumbbell'} mode={'contained'} style={{ marginLeft: 16, marginRight: 16, marginTop: (this.props.userData.type == '1')? 0: 16 }} labelStyle={{ color: '#FFFFFF' }}>
                                 Ver rendimiento
                             </Button>
                         </View>
                     </View>
                 </View>
             </PaperProvider>
-        </Modal>);
+        </CustomModal>);
     }
 };
 const styles = StyleSheet.create({

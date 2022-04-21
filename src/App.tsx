@@ -3,7 +3,7 @@ import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SystemNavigationBar from "react-native-system-navigation-bar";
-import { DeviceEventEmitter, StatusBar, View } from 'react-native';
+import { DeviceEventEmitter, Linking, StatusBar, View } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import Client from './screens/client';
 import Profesional from './screens/profesional';
@@ -15,6 +15,7 @@ import { setLoadNow } from './scripts/Global';
 import DeviceInfo from "react-native-device-info";
 import { decode } from 'base-64';
 import { getNavigationBarHeight } from 'react-native-android-navbar-height';
+import VersionCheck from 'react-native-version-check';
 
 type IProps = {};
 type IState = {
@@ -55,6 +56,7 @@ export default class App extends Component<IProps, IState> {
         this.verifyAccount();
         setTimeout(async() =>(await DeviceInfo.getApiLevel() < 26) && this.setState({ marginTop: StatusBar.currentHeight || 24, marginBottom: await getNavigationBarHeight() }));
         DeviceEventEmitter.addListener('nowVerify', ()=>this.verifyAccount());
+        VersionCheck.needUpdate({ ignoreErrors: true }).then((value)=>(value.isNeeded)&&Linking.openURL(value.storeUrl));
     }
     componentWillUnmount() {
         setLoadNow(false);

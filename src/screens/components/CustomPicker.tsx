@@ -25,6 +25,14 @@ export class CustomPicker1 extends PureComponent<IProps, IState> {
         };
     }
     private ref: Picker<string> | null = null;
+    componentWillUnmount() {
+        this.ref = null;
+        this.setState({
+            colorsClick: ['rgba(255, 255, 255, 0.5)', 'rgba(237, 112, 53, 1)'],
+            borderClick: ['#FFFFFF', '#ED7035'],
+            indexColors: 0
+        });
+    }
     render(): React.ReactNode {
         return(<TouchableRipple
                 disabled={this.props.disabled}
@@ -80,6 +88,16 @@ export class CustomPicker2 extends PureComponent<IProps, IState2> {
         };
     }
     private ref: Picker<string> | null = null;
+    componentWillUnmount() {
+        this.ref = null;
+        this.setState({
+            colorsClick: ['rgba(255, 255, 255, 0.5)', 'rgba(237, 112, 53, 1)'],
+            borderClick: ['#FFFFFF', '#ED7035'],
+            indexColors: 0,
+            widthMax: 0,
+            widthText: 0
+        });
+    }
     render(): React.ReactNode {
         return(<TouchableRipple
                 onPress={()=>(!this.props.disabled)? this.ref?.focus(): null}

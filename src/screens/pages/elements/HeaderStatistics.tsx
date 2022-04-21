@@ -32,6 +32,7 @@ export default class HeaderStatistics extends PureComponent<IProps, IState> {
     }
     componentWillUnmount() {
         this._isMount = false;
+        this.animText = 0;
         clearInterval(this.animText);
         this.setState({ loadAnimation: 'Cargando' });
     }

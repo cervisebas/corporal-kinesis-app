@@ -56,12 +56,16 @@ export default class AddNewAccount extends Component<IProps, IState> {
     }
     closeModal() {
         if (this.state.isLoading) return ToastAndroid.show('Espere...', ToastAndroid.SHORT);
+        this.props.close();
         this.setState({
             name: '',
             dni: '',
             date: moment(new Date()).format('DD/MM/YYYY'),
-            actualDate: new Date()
-        }, ()=>this.props.close());
+            actualDate: new Date(),
+            alertName: false,
+            alertDni: false,
+            alertDate: false,
+        });
     }
     calcYears(date: string): number {
         var dateProcess = moment(date, 'DD/MM/YYYY').toDate();

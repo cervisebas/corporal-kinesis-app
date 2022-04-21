@@ -135,9 +135,9 @@ export default class Page1 extends Component<IProps, IState> {
                 <Snackbar visible={this.state.showSnackBar} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ showSnackBar: false })}><Text>{this.state.textSnackBar}</Text></Snackbar>
                 <DialogError show={this.state.errorView} close={()=>this.setState({ errorView: false })} title={this.state.errorTitle} message={this.state.errorMessage} />
                 <AddTraining show={this.state.showAddTraining} listUsers={this.state.userList} close={()=>this.setState({ showAddTraining: false })} />
-                <SearchClient show={this.state.showSearchClient} listUsers={this.state.userList} goDetailsClient={(idClient)=>this.goDetailsClient(idClient)} close={()=>this.setState({ showSearchClient: false })} />
+                <SearchClient show={this.state.showSearchClient} listUsers={this.state.userList} goDetailsClient={(idClient)=>this.goDetailsClient(idClient)} close={()=>this.setState({ showSearchClient: false })} showLoading={(visible, message, after)=>this.setState({ loadingView: visible, loadingText: message }, ()=>(after)&&after())} showSnackOut={(text)=>this.setState({ showSnackBar: true, textSnackBar: text })} />
                 <Global loadingView={this.state.loadingView} loadingText={this.state.loadingText} />
-                <ViewClietDetails show={this.state.detailsClientView} close={()=>this.setState({ detailsClientView: false })} completeClose={()=>this.setState({ detailsClientData: this.detailsClientDataDefault })} userData={this.state.detailsClientData} />
+                <ViewClietDetails show={this.state.detailsClientView} close={()=>this.setState({ detailsClientView: false })} completeClose={()=>setTimeout(()=>this.setState({ detailsClientData: this.detailsClientDataDefault }), 300)} userData={this.state.detailsClientData} />
                 <Portal>
                     <Dialog visible={this.state.showQuestionDeleteUser}>
                         <Dialog.Title>¡¡Advertencia!!</Dialog.Title>

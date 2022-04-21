@@ -37,6 +37,16 @@ export default class Options extends Component<IProps, IState> {
             showDialog: false
         };
     }
+    componentWillUnmount() {
+        this.setState({
+            userInfo: {
+                name: 'Cargando información...',
+                image: ''
+            },
+            loading: false,
+            showDialog: false
+        });
+    }
     loadInfo() {
         AsyncStorage.getItem('account_session').then((value)=>{
             var datas: storageData = JSON.parse(decode(String(value)));

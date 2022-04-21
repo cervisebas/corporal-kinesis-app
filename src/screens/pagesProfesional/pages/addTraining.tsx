@@ -78,7 +78,15 @@ export default class AddTraining extends Component<IProps, IState> {
             pulse: '0',
             repetitions: '0',
             kilage: '0',
-            tonnage: '0'
+            tonnage: '0',
+            clientId: '1',
+            date: new Date(),
+            dateActual: moment(new Date()).format('DD/MM/YYYY'),
+            viewDialogDate: false,
+            isSendResults: false,
+            showError: false,
+            messageError: '',
+            successShow: false
         });
         return this.props.close();
     }

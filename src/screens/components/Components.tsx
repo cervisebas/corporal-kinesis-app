@@ -2,6 +2,7 @@ import { decode } from "base-64";
 import React, { PureComponent } from "react";
 import { StyleProp, View, ViewStyle } from "react-native";
 import { Avatar, Card, Colors, Text, IconButton, Paragraph, Title, List, Menu, Divider, TouchableRipple } from "react-native-paper";
+import { AvatarImageSource } from "react-native-paper/lib/typescript/components/Avatar/AvatarImage";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { HostServer } from "../../scripts/ApiCorporal";
@@ -36,6 +37,7 @@ type IProps1 = {
     accountName: string;
     date: string;
     comment: string;
+    source: AvatarImageSource;
 };
 class CustomCardComments extends PureComponent<IProps1> {
     constructor(props: IProps1) {
@@ -48,7 +50,8 @@ class CustomCardComments extends PureComponent<IProps1> {
                 subtitle={this.props.date}
                 subtitleStyle={{ marginLeft: 8, fontSize: 11 }}
                 titleStyle={{ fontSize: 16 }}
-                left={(props)=><Avatar.Image {...props} size={40} source={require('../../assets/profile.png')} />}
+                //left={(props)=><Avatar.Image {...props} size={40} source={require('../../assets/profile.png')} />}
+                left={(props)=><Avatar.Image {...props} size={40} source={this.props.source} />}
             />
             <Card.Content><Text>{this.props.comment}</Text></Card.Content>
         </Card>);
@@ -164,6 +167,32 @@ class CustomShowError extends PureComponent<IProps7> {
     }
 }
 
+type IProps8 = { title: string; subtitle: string; image: string; onPress: ()=>any; };
+type IState8 = { viewMenu: boolean; };
+class CustomItemList3 extends PureComponent<IProps8, IState8> {
+    constructor(props: IProps8) {
+        super(props);
+        this.state = {
+            viewMenu: false
+        };
+    }
+    render(): React.ReactNode {
+        return(<TouchableRipple onPress={()=>this.setState({ viewMenu: true })}>
+            <List.Item
+                left={(props)=><Avatar.Image {...props} size={48} source={(!this.props.image)? require('../../assets/profile.png'): { uri: `${HostServer}/images/accounts/${decode(this.props.image)}` }} />}
+                title={this.props.title}
+                description={this.props.subtitle}
+                right={()=><Menu
+                    visible={this.state.viewMenu}
+                    onDismiss={()=>this.setState({ viewMenu: false })}
+                    anchor={<IconButton onPress={()=>this.setState({ viewMenu: true })} icon={'dots-vertical'} />}>
+                    <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.onPress())} title={"Cambiar permisos"} />
+                </Menu>}
+            />
+        </TouchableRipple>);
+    }
+}
+
 export {
     CustomCard1,
     CustomCardComments,
@@ -171,5 +200,6 @@ export {
     CustomItemList,
     CustomCard2,
     CustomItemList2,
-    CustomShowError
+    CustomShowError,
+    CustomItemList3
 };

@@ -135,6 +135,11 @@ type commentsData = {
     id_issuer: string;
     comment: string;
     date: string;
+    accountData: {
+        name: string;
+        image: string;
+        birthday: string;
+    };
 };
 type getCommentsAll = {
     ok?: boolean;
@@ -145,6 +150,22 @@ type getPermission = {
     ok?: boolean;
     cause?: string;
     permission?: string;
+};
+type permissionItem = {
+    id: string;
+    idUser: string;
+    idDeclare: string;
+    permission: string;
+    accountData: {
+        name: string;
+        image: string;
+        birthday: string;
+    };
+};
+type getAllPermissions = {
+    ok?: boolean;
+    cause?: string;
+    permissions?: permissionItem[];
 };
 
 export type {
@@ -162,5 +183,7 @@ export type {
     userData,
     commentsData,
     getCommentsAll,
-    getPermission
+    getPermission,
+    permissionItem,
+    getAllPermissions
 };

@@ -4,7 +4,7 @@ import React, { Component } from "react";
 import { View, FlatList } from "react-native";
 import { Appbar, Divider, Menu, ProgressBar, Snackbar, Text } from "react-native-paper";
 import { NoComment } from "../../assets/icons";
-import { Comment, Training } from "../../scripts/ApiCorporal";
+import { Comment, HostServer, Training } from "../../scripts/ApiCorporal";
 import { commentsData, DetailsTrainings, statisticData } from "../../scripts/ApiCorporal/types";
 import { LoadNow } from "../../scripts/Global";
 import CombinedTheme from "../../Theme";
@@ -54,6 +54,7 @@ export class Tab1 extends Component<IProps, IState> {
     private _isMount: boolean = true;
     componentWillUnmount() {
         this._isMount = false;
+        this.timeLoad = 512;
         this.setState({
             visiblemenu: false,
             showLoading: true,
@@ -95,16 +96,35 @@ export class Tab1 extends Component<IProps, IState> {
             this.loading = setInterval(()=>{ if (loadNow = true) setTimeout(()=>this.goLoading(), 256) }, this.timeLoad);
         });
         Comment.getAll().then((value)=>this.setState({ commentsLoading: false, dataComments: value })).catch((error)=>{
-            var commentError: commentsData[] = [{ id: '-1', id_training: '0', id_issuer: '1', comment: encode('Al parecer ocurrió un error al cargar los comentarios :(\n\nPor favor, vuelve a intentarlo actualizando la sección de estadísticas en el botón de tres puntos ubicado en la parte de arriba en la derecha de la aplicación, si el problema persiste comunícate con el equipo de Corporal Kinesis o vuelve a intentarlo más tarde.'), date: encode(moment(new Date()).format('DD/MM/YYYY')) }];
+            var commentError: commentsData[] = [{
+                id: '-1',
+                id_training: '0',
+                id_issuer: '1',
+                comment: encode('Al parecer ocurrió un error al cargar los comentarios :(\n\nPor favor, vuelve a intentarlo actualizando la sección de estadísticas en el botón de tres puntos ubicado en la parte de arriba en la derecha de la aplicación, si el problema persiste comunícate con el equipo de Corporal Kinesis o vuelve a intentarlo más tarde.'),
+                date: encode(moment(new Date()).format('DD/MM/YYYY')),
+                accountData: {
+                    name: encode('Equipo Corporal Kinesis'),
+                    image: '',
+                    birthday: ''
+                }
+            }];
             this.setState({ dialogShow: true, messageDialog: error.cause, dataComments: commentError, commentsLoading: false });
         });
+    }
+    calcYears(date: string): string {
+        var dateNow = new Date();
+        var processDate = moment(date, 'DD-MM-YYYY').toDate();
+        var years = dateNow.getFullYear() - processDate.getFullYear();
+        var months = dateNow.getMonth() - processDate.getMonth();
+        if (months < 0 || (months === 0 && dateNow.getDate() < processDate.getDate())) years--;
+        return String(years);
     }
     render(): React.ReactNode {
         return((this._isMount)? <View style={{ flex: 2 }}>
             <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
                 <Appbar.Content title="Estadísticas" />
                 <Menu visible={this.state.visiblemenu} onDismiss={()=>this.setState({ visiblemenu: false })} anchor={<Appbar.Action icon="dots-vertical" color={'#FFFFFF'} onPress={()=>this.setState({ visiblemenu: true })} />} >
-                    <Menu.Item onPress={()=>this.setState({ showLoading: true, commentsLoading: true, visiblemenu: false }, ()=>this.goLoading())} title="Actualizar" icon={'refresh'} />
+                    <Menu.Item onPress={()=>this.setState({ showLoading: true, commentsLoading: true, dataComments: [], visiblemenu: false }, ()=>this.goLoading())} title="Actualizar" icon={'refresh'} />
                     <Menu.Item onPress={()=>this.setState({ visiblemenu: false }, ()=>this.props.openOptions())} title="Opciones" icon={'cog'} />
                     <Divider />
                     <Menu.Item onPress={() => {}} title="¿Qué es esto?" icon={'information-outline'} />
@@ -116,7 +136,8 @@ export class Tab1 extends Component<IProps, IState> {
                 ListEmptyComponent={()=>(!this.state.commentsLoading)? <EmptyListComments message={'No hay comentarios para mostrar'} icon={<NoComment width={96} height={96} />} style={{ marginTop: 32 }} />: <View><ProgressBar indeterminate={true} /></View>}
                 renderItem={({ item, index })=><CustomCardComments
                     key={index}
-                    accountName={'Equipo Corporal Kinesis'}
+                    source={(item.id !== '-1')? { uri: `${HostServer}/images/accounts/${decode(item.accountData.image)}` }: require('../../assets/profile.png')}
+                    accountName={(item.id !== '-1')? `${decode(item.accountData.name)} (${this.calcYears(decode(item.accountData.birthday))} años)`: decode(item.accountData.name)}
                     date={decode(item.date)}
                     comment={decode(item.comment)}
                 />}

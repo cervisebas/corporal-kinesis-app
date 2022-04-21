@@ -1,7 +1,7 @@
 import { decode } from "base-64";
 import moment from "moment";
 import React, { Component } from "react";
-import { DeviceEventEmitter, Dimensions, KeyboardAvoidingView, Modal, StyleSheet, View } from "react-native";
+import { DeviceEventEmitter, Dimensions, KeyboardAvoidingView, Modal, PixelRatio, StyleSheet, View } from "react-native";
 import DatePicker from "react-native-date-picker";
 import { Button, Dialog, Paragraph, Portal, Provider as PaperProvider, Text, TextInput } from "react-native-paper";
 import SplashScreen from "react-native-splash-screen";
@@ -73,7 +73,7 @@ export class Session extends Component<IProps, IState> {
             registerPassword: '',
             registerConfirmPassword: '',
             registerDni: '',
-            registerDate: `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`,
+            registerDate: moment(date).format('DD/MM/YYYY'),
             registerTel: '',
 
             registerAlertName: false,
@@ -86,7 +86,7 @@ export class Session extends Component<IProps, IState> {
 
             viewModalDate: false,
             actualDatePicker: date,
-            actualDate: '',
+            actualDate: moment(date).format('DD/MM/YYYY'),
             viewPanel: 1,
 
             dialogShow: false,
@@ -213,13 +213,14 @@ export class Session extends Component<IProps, IState> {
             <PaperProvider theme={CombinedTheme}>
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={'height'} keyboardVerticalOffset={0}>
                     <View style={styles.contain}>
-                        {(this.state.viewPanel == 1)? <View style={styles.card}>
+                        <View style={{ ...styles.card, display: (this.state.viewPanel == 1)? 'flex': 'none' }}>
                             <Logo width={128} height={128} />
                             <View style={styles.form}>
                                 <TextInput
                                     style={styles.textInput}
                                     mode={'outlined'}
                                     label={'Email o teléfono'}
+                                    autoCapitalize={'none'}
                                     textContentType={'emailAddress'}
                                     value={this.state.sessionEmail}
                                     keyboardType={'email-address'}
@@ -228,6 +229,7 @@ export class Session extends Component<IProps, IState> {
                                     style={styles.textInput}
                                     mode={'outlined'}
                                     secureTextEntry={true}
+                                    autoCapitalize={'none'}
                                     label={'Contraseña'}
                                     value={this.state.sessionPassword}
                                     textContentType={'password'}
@@ -238,7 +240,7 @@ export class Session extends Component<IProps, IState> {
                                 <Button onPress={()=>this.setState({ viewPanel: 2 })} style={{ marginTop: 8 }}>Registrarse</Button>
                             </View>
                         </View>
-                        : <View style={styles.card}>
+                        <View style={{ ...styles.card, display: (this.state.viewPanel == 2)? 'flex': 'none' }}>
                             <Text style={{ fontSize: 28, color: '#ED7035', textAlign: 'center' }}>{'Bienvenid@ a \nCorporal Kinesis App'}</Text>
                             <View style={styles.form2}>
                                 <TextInput
@@ -254,6 +256,7 @@ export class Session extends Component<IProps, IState> {
                                     style={styles.textInput}
                                     mode={'outlined'}
                                     label={'Correo electrónico'}
+                                    autoCapitalize={'none'}
                                     textContentType={'emailAddress'}
                                     error={this.state.registerAlertEmail}
                                     keyboardType={'email-address'}
@@ -264,6 +267,7 @@ export class Session extends Component<IProps, IState> {
                                     mode={'outlined'}
                                     secureTextEntry={true}
                                     label={'Contraseña'}
+                                    autoCapitalize={'none'}
                                     textContentType={'password'}
                                     error={this.state.registerAlertPassword}
                                     value={this.state.registerPassword}
@@ -272,6 +276,7 @@ export class Session extends Component<IProps, IState> {
                                     style={styles.textInput}
                                     mode={'outlined'}
                                     secureTextEntry={true}
+                                    autoCapitalize={'none'}
                                     label={'Confirmar contraseña'}
                                     textContentType={'password'}
                                     error={this.state.registerAlertConfirmPassword}
@@ -307,7 +312,7 @@ export class Session extends Component<IProps, IState> {
                                 <Button onPress={()=>this.goRegister()} mode={'contained'}>Registrarse</Button>
                                 <Button onPress={()=>this.setState({ viewPanel: 1 })} style={{ marginTop: 8 }}>¿Ya estas registrado?</Button>
                             </View>
-                        </View>}
+                        </View>
                     </View>
                 </KeyboardAvoidingView>
                 <Portal>
@@ -319,7 +324,7 @@ export class Session extends Component<IProps, IState> {
                                 mode={'date'}
                                 fadeToColor={'#323335'}
                                 textColor={'#FFFFFF'}
-                                onDateChange={(date)=>this.setState({ actualDatePicker: date, actualDate: `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}` })}
+                                onDateChange={(date)=>this.setState({ actualDatePicker: date, actualDate: moment(date).format('DD/MM/YYYY') })}
                             />
                         </Dialog.Content>
                         <Dialog.Actions>
@@ -345,7 +350,7 @@ export class Session extends Component<IProps, IState> {
                                     registerPassword: '',
                                     registerConfirmPassword: '',
                                     registerDni: '',
-                                    registerDate: `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`,
+                                    registerDate: moment(date).format('DD/MM/YYYY'),
                                     registerTel: ''
                                 }), 1024);
                                 setTimeout(()=>this.props.setLoading(false, ''), 1152);
@@ -364,7 +369,8 @@ const styles = StyleSheet.create({
         height: '100%',
         backgroundColor: '#0B0C0E',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        flex: 2
     },
     card: {
         width: (width - 64),
@@ -374,19 +380,16 @@ const styles = StyleSheet.create({
         borderRadius: 8
     },
     textInput: {
-        height: 52,
         marginLeft: 16,
         marginRight: 16,
         marginBottom: 4,
-        marginTop: 4,
+        marginTop: 4
     },
     form: {
-        height: 136,
         width: (width - 80),
         marginTop: 8
     },
     form2: {
-        height: 468,
         width: (width - 80),
         marginTop: 8
     },

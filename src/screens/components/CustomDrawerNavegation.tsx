@@ -31,6 +31,13 @@ export default class CustomDrawerNavegation extends Component<DrawerContentCompo
         activeBackgroundColor: 'rgba(237, 112, 53, 0.9)',
         inactiveBackgroundColor: 'rgba(255, 255, 255, 0)'
     };
+    componentWillUnmount() {
+        this.setState({
+            nameUser: 'Cargando...',
+            pictureUser: '',
+            loadingUser: false
+        });
+    }
     componentDidMount() {
         AsyncStorage.getItem('account_session').then((value)=>{
             var datas: storageData = JSON.parse(decode(String(value)));

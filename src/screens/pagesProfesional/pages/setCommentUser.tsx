@@ -22,7 +22,6 @@ export default class SetCommentUser extends Component<IProps, IState> {
             alert: false
         };
     }
-    private refTextInput: any;
     sendComment() {
         if (this.state.text.length >= 10) {
             this.props.send(encode(this.state.text));
@@ -31,19 +30,17 @@ export default class SetCommentUser extends Component<IProps, IState> {
             ToastAndroid.show('El comentario por lo menos debe de contener 10 caracteres o más.', ToastAndroid.LONG);
         }
     }
-    componentDidUpdate() {
-        if (this.props.visible == true) {
-            if (!this.refTextInput.isFocused()) {
-                this.refTextInput.forceFocus();
-            }
-        }
+    dialogClose() {
+        this.setState({
+            text: '',
+            alert: false
+        });
     }
     render(): React.ReactNode {
         return(<Dialog visible={this.props.visible} dismissable={false}>
             <Dialog.Title>Añadir comentario</Dialog.Title>
             <Dialog.Content>
                 <TextInput
-                    ref={(ref: any)=>this.refTextInput = ref}
                     dense={true}
                     mode={'outlined'}
                     label={'Escriba aquí...'}

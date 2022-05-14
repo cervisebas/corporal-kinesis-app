@@ -10,7 +10,7 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "clean": "cd android && ./gradlew clean && cd ..",
     "sync": "node sync-git.js",
-    "buildRelease": "cd android && ./gradlew bundleRelease"
+    "buildRelease": "cd android && ./gradlew bundleRelease && cd .."
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.17.3",

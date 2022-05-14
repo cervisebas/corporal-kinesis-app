@@ -47,7 +47,7 @@ export default class App extends Component<IProps, IState> {
             setTimeout(()=>this.setState({ openSession: !value, showVerify: false }, ()=>(value) && setLoadNow(true)), 2500);
         }).catch((error)=>{
             if (error.action == 1) return this.setState({ openSession: true });
-            this.setState({ textAnimVerify: error.cause, showTextAnimVerify: false });
+            this.setState({ textAnimVerify: error.cause, showTextAnimVerify: false }, ()=>setTimeout(()=>this.setState({ openSession: true }), 1500));
         });
     }
     componentDidMount() {

@@ -123,3 +123,99 @@ export class CustomPicker2 extends PureComponent<IProps, IState2> {
         </TouchableRipple>);
     }
 };
+
+export class CustomPicker3 extends PureComponent<IProps, IState> {
+    constructor(props: IProps) {
+        super(props);
+        this.state = {
+            colorsClick: ['rgba(255, 255, 255, 0.5)', 'rgba(237, 112, 53, 1)'],
+            borderClick: ['#FFFFFF', '#ED7035'],
+            indexColors: 0
+        };
+    }
+    private ref: Picker<string> | null = null;
+    componentWillUnmount() {
+        this.ref = null;
+        this.setState({
+            colorsClick: ['rgba(255, 255, 255, 0.5)', 'rgba(237, 112, 53, 1)'],
+            borderClick: ['#FFFFFF', '#ED7035'],
+            indexColors: 0
+        });
+    }
+    render(): React.ReactNode {
+        return(<TouchableRipple
+                disabled={this.props.disabled}
+                onPress={()=>(!this.props.disabled)? this.ref?.focus(): null}
+                onPressIn={()=>(!this.props.disabled)? this.setState({ indexColors: 1 }): null}
+                onPressOut={()=>(!this.props.disabled)? this.setState({ indexColors: 0 }): null}
+                style={[this.props.style, { borderRadius: 4, borderColor: (!this.props.disabled)? this.state.colorsClick[this.state.indexColors]: 'rgba(255, 255, 255, 0.30)', borderWidth: 1.5, paddingTop: 8, overflow: 'hidden' }]}>
+            <View>
+                <Text style={{ marginLeft: 8, color: (!this.props.disabled)? '#FFFFFF': 'rgba(255, 255, 255, 0.30)' }}>{this.props.title}</Text>
+                <Picker
+                    ref={(ref)=>this.ref = ref}
+                    style={{ width: "100%", height: 52, color: (!this.props.disabled)? '#FFFFFF': 'rgba(255, 255, 255, 0.30)' }}
+                    selectedValue={this.props.value}
+                    enabled={!this.props.disabled}
+                    onValueChange={(itemValue)=>this.props.onChange(itemValue)}
+                    mode={'dropdown'}
+                    dropdownIconColor={(!this.props.disabled)? this.state.borderClick[this.state.indexColors]: 'rgba(255, 255, 255, 0.30)'}
+                    dropdownIconRippleColor={'rgba(0,0,0,0)'}
+                >
+                    <Picker.Item label="✮ 1" value="1" />
+                    <Picker.Item label="✮ 1.5" value="1.5" />
+                    <Picker.Item label="✮ 2" value="2" />
+                    <Picker.Item label="✮ 2.5" value="2.5" />
+                    <Picker.Item label="✮ 3" value="3" />
+                    <Picker.Item label="✮ 3.5" value="3.5" />
+                    <Picker.Item label="✮ 4" value="4" />
+                    <Picker.Item label="✮ 4.5" value="4.5" />
+                    <Picker.Item label="✮ 5" value="5" />
+                </Picker>
+            </View>
+        </TouchableRipple>);
+    }
+};
+
+export class CustomPicker4 extends PureComponent<IProps, IState> {
+    constructor(props: IProps) {
+        super(props);
+        this.state = {
+            colorsClick: ['rgba(255, 255, 255, 0.5)', 'rgba(237, 112, 53, 1)'],
+            borderClick: ['#FFFFFF', '#ED7035'],
+            indexColors: 0
+        };
+    }
+    private ref: Picker<string> | null = null;
+    componentWillUnmount() {
+        this.ref = null;
+        this.setState({
+            colorsClick: ['rgba(255, 255, 255, 0.5)', 'rgba(237, 112, 53, 1)'],
+            borderClick: ['#FFFFFF', '#ED7035'],
+            indexColors: 0
+        });
+    }
+    render(): React.ReactNode {
+        return(<TouchableRipple
+                disabled={this.props.disabled}
+                onPress={()=>(!this.props.disabled)? this.ref?.focus(): null}
+                onPressIn={()=>(!this.props.disabled)? this.setState({ indexColors: 1 }): null}
+                onPressOut={()=>(!this.props.disabled)? this.setState({ indexColors: 0 }): null}
+                style={[this.props.style, { borderRadius: 4, borderColor: (!this.props.disabled)? this.state.colorsClick[this.state.indexColors]: 'rgba(255, 255, 255, 0.30)', borderWidth: 1.5, paddingTop: 8, overflow: 'hidden' }]}>
+            <View>
+                <Text style={{ marginLeft: 8, color: (!this.props.disabled)? '#FFFFFF': 'rgba(255, 255, 255, 0.30)' }}>{this.props.title}</Text>
+                <Picker
+                    ref={(ref)=>this.ref = ref}
+                    style={{ width: "100%", height: 52, color: (!this.props.disabled)? '#FFFFFF': 'rgba(255, 255, 255, 0.30)' }}
+                    selectedValue={this.props.value}
+                    enabled={!this.props.disabled}
+                    onValueChange={(itemValue)=>this.props.onChange(itemValue)}
+                    mode={'dropdown'}
+                    dropdownIconColor={(!this.props.disabled)? this.state.borderClick[this.state.indexColors]: 'rgba(255, 255, 255, 0.30)'}
+                    dropdownIconRippleColor={'rgba(0,0,0,0)'}
+                >
+                    {this.props.children}
+                </Picker>
+            </View>
+        </TouchableRipple>);
+    }
+};

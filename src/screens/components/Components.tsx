@@ -1,11 +1,13 @@
 import { decode } from "base-64";
-import React, { PureComponent } from "react";
-import { StyleProp, View, ViewStyle } from "react-native";
-import { Avatar, Card, Colors, Text, IconButton, Paragraph, Title, List, Menu, Divider, TouchableRipple } from "react-native-paper";
+import moment from "moment";
+import React, { Component, PureComponent } from "react";
+import { ScrollView, StyleProp, View, ViewStyle } from "react-native";
+import { Avatar, Card, Colors, Text, IconButton, Paragraph, Title, List, Menu, Divider, TouchableRipple, Button } from "react-native-paper";
 import { AvatarImageSource } from "react-native-paper/lib/typescript/components/Avatar/AvatarImage";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { HostServer } from "../../scripts/ApiCorporal";
+import { trainings } from "../../scripts/ApiCorporal/types";
 import CombinedTheme from "../../Theme";
 
 type IProps0 = {
@@ -36,6 +38,7 @@ class CustomCard1 extends PureComponent<IProps0> {
 type IProps1 = {
     accountName: string;
     date: string;
+    edit: boolean;
     comment: string;
     source: AvatarImageSource;
 };
@@ -47,10 +50,9 @@ class CustomCardComments extends PureComponent<IProps1> {
         return(<Card style={{ marginLeft: 12, marginBottom: 12, marginRight: 12 }}>
             <Card.Title
                 title={this.props.accountName}
-                subtitle={this.props.date}
+                subtitle={`${this.props.date}${(this.props.edit)? ' (editado)': ''}`}
                 subtitleStyle={{ marginLeft: 8, fontSize: 11 }}
                 titleStyle={{ fontSize: 16 }}
-                //left={(props)=><Avatar.Image {...props} size={40} source={require('../../assets/profile.png')} />}
                 left={(props)=><Avatar.Image {...props} size={40} source={this.props.source} />}
             />
             <Card.Content><Text>{this.props.comment}</Text></Card.Content>
@@ -193,6 +195,200 @@ class CustomItemList3 extends PureComponent<IProps8, IState8> {
     }
 }
 
+type IProps9 = {
+    accountName: string;
+    date: string;
+    edit: boolean;
+    comment: string;
+    source: AvatarImageSource;
+    buttonEdit?: ()=>any;
+    buttonDelete?: ()=>any;
+};
+class CustomCardComments2 extends PureComponent<IProps9> {
+    constructor(props: IProps9) {
+        super(props);
+    }
+    render(): React.ReactNode {
+        return(<Card style={{ marginLeft: 12, marginBottom: 12, marginRight: 12 }}>
+            <Card.Title
+                title={this.props.accountName}
+                subtitle={`${this.props.date}${(this.props.edit)? ' (editado)': ''}`}
+                subtitleStyle={{ marginLeft: 8, fontSize: 11 }}
+                titleStyle={{ fontSize: 16 }}
+                left={(props)=><Avatar.Image {...props} size={40} source={this.props.source} />}
+                right={(props)=><IconButton {...props} icon={'clipboard-text-clock-outline'}/>}
+            />
+            <Card.Content><Text>{this.props.comment}</Text></Card.Content>
+            <Card.Actions style={{ alignItems: 'flex-end' }}>
+                <Button onPress={()=>(this.props.buttonEdit)&&this.props.buttonEdit()}>Editar</Button>
+                <Button onPress={()=>(this.props.buttonDelete)&&this.props.buttonDelete()}>Borrar</Button>
+            </Card.Actions>
+        </Card>);
+    }
+}
+
+type IProps10 = { title: string; actionDelete: ()=>any; actionViewDescription: ()=>any; };
+type IState10 = { viewMenu: boolean; };
+class CustomItemList4 extends PureComponent<IProps10, IState10> {
+    constructor(props: IProps10) {
+        super(props);
+        this.state = {
+            viewMenu: false
+        };
+    }
+    render(): React.ReactNode {
+        return(<TouchableRipple onPress={()=>this.setState({ viewMenu: true })}>
+            <List.Item
+                left={(props)=><List.Icon {...props} icon="calendar-check-outline" />}
+                title={this.props.title}
+                right={()=><Menu
+                    visible={this.state.viewMenu}
+                    onDismiss={()=>this.setState({ viewMenu: false })}
+                    anchor={<IconButton onPress={()=>this.setState({ viewMenu: true })} icon={'dots-vertical'} />}>
+                    <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionViewDescription())} title={"Ver descripción"} />
+                    <Menu.Item style={{ backgroundColor: Colors.red500 }} onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionDelete())} title={"Borrar"} />
+                </Menu>}
+            />
+        </TouchableRipple>);
+    }
+}
+
+type IProps11 = {
+    onPress: ()=>any;
+    style?: StyleProp<ViewStyle>;
+    title: string;
+};
+type IState11 = {
+    clickColor: string;
+    heightComponent: number;
+};
+class CustomCard3 extends PureComponent<IProps11, IState11> {
+    constructor(props: IProps11) {
+        super(props);
+        this.state = {
+            clickColor: CombinedTheme.colors.background,
+            heightComponent: 68
+        };
+    }
+    onPressClick() {
+        this.setState({ clickColor: 'rgb(213, 0, 0)' }, ()=>{
+            this.props.onPress();
+            setTimeout(()=>this.setState({ clickColor: CombinedTheme.colors.background }), 150);
+        });
+    }
+    render(): React.ReactNode {
+        return(<Card onLayout={(layout)=>this.setState({ heightComponent: layout.nativeEvent.layout.height })} style={this.props.style} accessible={true} onPress={()=>this.onPressClick()}>
+            <Card.Content>
+                <Title>{this.props.title}</Title>
+                <View style={{ position: 'absolute', right: 16, height: 24, top: (this.state.heightComponent - 24)/2, alignItems: 'center', flexDirection: 'row' }}>
+                    <Text style={{ fontWeight: '700', color: this.state.clickColor }}>Ver más detalles</Text>
+                    <Icon name="arrow-right" size={24} color={this.state.clickColor} style={{ marginLeft: 8 }} />
+                </View>
+            </Card.Content>
+        </Card>);
+    }
+}
+
+type IProps12 = {
+    onPress?: ()=>any;
+    style?: StyleProp<ViewStyle>;
+    title: string;
+    value: string;
+    iconName: string;
+};
+class CustomCard4 extends PureComponent<IProps12> {
+    constructor(props: IProps12) { super(props); }
+    render(): React.ReactNode {
+        return(<Card style={this.props.style} accessible={true} onPress={()=>(this.props.onPress)&&this.props.onPress()}>
+            <Card.Content>
+                <Title>{this.props.value}</Title>
+                <Paragraph>{this.props.title}</Paragraph>
+                <IconButton
+                    icon={this.props.iconName}
+                    color={Colors.blue500}
+                    size={26}
+                    style={{ position: 'absolute', right: 6, top: 18, backgroundColor: CombinedTheme.colors.background }}
+                />
+            </Card.Content>
+        </Card>);
+    }
+}
+
+type IProps13 = {
+    onPress?: ()=>any;
+    style?: StyleProp<ViewStyle>;
+    title: string;
+    paragraph: string;
+};
+class CustomCard5 extends PureComponent<IProps13> {
+    constructor(props: IProps13) { super(props); }
+    render(): React.ReactNode {
+        return(<Card style={this.props.style} accessible={true} onPress={()=>(this.props.onPress)&&this.props.onPress()}>
+            <Card.Content>
+                <Title>{this.props.title}</Title>
+                <Paragraph>{this.props.paragraph}</Paragraph>
+            </Card.Content>
+        </Card>);
+    }
+}
+
+type CustomType1 = { title: string; value: string; marginLeft?: number; };
+class MiniCustomCard extends PureComponent<CustomType1> {
+    constructor(props: CustomType1) {
+        super(props);
+    }
+    render(): React.ReactNode {
+        return(<Card style={{ backgroundColor: CombinedTheme.colors.accent, height: 48, marginTop: 4, marginBottom: 4, marginLeft: (this.props.marginLeft)? this.props.marginLeft: 6, marginRight: 6 }}>
+            <Card.Content style={{ padding: 0, margin: 0 }}>
+                <Text><Text style={{ fontWeight: '700' }}>{this.props.title}</Text> {this.props.value}</Text>
+            </Card.Content>
+        </Card>);
+    }
+}
+
+type IProps14 = {
+    data: trainings;
+    editButton?: ()=>any;
+    viewButton?: ()=>any;
+    deleteButton?: ()=>any;
+};
+type IState14 = { title: string; };
+
+class CustomItemList5 extends PureComponent<IProps14, IState14> {
+    constructor(props: IProps14) {
+        super(props);
+        var date: Date = moment(decode(this.props.data.date), 'DD/MM/YYYY').toDate();
+        var strDate: string = moment(date).format('dddd D [de] MMMM [del] YYYY');
+        this.state = {
+            title: strDate.charAt(0).toUpperCase() + strDate.slice(1)
+        };
+    }
+    render(): React.ReactNode {
+        return(<Card style={{ marginLeft: 8, marginRight: 8, marginTop: 12, height: 182 }} theme={{ dark: true }}>
+            <Card.Title
+                title={this.state.title}
+                subtitle={decode(this.props.data.exercise.name)}
+                subtitleStyle={{ marginLeft: 4 }}
+                right={(props)=><IconButton {...props} icon={'trash-can-outline'} onPress={()=>(this.props.deleteButton)&&this.props.deleteButton()} />}
+            />
+            <Card.Content>
+                <ScrollView horizontal={true}>
+                    <MiniCustomCard title={'RDS:'} value={decode(this.props.data.rds)} marginLeft={8} />
+                    <MiniCustomCard title={'RPE:'} value={decode(this.props.data.rpe)} />
+                    <MiniCustomCard title={'PULSO:'} value={decode(this.props.data.pulse)} />
+                    <MiniCustomCard title={'REPS:'} value={decode(this.props.data.repetitions)} />
+                    <MiniCustomCard title={'KLG:'} value={decode(this.props.data.kilage)} />
+                    <MiniCustomCard title={'TLG:'} value={decode(this.props.data.tonnage)} />
+                </ScrollView>
+            </Card.Content>
+            <Card.Actions>
+                <Button style={{ display: 'none' }} onPress={()=>(this.props.editButton)&&this.props.editButton()}>Editar</Button>
+                <Button onPress={()=>(this.props.viewButton)&&this.props.viewButton()}>Ver detalles</Button>
+            </Card.Actions>
+        </Card>);
+    }
+}
+
 export {
     CustomCard1,
     CustomCardComments,
@@ -201,5 +397,11 @@ export {
     CustomCard2,
     CustomItemList2,
     CustomShowError,
-    CustomItemList3
+    CustomItemList3,
+    CustomCardComments2,
+    CustomItemList4,
+    CustomCard3,
+    CustomCard4,
+    CustomCard5,
+    CustomItemList5
 };

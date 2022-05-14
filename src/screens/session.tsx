@@ -1,7 +1,7 @@
 import { decode } from "base-64";
 import moment from "moment";
 import React, { Component } from "react";
-import { DeviceEventEmitter, Dimensions, KeyboardAvoidingView, Modal, PixelRatio, StyleSheet, View } from "react-native";
+import { DeviceEventEmitter, Dimensions, KeyboardAvoidingView, StyleSheet, View, TextInput as NativeTextInput } from "react-native";
 import DatePicker from "react-native-date-picker";
 import { Button, Dialog, Paragraph, Portal, Provider as PaperProvider, Text, TextInput } from "react-native-paper";
 import SplashScreen from "react-native-splash-screen";
@@ -95,6 +95,17 @@ export class Session extends Component<IProps, IState> {
             dialogShowContinue: false
         };
     }
+    
+    // Inputs
+    private sessionInputEmail: NativeTextInput | null = null;
+    private sessionInputPassword: NativeTextInput | null = null;
+    private registerInputName: NativeTextInput | null = null;
+    private registerInputEmail: NativeTextInput | null = null;
+    private registerInputPassword: NativeTextInput | null = null;
+    private registerInputConfirmPassword: NativeTextInput | null = null;
+    private registerInputDNI: NativeTextInput | null = null;
+    private registerInputPhone: NativeTextInput | null = null;
+
     closeModal() {
         var date = new Date();
         this.setState({ sessionEmail: '', sessionPassword: '', sessionAlertEmail: false, sessionAlertPassword: false, registerName: '', registerEmail: '', registerPassword: '', registerConfirmPassword: '', registerDni: '', registerDate: `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`, registerTel: '', registerAlertName: false, registerAlertEmail: false, registerAlertPassword: false, registerAlertConfirmPassword: false, registerAlertDni: false, registerAlertDate: false, registerAlertTel: false, viewModalDate: false, actualDatePicker: date, actualDate: '', viewPanel: 1, dialogShow: false, dialogTitle: '', dialogText: '', dialogShowContinue: false });
@@ -208,6 +219,24 @@ export class Session extends Component<IProps, IState> {
             });
         });
     }
+    changeViewPanel(panel: number) {
+        switch (panel) {
+            case 1:
+                this.sessionInputEmail?.clear();
+                this.sessionInputPassword?.clear();
+                this.setState({ viewPanel: 1 });
+                break;
+            case 2:
+                this.registerInputName?.clear();
+                this.registerInputEmail?.clear();
+                this.registerInputPassword?.clear();
+                this.registerInputConfirmPassword?.clear();
+                this.registerInputDNI?.clear();
+                this.registerInputPhone?.clear();
+                this.setState({ viewPanel: 2 });
+                break;
+        }
+    }
     render(): React.ReactNode {
         return(<CustomModal visible={this.props.visible} animationIn={'fadeIn'} animationOut={'fadeOut'}>
             <PaperProvider theme={CombinedTheme}>
@@ -224,6 +253,9 @@ export class Session extends Component<IProps, IState> {
                                     textContentType={'emailAddress'}
                                     value={this.state.sessionEmail}
                                     keyboardType={'email-address'}
+                                    render={(props)=><NativeTextInput {...props} ref={(ref)=>this.sessionInputEmail = ref} />}
+                                    returnKeyType={'next'}
+                                    onSubmitEditing={()=>this.sessionInputPassword?.focus()}
                                     onChangeText={(text)=>this.setState({ sessionEmail: text.replace(/\ /gi, '') })} />
                                 <TextInput
                                     style={styles.textInput}
@@ -233,6 +265,9 @@ export class Session extends Component<IProps, IState> {
                                     label={'Contraseña'}
                                     value={this.state.sessionPassword}
                                     textContentType={'password'}
+                                    render={(props)=><NativeTextInput {...props} ref={(ref)=>this.sessionInputPassword = ref} />}
+                                    returnKeyType={'send'}
+                                    onSubmitEditing={()=>this.goSession()}
                                     onChangeText={(text)=>this.setState({ sessionPassword: text })} />
                             </View>
                             <View style={styles.formButtons}>
@@ -250,6 +285,9 @@ export class Session extends Component<IProps, IState> {
                                     textContentType={'nickname'}
                                     error={this.state.registerAlertName}
                                     keyboardType={'default'}
+                                    render={(props)=><NativeTextInput {...props} ref={(ref)=>this.registerInputName = ref} />}
+                                    returnKeyType={'next'}
+                                    onSubmitEditing={()=>this.registerInputEmail?.focus()}
                                     value={this.state.registerName}
                                     onChangeText={(text)=>this.setState({ registerName: text })} />
                                 <TextInput
@@ -260,6 +298,9 @@ export class Session extends Component<IProps, IState> {
                                     textContentType={'emailAddress'}
                                     error={this.state.registerAlertEmail}
                                     keyboardType={'email-address'}
+                                    render={(props)=><NativeTextInput {...props} ref={(ref)=>this.registerInputEmail = ref} />}
+                                    returnKeyType={'next'}
+                                    onSubmitEditing={()=>this.registerInputPassword?.focus()}
                                     value={this.state.registerEmail}
                                     onChangeText={(text)=>this.setState({ registerEmail: text.replace(/\ /gi, '') })} />
                                 <TextInput
@@ -270,6 +311,9 @@ export class Session extends Component<IProps, IState> {
                                     autoCapitalize={'none'}
                                     textContentType={'password'}
                                     error={this.state.registerAlertPassword}
+                                    render={(props)=><NativeTextInput {...props} ref={(ref)=>this.registerInputPassword = ref} />}
+                                    returnKeyType={'next'}
+                                    onSubmitEditing={()=>this.registerInputConfirmPassword?.focus()}
                                     value={this.state.registerPassword}
                                     onChangeText={(text)=>this.setState({ registerPassword: text })} />
                                 <TextInput
@@ -280,6 +324,9 @@ export class Session extends Component<IProps, IState> {
                                     label={'Confirmar contraseña'}
                                     textContentType={'password'}
                                     error={this.state.registerAlertConfirmPassword}
+                                    render={(props)=><NativeTextInput {...props} ref={(ref)=>this.registerInputConfirmPassword = ref} />}
+                                    returnKeyType={'next'}
+                                    onSubmitEditing={()=>this.registerInputDNI?.focus()}
                                     value={this.state.registerConfirmPassword}
                                     onChangeText={(text)=>this.setState({ registerConfirmPassword: text })} />
                                 <TextInput
@@ -288,6 +335,9 @@ export class Session extends Component<IProps, IState> {
                                     label={'D.N.I'}
                                     keyboardType={'numeric'}
                                     error={this.state.registerAlertDni}
+                                    render={(props)=><NativeTextInput {...props} ref={(ref)=>this.registerInputDNI = ref} />}
+                                    returnKeyType={'next'}
+                                    onSubmitEditing={()=>this.setState({ viewModalDate: true })}
                                     value={this.state.registerDni}
                                     onChangeText={(text)=>this.setState({ registerDni: text })} />
                                 <TextInput
@@ -305,6 +355,9 @@ export class Session extends Component<IProps, IState> {
                                     textContentType={'telephoneNumber'}
                                     keyboardType={'phone-pad'}
                                     error={this.state.registerAlertTel}
+                                    render={(props)=><NativeTextInput {...props} ref={(ref)=>this.registerInputPhone = ref} />}
+                                    returnKeyType={'send'}
+                                    onSubmitEditing={()=>this.goRegister()}
                                     value={this.state.registerTel}
                                     onChangeText={(text)=>this.setState({ registerTel: text })} />
                             </View>
@@ -332,7 +385,7 @@ export class Session extends Component<IProps, IState> {
                             <Button onPress={()=>this.setState({ registerDate: this.state.actualDate, viewModalDate: false })}>Aceptar</Button>
                         </Dialog.Actions>
                     </Dialog>
-                    <Dialog visible={this.state.dialogShow} dismissable={false}>
+                    <Dialog visible={this.state.dialogShow} dismissable={true} onDismiss={()=>this.setState({ dialogShow: false })}>
                         <Dialog.Title>{this.state.dialogTitle}</Dialog.Title>
                         <Dialog.Content>
                             <Paragraph>{this.state.dialogText}</Paragraph>

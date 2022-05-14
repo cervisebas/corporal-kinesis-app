@@ -1,12 +1,13 @@
 import { decode } from "base-64";
 import moment from "moment";
 import React, { Component, PureComponent, ReactNode } from "react";
-import { Dimensions, Image, Linking, StyleSheet, View } from "react-native";
-import { Appbar, Provider as PaperProvider, Divider, Text, Card, IconButton, Button } from "react-native-paper";
-import { HostServer } from "../../../scripts/ApiCorporal";
-import { userData } from "../../../scripts/ApiCorporal/types";
+import { DeviceEventEmitter, Dimensions, Image, Linking, StyleSheet, ToastAndroid, View } from "react-native";
+import { Appbar, Provider as PaperProvider, Divider, Text, Card, IconButton, Button, Snackbar, Portal, Dialog, Paragraph } from "react-native-paper";
+import { Account, Comment, HostServer, Training } from "../../../scripts/ApiCorporal";
+import { commentsData, trainings, userData } from "../../../scripts/ApiCorporal/types";
 import CombinedTheme from "../../../Theme";
 import CustomModal from "../../components/CustomModal";
+import DialogError from "../../components/DialogError";
 
 const { width } = Dimensions.get('window');
 
@@ -15,12 +16,31 @@ type IProps = {
     close: ()=>any;
     userData: userData;
     completeClose: ()=>any;
+    goLoading: (show: boolean, text: string, after?: ()=>any)=>any;
+    openAllComment: (data: commentsData[])=>any;
+    openAllTrainings: (data: trainings[])=>any;
+    showExternalSnackbar: (text: string, after?: ()=>any)=>any;
 };
-type IState = {};
+type IState = {
+    errorView: boolean;
+    errorTitle: string;
+    errorMessage: string;
+    showSnackBar: boolean;
+    textSnackBar: string;
+    showQuestionDeleteUser: boolean;
+};
 
 export default class ViewClietDetails extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
+        this.state = {        
+            errorView: false,
+            errorTitle: '',
+            errorMessage: '',
+            showSnackBar: false,
+            textSnackBar: '',
+            showQuestionDeleteUser: false
+        };
     }
     calcYears(date: string): string {
         var dateNow = new Date();
@@ -30,6 +50,39 @@ export default class ViewClietDetails extends Component<IProps, IState> {
         if (months < 0 || (months === 0 && dateNow.getDate() < processDate.getDate())) years--;
         return String(years);
     }
+    deleteClient() {
+        this.props.goLoading(true, 'Borrando información del cliente...', ()=>
+            Account.admin_delete(this.props.userData.id)
+                .then(()=>
+                    this.props.goLoading(false, '', ()=>{
+                        this.props.close();
+                        this.props.showExternalSnackbar('Usuario borrado correctamente.');
+                        DeviceEventEmitter.emit('adminPage1Reload');
+                    }))
+                .catch((error)=>this.props.goLoading(false, '', ()=>this.setState({ errorView: true, errorTitle: 'Ocurrio un error', errorMessage: error.cause })))
+        );
+    }
+    goAllComments() {
+        this.props.goLoading(true, 'Obteniendo información...', ()=>
+            Comment.admin_getAllAccount(this.props.userData.id)
+                .then((value)=>this.props.goLoading(false, '', ()=>this.props.openAllComment(value.reverse())))
+                .catch((error)=>this.setState({ errorView: true, errorTitle: 'Ocurrio un error...', errorMessage: error.cause }))
+        );
+    }
+    getAllTrainings() {
+        this.props.goLoading(true, 'Obteniendo informació...', ()=>
+            Training.admin_getAllAccount(this.props.userData.id)
+                .then((value)=>this.props.goLoading(false, '', ()=>this.props.openAllTrainings(value.reverse())))
+                .catch((error)=>this.setState({ errorView: true, errorTitle: 'Ocurrio un error...', errorMessage: error.cause }))
+        );
+    }
+    editData() {
+        if (this.props.userData.type == '1') {
+            ToastAndroid.show('Función en desarrollo...', ToastAndroid.SHORT);
+        } else {
+            ToastAndroid.show('Debido a las políticas de usuario no puedes editar este perfil.', ToastAndroid.SHORT);
+        }
+    }
     render(): ReactNode {
         return(<CustomModal visible={this.props.show} onClose={()=>this.props.completeClose()} onRequestClose={()=>this.props.close()}>
             <PaperProvider theme={CombinedTheme}>
@@ -37,8 +90,10 @@ export default class ViewClietDetails extends Component<IProps, IState> {
                     <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
                         <Appbar.BackAction onPress={()=>this.props.close()} />
                         <Appbar.Content title={decode(this.props.userData.name)} />
+                        <Appbar.Action icon={'pencil'} onPress={()=>this.editData()} />
+                        <Appbar.Action icon={'trash-can-outline'} onPress={()=>this.setState({ showQuestionDeleteUser: true })} />
                     </Appbar.Header>
-                    <View style={{ flex: 2 }}>
+                    <View style={{ flex: 2, overflow: 'hidden' }}>
                         <View style={{ margin: 20, height: 100, width: (width - 40), flexDirection: 'row' }}>
                             <View style={styles.imageProfile}>
                                 <Image style={{ width: '100%', height: '100%' }} source={{ uri: `${HostServer}/images/accounts/${decode(this.props.userData.image)}` }} />
@@ -75,10 +130,27 @@ export default class ViewClietDetails extends Component<IProps, IState> {
                                     </View>
                                 </Card.Content>
                             </Card>
-                            <Button icon={'dumbbell'} mode={'contained'} style={{ marginLeft: 16, marginRight: 16, marginTop: (this.props.userData.type == '1')? 0: 16 }} labelStyle={{ color: '#FFFFFF' }}>
+                            <Button icon={'dumbbell'} onPress={()=>this.getAllTrainings()} mode={'contained'} style={{ marginLeft: 16, marginRight: 16, marginTop: (this.props.userData.type == '1')? 0: 16 }} labelStyle={{ color: '#FFFFFF' }}>
                                 Ver rendimiento
                             </Button>
+                            <Button icon={'comment-text-multiple-outline'} onPress={()=>this.goAllComments()} mode={'contained'} style={{ marginLeft: 16, marginRight: 16, marginTop: 16 }} labelStyle={{ color: '#FFFFFF' }}>
+                                Ver todos los comentarios
+                            </Button>
                         </View>
+                        <Portal>
+                            <Dialog visible={this.state.showQuestionDeleteUser}>
+                                <Dialog.Title>¡¡Advertencia!!</Dialog.Title>
+                                <Dialog.Content>
+                                    <Paragraph>{'¿Estás de acuerdo que quieres borrar este usuario junto a toda su información?\n\nEsta acción no se podrá deshacer luego de una vez realizada.'}</Paragraph>
+                                </Dialog.Content>
+                                <Dialog.Actions>
+                                    <Button onPress={()=>this.setState({ showQuestionDeleteUser: false })}>Cancelar</Button>
+                                    <Button onPress={()=>this.setState({ showQuestionDeleteUser: false }, ()=>this.deleteClient())}>Aceptar</Button>
+                                </Dialog.Actions>
+                            </Dialog>
+                        </Portal>
+                        <DialogError show={this.state.errorView} close={()=>this.setState({ errorView: false })} title={this.state.errorTitle} message={this.state.errorMessage} />
+                        <Snackbar visible={this.state.showSnackBar} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ showSnackBar: false })}><Text>{this.state.textSnackBar}</Text></Snackbar>
                     </View>
                 </View>
             </PaperProvider>

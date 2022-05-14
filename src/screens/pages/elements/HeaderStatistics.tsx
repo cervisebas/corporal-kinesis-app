@@ -1,13 +1,15 @@
+import { decode } from "base-64";
 import React, { PureComponent, ReactNode } from "react";
-import { Dimensions, StyleProp, StyleSheet, View, ViewStyle } from "react-native";
+import { Dimensions, StyleProp, StyleSheet, ToastAndroid, View, ViewStyle } from "react-native";
 import { Title } from "react-native-paper";
-import { DetailsTrainings } from "../../../scripts/ApiCorporal/types";
-import { CustomCard1 } from "../../components/Components";
+import { dataExercise, DetailsTrainings } from "../../../scripts/ApiCorporal/types";
+import { CustomCard1, CustomCard3 } from "../../components/Components";
 
 type IProps = {
     goStatistics: (data: number, titleStatistics: string)=>any;
     showLoading: boolean;
     dataShow: DetailsTrainings;
+    openDetails: ()=>any;
 };
 type IState = {
     loadAnimation: string;
@@ -39,6 +41,10 @@ export default class HeaderStatistics extends PureComponent<IProps, IState> {
     render(): ReactNode {
         return(<>
             {(this._isMount)?<View style={{ flexDirection: 'column' }}>
+                <CustomCard3
+                    style={{ backgroundColor: '#ED7035', height: 68, marginTop: 18, marginLeft: 8, marginRight: 8 }}
+                    title={(this.props.showLoading)? this.state.loadAnimation: this.props.dataShow.exercise.name}
+                    onPress={()=>(this.props.dataShow.exercise.status == 0)? this.props.openDetails(): ToastAndroid.show('No se puede abrir esta sección en este momento.', ToastAndroid.LONG)} />
                 <View style={{ ...styles.cardRowContent, width: width }}>
                     <View style={styles.cardContents}>
                         <CustomCard1 style={this.styleCard} title={'RDS'} status={(this.props.showLoading)? -5: this.props.dataShow.rds.status} value={(this.props.showLoading)? this.state.loadAnimation: this.props.dataShow.rds.value} onPress={()=>this.props.goStatistics(3, 'RDS')} />

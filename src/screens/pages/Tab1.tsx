@@ -3,13 +3,15 @@ import moment from "moment";
 import React, { Component } from "react";
 import { View, FlatList } from "react-native";
 import { Appbar, Divider, Menu, ProgressBar, Snackbar, Text } from "react-native-paper";
+import utf8 from "utf8";
 import { NoComment } from "../../assets/icons";
 import { Comment, HostServer, Training } from "../../scripts/ApiCorporal";
-import { commentsData, DetailsTrainings, statisticData } from "../../scripts/ApiCorporal/types";
+import { commentsData, dataExercise, DetailsTrainings, statisticData } from "../../scripts/ApiCorporal/types";
 import { LoadNow } from "../../scripts/Global";
 import CombinedTheme from "../../Theme";
 import { CustomCardComments, EmptyListComments } from "../components/Components";
 import HeaderStatistics from "./elements/HeaderStatistics";
+import ViewMoreDetails from "./pages/viewMoreDetails";
 import { Statistics } from "./statistics/statistic";
 
 type IProps = {
@@ -31,6 +33,17 @@ type IState = {
     // Comments
     commentsLoading: boolean;
     dataComments: commentsData[];
+
+    // View More Details
+    viewMoreDetailsVisible: boolean;
+};
+
+const decodeUtf8 = (str: string)=>{
+    try {
+        return utf8.decode(str);
+    } catch {
+        return str;
+    }
 };
 
 export class Tab1 extends Component<IProps, IState> {
@@ -39,29 +52,32 @@ export class Tab1 extends Component<IProps, IState> {
         this.state = {
             visiblemenu: false,
             showLoading: true,
-            dataShow: { date: { value: '', status: -1 }, session_number: { value: '', status: -1 }, rds: { value: '', status: -1 }, rpe: { value: '', status: -1 }, pulse: { value: '', status: -1 }, repetitions: { value: '', status: -1 }, kilage: { value: '', status: -1 }, tonnage: { value: '', status: -1 } },
+            dataShow: this.reserve1,
             visibleStatistics: false,
             titleStatistics: '',
-            statistics: { singles: [], separate: { labels: [], values: [] } },
+            statistics: { singles: [], separate: { labels: [], values: [] }, exercises: [] },
             dialogShow: false,
             messageDialog: '',
             commentsLoading: true,
-            dataComments: []
+            dataComments: [],
+            viewMoreDetailsVisible: false
         };
     }
     private timeLoad: number = 512;
     private loading = setInterval(()=>{ if (LoadNow == true) setTimeout(()=>this.goLoading(), 256) }, this.timeLoad);
     private _isMount: boolean = true;
+    private reserve1 = { id: '-1', date: { value: '-', status: -1, difference: undefined }, session_number: { value: '-', status: -1, difference: undefined }, rds: { value: '-', status: -1, difference: undefined }, rpe: { value: '-', status: -1, difference: undefined }, pulse: { value: '-', status: -1, difference: undefined }, repetitions: { value: '-', status: -1, difference: undefined }, kilage: { value: '-', status: -1, difference: undefined }, tonnage: { value: '-', status: -1, difference: undefined }, exercise: { name: 'No disponible', status: -1, description: '' } };
+    private reserve2 = { id: '-1', date: { value: 'n/a', status: -1, difference: undefined }, session_number: { value: 'n/a', status: -1, difference: undefined }, rds: { value: 'n/a', status: -1, difference: undefined }, rpe: { value: 'n/a', status: -1, difference: undefined }, pulse: { value: 'n/a', status: -1, difference: undefined }, repetitions: { value: 'n/a', status: -1, difference: undefined }, kilage: { value: 'n/a', status: -1, difference: undefined }, tonnage: { value: 'n/a', status: -1, difference: undefined }, exercise: { name: 'No disponible', status: -1, description: '' } };
     componentWillUnmount() {
         this._isMount = false;
         this.timeLoad = 512;
         this.setState({
             visiblemenu: false,
             showLoading: true,
-            dataShow: { date: { value: '', status: -1 }, session_number: { value: '', status: -1 }, rds: { value: '', status: -1 }, rpe: { value: '', status: -1 }, pulse: { value: '', status: -1 }, repetitions: { value: '', status: -1 }, kilage: { value: '', status: -1 }, tonnage: { value: '', status: -1 } },
+            dataShow: this.reserve1,
             visibleStatistics: false,
             titleStatistics: '',
-            statistics: { singles: [], separate: { labels: [], values: [] } },
+            statistics: { singles: [], separate: { labels: [], values: [] }, exercises: [] },
             dialogShow: false,
             messageDialog: '',
             commentsLoading: true,
@@ -84,12 +100,10 @@ export class Tab1 extends Component<IProps, IState> {
     }
     goLoading() {
         Training.getActual().then((value)=>{
-            var reserve = { date: { value: '-', status: -1 }, session_number: { value: '-', status: -1 }, rds: { value: '-', status: -1 }, rpe: { value: '-', status: -1 }, pulse: { value: '-', status: -1 }, repetitions: { value: '-', status: -1 }, kilage: { value: '-', status: -1 }, tonnage: { value: '-', status: -1 } };
-            this.setState({ dataShow: (value)? { date: value.date, session_number: value.session_number, rds: value.rds, rpe: value.rpe, pulse: value.pulse, repetitions: value.repetitions, kilage: value.kilage, tonnage: value.tonnage }: reserve, showLoading: false });
+            this.setState({ dataShow: (value)? { id: value.id, date: value.date, session_number: value.session_number, rds: value.rds, rpe: value.rpe, pulse: value.pulse, repetitions: value.repetitions, kilage: value.kilage, tonnage: value.tonnage, exercise: value.exercise }: this.reserve1, showLoading: false });
             clearInterval(this.loading);
         }).catch((error)=>{
-            var reserve = { date: { value: 'n/a', status: -1 }, session_number: { value: 'n/a', status: -1 }, rds: { value: 'n/a', status: -1 }, rpe: { value: 'n/a', status: -1 }, pulse: { value: 'n/a', status: -1 }, repetitions: { value: 'n/a', status: -1 }, kilage: { value: 'n/a', status: -1 }, tonnage: { value: 'n/a', status: -1 } };
-            this.setState({ dataShow: reserve, showLoading: false, dialogShow: true, messageDialog: error.cause });
+            this.setState({ dataShow: this.reserve2, showLoading: false, dialogShow: true, messageDialog: error.cause });
             clearInterval(this.loading);
             var loadNow = LoadNow;
             this.timeLoad *= 2;
@@ -102,6 +116,7 @@ export class Tab1 extends Component<IProps, IState> {
                 id_issuer: '1',
                 comment: encode('Al parecer ocurrió un error al cargar los comentarios :(\n\nPor favor, vuelve a intentarlo actualizando la sección de estadísticas en el botón de tres puntos ubicado en la parte de arriba en la derecha de la aplicación, si el problema persiste comunícate con el equipo de Corporal Kinesis o vuelve a intentarlo más tarde.'),
                 date: encode(moment(new Date()).format('DD/MM/YYYY')),
+                edit: false,
                 accountData: {
                     name: encode('Equipo Corporal Kinesis'),
                     image: '',
@@ -132,14 +147,15 @@ export class Tab1 extends Component<IProps, IState> {
             </Appbar.Header>
             <FlatList
                 data={this.state.dataComments}
-                ListHeaderComponent={<HeaderStatistics dataShow={this.state.dataShow} showLoading={this.state.showLoading} goStatistics={(data, title)=>this.goStatistics(data, title)} />}
+                ListHeaderComponent={<HeaderStatistics dataShow={this.state.dataShow} showLoading={this.state.showLoading} goStatistics={(data, title)=>this.goStatistics(data, title)} openDetails={()=>this.setState({ viewMoreDetailsVisible: true })} />}
                 ListEmptyComponent={()=>(!this.state.commentsLoading)? <EmptyListComments message={'No hay comentarios para mostrar'} icon={<NoComment width={96} height={96} />} style={{ marginTop: 32 }} />: <View><ProgressBar indeterminate={true} /></View>}
                 renderItem={({ item, index })=><CustomCardComments
                     key={index}
                     source={(item.id !== '-1')? { uri: `${HostServer}/images/accounts/${decode(item.accountData.image)}` }: require('../../assets/profile.png')}
                     accountName={(item.id !== '-1')? `${decode(item.accountData.name)} (${this.calcYears(decode(item.accountData.birthday))} años)`: decode(item.accountData.name)}
+                    edit={item.edit}
                     date={decode(item.date)}
-                    comment={decode(item.comment)}
+                    comment={decodeUtf8(decode(item.comment))}
                 />}
             />
             <Statistics
@@ -147,6 +163,12 @@ export class Tab1 extends Component<IProps, IState> {
                 datas={this.state.statistics}
                 title={this.state.titleStatistics}
                 close={()=>this.setState({ visibleStatistics: false })}
+            />
+            <ViewMoreDetails
+                visible={this.state.viewMoreDetailsVisible}
+                close={()=>this.setState({ viewMoreDetailsVisible: false })}
+                dataShow={this.state.dataShow}
+                commentData={this.state.dataComments.find((value)=>value.id_training == this.state.dataShow.id)}
             />
             <Snackbar
                 visible={this.state.dialogShow}

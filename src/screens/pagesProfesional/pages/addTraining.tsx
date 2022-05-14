@@ -4,13 +4,15 @@ import { Appbar, Button, Text, TextInput, Provider as PaperProvider, Portal, Dia
 import { Picker } from '@react-native-picker/picker';
 import CombinedTheme from "../../../Theme";
 import { ScrollView } from "react-native-gesture-handler";
-import { CustomPicker1, CustomPicker2 } from "../../components/CustomPicker";
-import { dataListUsers } from "../../../scripts/ApiCorporal/types";
-import { decode } from "base-64";
+import { CustomPicker1, CustomPicker2, CustomPicker3, CustomPicker4 } from "../../components/CustomPicker";
+import { dataExercise, dataListUsers } from "../../../scripts/ApiCorporal/types";
+import { decode, encode } from "base-64";
 import DatePicker from "react-native-date-picker";
 import moment from "moment";
-import { Training } from "../../../scripts/ApiCorporal";
+import 'moment/locale/es';
+import { Comment, Training } from "../../../scripts/ApiCorporal";
 import CustomModal from "../../components/CustomModal";
+import utf8 from 'utf8';
 
 const { width } = Dimensions.get('window');
 
@@ -18,6 +20,7 @@ type IProps = {
     show: boolean;
     close: ()=>any;
     listUsers: dataListUsers[];
+    listExercise: dataExercise[];
 };
 type IState = {
     rds: string;
@@ -27,13 +30,21 @@ type IState = {
     kilage: string;
     tonnage: string;
     clientId: string;
+    exerciseId: string;
+    rir: string;
+    shoelaces: string;
     date: Date;
     dateActual: string;
+    technique: string;
+
     viewDialogDate: boolean;
     isSendResults: boolean;
+    buttonSendText: string;
     showError: boolean;
     messageError: string;
     successShow: boolean;
+
+    comment: string;
 };
 export default class AddTraining extends Component<IProps, IState> {
     constructor(props: IProps) {
@@ -46,14 +57,21 @@ export default class AddTraining extends Component<IProps, IState> {
             kilage: '0',
             tonnage: '0',
             clientId: '1',
+            exerciseId: '1',
+            rir: '0',
+            shoelaces: 'nada',
             date: new Date(),
             dateActual: moment(new Date()).format('DD/MM/YYYY'),
+            technique: '5',
             viewDialogDate: false,
             isSendResults: false,
+            buttonSendText: 'Enviar',
             showError: false,
             messageError: '',
-            successShow: false
+            successShow: false,
+            comment: ''
         };
+        moment.locale('es');
     }
     startCalculate() {
         if (this.state.repetitions.length !== 0 && this.state.kilage.length !== 0) {
@@ -80,38 +98,64 @@ export default class AddTraining extends Component<IProps, IState> {
             kilage: '0',
             tonnage: '0',
             clientId: '1',
+            exerciseId: '1',
+            rir: '0',
+            shoelaces: 'nada',
             date: new Date(),
             dateActual: moment(new Date()).format('DD/MM/YYYY'),
+            technique: '5',
             viewDialogDate: false,
             isSendResults: false,
             showError: false,
             messageError: '',
-            successShow: false
+            successShow: false,
+            comment: ''
         });
         return this.props.close();
     }
     sendResults() {
-        this.setState({ isSendResults: true });
-        Training.create(this.state.clientId, this.state.dateActual, this.state.rds, this.state.rpe, this.state.pulse, this.state.repetitions, this.state.kilage, this.state.tonnage).then(()=>this.setState({
-            isSendResults: false,
-            successShow: true,
-            rds: '5',
-            rpe: '5',
-            pulse: '0',
-            repetitions: '0',
-            kilage: '0',
-            tonnage: '0',
-            clientId: '1',
-            date: new Date(),
-            dateActual: moment(new Date()).format('DD/MM/YYYY')
-        })).catch((error)=>this.setState({
-            isSendResults: false,
-            showError: true,
-            messageError: error.cause
-        }));
+        this.setState({ isSendResults: true, buttonSendText: 'Enviando...' }, ()=>
+            Training.create(this.state.clientId, this.state.exerciseId, this.state.dateActual, this.state.rds, this.state.rpe, this.state.pulse, this.state.repetitions, this.state.kilage, this.state.tonnage).then((idTrainingGet)=>{
+                var comment: string = `
+                    Observaciones: ${moment(this.state.date).format('dddd D [de] MMMM [del] YYYY')}\n   • Ejercicio realizado: ${decode(String(this.props.listExercise.find((e)=>e.id == this.state.exerciseId)?.name))}\n   • RIR: ${this.state.rir}\n   • Agujetas: ${this.state.shoelaces}\n   • Técnica realizada: ${this.state.technique}\n\nObservaciones del entrenador:\n${this.state.comment}
+                `.trimStart().trimEnd();
+                Comment.admin_create(this.state.clientId, encode(utf8.encode(comment)), idTrainingGet).then(()=>this.setState({
+                    isSendResults: false,
+                    buttonSendText: 'Enviar',
+                    successShow: true,
+                    rds: '5',
+                    rpe: '5',
+                    pulse: '0',
+                    repetitions: '0',
+                    kilage: '0',
+                    tonnage: '0',
+                    clientId: '1',
+                    exerciseId: '1',
+                    rir: '0',
+                    shoelaces: 'nada',
+                    date: new Date(),
+                    dateActual: moment(new Date()).format('DD/MM/YYYY'),
+                    technique: '5',
+                    comment: ''
+                })).catch((error)=>this.setState({
+                    isSendResults: false,
+                    buttonSendText: 'Enviar',
+                    showError: true,
+                    messageError: error.cause
+                }));
+            }).catch((error)=>this.setState({
+                isSendResults: false,
+                buttonSendText: 'Enviar',
+                showError: true,
+                messageError: error.cause
+            }))
+        );
+    }
+    loadStart() {
+        this.setState({ exerciseId: this.props.listExercise[0].id });
     }
     render(): React.ReactNode {
-        return(<CustomModal visible={this.props.show} onRequestClose={()=>this.closeModal()}>
+        return(<CustomModal visible={this.props.show} onShow={()=>this.loadStart()} onRequestClose={()=>this.closeModal()}>
             <PaperProvider theme={CombinedTheme}>
                 <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background }}>
                     <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
@@ -119,7 +163,7 @@ export default class AddTraining extends Component<IProps, IState> {
                         <Appbar.Content title={'Cargar entrenamiento'}/>
                     </Appbar.Header>
                     <ScrollView>
-                        <View style={{ marginLeft: 8, marginRight: 8, flexDirection: 'column', paddingTop: 16, alignItems: 'center' }}>
+                        <View style={{ marginLeft: 8, marginRight: 8, flexDirection: 'column', paddingTop: 16, paddingBottom: 16, alignItems: 'center' }}>
                             <TextInput
                                 style={styles.textInput}
                                 mode={'outlined'}
@@ -133,6 +177,11 @@ export default class AddTraining extends Component<IProps, IState> {
                                     return(<Picker.Item label={`${index+1} - ${decode(value.name)}`} value={value.id} key={index} />);
                                 })}
                             </CustomPicker2>
+                            <CustomPicker4 disabled={this.state.isSendResults} style={{ width: Math.floor(width - 24), margin: 8 }} title={"Ejercicio:"} value={this.state.exerciseId} onChange={(value)=>this.setState({ exerciseId: value })}>
+                                {this.props.listExercise.map((value, index)=>{
+                                    return(<Picker.Item label={decode(value.name)} value={value.id} key={index} />);
+                                })}
+                            </CustomPicker4>
                             <View style={{ flexDirection: 'row', marginTop: 8, marginBottom: 8 }}>
                                 <CustomPicker1 disabled={this.state.isSendResults} title={'RDS'} value={this.state.rds} onChange={(value)=>this.setState({ rds: value })} style={{ width: Math.floor((width / 2) - 20), marginLeft: 8, marginRight: 8 }} />
                                 <CustomPicker1 disabled={this.state.isSendResults} title={'RPE'} value={this.state.rpe} onChange={(value)=>this.setState({ rpe: value })} style={{ width: Math.floor((width / 2) - 20), marginLeft: 8, marginRight: 8 }} />
@@ -170,12 +219,44 @@ export default class AddTraining extends Component<IProps, IState> {
                                     editable={false}
                                     value={this.state.tonnage} />
                             </Pressable>
+                            <CustomPicker4 disabled={this.state.isSendResults} title={'RIR'} value={this.state.rir} onChange={(value)=>this.setState({ rir: value })} style={styles.textInput}>
+                                <Picker.Item label={'0'} value={'0'}/>
+                                <Picker.Item label={'1/2'} value={'1/2'}/>
+                                <Picker.Item label={'2/3'} value={'2/3'}/>
+                                <Picker.Item label={'3/4'} value={'3/4'}/>
+                                <Picker.Item label={'4+'} value={'4+'}/>
+                                <Picker.Item label={'Fallo muscular'} value={'fallo muscular'}/>
+                                <Picker.Item label={'Fallo técnica'} value={'fallo técnica'}/>
+                            </CustomPicker4>
+                            <CustomPicker4 disabled={this.state.isSendResults} title={'Agujetas'} value={this.state.shoelaces} onChange={(value)=>this.setState({ shoelaces: value })} style={styles.textInput}>
+                                <Picker.Item label={'Nada'} value={'nada'}/>
+                                <Picker.Item label={'Leves'} value={'leves'}/>
+                                <Picker.Item label={'Moderadas'} value={'moderadas'}/>
+                                <Picker.Item label={'Altas'} value={'altas'}/>
+                                <Picker.Item label={'Muy altas'} value={'muy altas'}/>
+                                <Picker.Item label={'Lesión'} value={'lesión'}/>
+                            </CustomPicker4>
+                            <CustomPicker1
+                                disabled={this.state.isSendResults}
+                                title={'Técnica'}
+                                value={this.state.technique}
+                                onChange={(value)=>this.setState({ technique: value })}
+                                style={styles.textInput}/>
+                            <TextInput
+                                style={styles.textInput}
+                                mode={'outlined'}
+                                label={'Observaciones'}
+                                multiline={true}
+                                numberOfLines={8}
+                                keyboardType={'default'}
+                                value={this.state.comment}
+                                disabled={this.state.isSendResults}
+                                onChangeText={(text)=>this.setState({ comment: text })} />
                             <Button
                                 loading={this.state.isSendResults}
                                 mode={'contained'}
                                 style={{ width: (width / 2), marginTop: 8 }}
-                                onPress={()=>(!this.state.isSendResults)? this.sendResults(): ToastAndroid.show('Espere...', ToastAndroid.SHORT)}>Guardar</Button>
-                            {(this.state.isSendResults) && <Text style={{ marginTop: 16 }}>Enviando resultados...</Text>}
+                                onPress={()=>(!this.state.isSendResults)? this.sendResults(): ToastAndroid.show('Espere...', ToastAndroid.SHORT)}>{this.state.buttonSendText}</Button>
                         </View>
                     </ScrollView>
                 </View>
@@ -207,9 +288,7 @@ export default class AddTraining extends Component<IProps, IState> {
                         </Dialog.Actions>
                     </Dialog>
                 </Portal>
-                <Snackbar visible={this.state.successShow} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ successShow: false })} duration={3000}>
-                    <Text>Carga realizada correctamente.</Text>
-                </Snackbar>
+                <Snackbar visible={this.state.successShow} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ successShow: false })} duration={3000}><Text>Carga realizada correctamente.</Text></Snackbar>
             </PaperProvider>
         </CustomModal>);
     }

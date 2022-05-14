@@ -1,6 +1,7 @@
 type tipical = {
     ok?: boolean;
     cause?: string;
+    datas?: any;
 };
 type openAccount = {
     ok?: boolean;
@@ -21,32 +22,15 @@ type storageData = {
 type trainingData = {
     ok?: boolean;
     cause?: string;
-    trainings?: {
-        date: string;
-        session_number: string;
-        rds: string;
-        rpe: string;
-        pulse: string;
-        repetitions: string;
-        kilage: string;
-        tonnage: string;
-    }
+    trainings?: trainings
 };
 type trainingsData = {
     ok?: boolean;
     cause?: string;
-    trainings?: {
-        date: string;
-        session_number: string;
-        rds: string;
-        rpe: string;
-        pulse: string;
-        repetitions: string;
-        kilage: string;
-        tonnage: string;
-    }[]
+    trainings?: trainings[]
 };
 type trainings = {
+    id: string;
     date: string;
     session_number: string;
     rds: string;
@@ -55,40 +39,32 @@ type trainings = {
     repetitions: string;
     kilage: string;
     tonnage: string;
+    exercise: {
+        id: string;
+        name: string;
+        description: string;
+    }
+};
+type details = {
+    value: string;
+    status: number;
+    difference?: number;
 };
 type DetailsTrainings = {
-    date: {
-        value: string;
+    id: string;
+    date: details;
+    session_number: details;
+    rds: details;
+    rpe: details;
+    pulse: details;
+    repetitions: details;
+    kilage: details;
+    tonnage: details;
+    exercise: {
         status: number;
-    };
-    session_number: {
-        value: string;
-        status: number;
-    };
-    rds: {
-        value: string;
-        status: number;
-    };
-    rpe: {
-        value: string;
-        status: number;
-    };
-    pulse: {
-        value: string;
-        status: number;
-    };
-    repetitions: {
-        value: string;
-        status: number;
-    };
-    kilage: {
-        value: string;
-        status: number;
-    };
-    tonnage: {
-        value: string;
-        status: number;
-    };
+        name: string;
+        description: string;
+    }
 };
 type statisticData = {
     separate: {
@@ -98,7 +74,8 @@ type statisticData = {
     singles: {
         label: string;
         value: string;
-    }[]
+    }[],
+    exercises: dataExercise[];
 };
 type listUsers = {
     ok?: boolean;
@@ -135,6 +112,7 @@ type commentsData = {
     id_issuer: string;
     comment: string;
     date: string;
+    edit: boolean;
     accountData: {
         name: string;
         image: string;
@@ -167,6 +145,16 @@ type getAllPermissions = {
     cause?: string;
     permissions?: permissionItem[];
 };
+type dataExercise = {
+    id: string;
+    name: string;
+    description: string;
+};
+type getAllExercises = {
+    ok?: boolean;
+    cause?: string;
+    data?: dataExercise[];
+};
 
 export type {
     tipical,
@@ -185,5 +173,8 @@ export type {
     getCommentsAll,
     getPermission,
     permissionItem,
-    getAllPermissions
+    getAllPermissions,
+    dataExercise,
+    getAllExercises,
+    details
 };

@@ -58,12 +58,12 @@ export class Statistics extends Component<IProps, IState> {
         });
     }
     getIconItem(past: number | undefined, actual: number | undefined): string {
-        if (this.props.title == 'RPE') return (past)? (actual)? (past == actual)? 'chart-timeline-variant-shimmer': (actual < past)? 'arrow-up': 'arrow-down': 'chart-timeline-variant': 'chart-timeline-variant';
-        return (past)? (actual)? (past == actual)? 'chart-timeline-variant-shimmer': (actual > past)? 'arrow-up': 'arrow-down': 'chart-timeline-variant': 'chart-timeline-variant';
+        if (this.props.title == 'RPE') return (past !== undefined)? (actual !== undefined)? (past == actual)? 'chart-timeline-variant-shimmer': (actual < past)? 'arrow-up': 'arrow-down': 'chart-timeline-variant': 'chart-timeline-variant';
+        return (past !== undefined)? (actual !== undefined)? (past == actual)? 'chart-timeline-variant-shimmer': (actual > past)? 'arrow-up': 'arrow-down': 'chart-timeline-variant': 'chart-timeline-variant';
     }
     getColorItem(past: number | undefined, actual: number | undefined): string {
-        if (this.props.title == 'RPE') return (past)? (actual)? (past == actual)? Colors.blue500: (actual < past)? Colors.green500: Colors.red500: Colors.yellow500: Colors.yellow500;
-        return (past)? (actual)? (past == actual)? Colors.blue500: (actual > past)? Colors.green500: Colors.red500: Colors.yellow500: Colors.yellow500;
+        if (this.props.title == 'RPE') return (past !== undefined)? (actual !== undefined)? (past == actual)? Colors.blue500: (actual < past)? Colors.green500: Colors.red500: Colors.yellow500: Colors.yellow500;
+        return (past !== undefined)? (actual !== undefined)? (past == actual)? Colors.blue500: (actual > past)? Colors.green500: Colors.red500: Colors.yellow500: Colors.yellow500;
     }
     async getNavBarHeight() { return this.setState({ navBarHeight: await getNavigationBarHeight() }); }
     resetDataAndClose() { this.setState({ dataView: [], isLoading: true, isLoadingGraphics: true }); this.props.close(); }

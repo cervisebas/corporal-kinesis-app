@@ -114,9 +114,9 @@ class OthersComponents extends Component<IProps2> {
 const styles = StyleSheet.create({
     fab: {
       position: 'absolute',
-      margin: 12,
+      margin: 16,
       right: 0,
-      bottom: 56,
+      bottom: 56
     },
 });
 

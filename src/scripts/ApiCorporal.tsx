@@ -1,6 +1,7 @@
 import { encode } from "base-64";
 import AccountSystem from "./ApiCorporal/accounts";
 import CommentSystem from "./ApiCorporal/comments";
+import { ExerciseSystem } from "./ApiCorporal/exercises";
 import PermissionSystem from "./ApiCorporal/permissions";
 import TrainingSystem from "./ApiCorporal/training";
 
@@ -12,11 +13,13 @@ const Account = new AccountSystem(HostServer, keyAccess);
 const Training = new TrainingSystem(HostServer, keyAccess);
 const Permission = new PermissionSystem(HostServer, keyAccess);
 const Comment = new CommentSystem(HostServer, keyAccess);
+const Exercise = new ExerciseSystem(HostServer, keyAccess);
 
 export {
     HostServer,
     Account,
     Training,
     Permission,
-    Comment
+    Comment,
+    Exercise
 };

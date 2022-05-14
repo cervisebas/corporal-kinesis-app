@@ -1,19 +1,22 @@
 import { decode } from "base-64";
 import React, { PureComponent } from "react";
 import { Component, ReactNode } from "react";
-import { DeviceEventEmitter, Dimensions, FlatList, RefreshControl, StyleProp, StyleSheet, ToastAndroid, View, ViewStyle } from "react-native";
+import { DeviceEventEmitter, Dimensions, EmitterSubscription, FlatList, RefreshControl, StyleProp, StyleSheet, ToastAndroid, View, ViewStyle } from "react-native";
 import { ActivityIndicator, Appbar, Button, Dialog, List, Paragraph, Portal, Snackbar, Text, TouchableRipple } from "react-native-paper";
-import { Account, Comment } from "../../scripts/ApiCorporal";
-import { dataListUsers, userData } from "../../scripts/ApiCorporal/types";
+import { Account, Comment, Exercise, Training } from "../../scripts/ApiCorporal";
+import { commentsData, dataExercise, dataListUsers, DetailsTrainings, trainings, userData } from "../../scripts/ApiCorporal/types";
 import { Global } from "../../scripts/Global";
 import CombinedTheme from "../../Theme";
 import { CustomCard2, CustomItemList2, CustomShowError } from "../components/Components";
 import DialogError from "../components/DialogError";
+import ViewMoreDetails from "../pages/pages/viewMoreDetails";
 import AddNewAccount from "./pages/addNewAccount";
 import AddTraining from "./pages/addTraining";
 import SearchClient from "./pages/searchClient";
 import SetCommentUser from "./pages/setCommentUser";
 import ViewClietDetails from "./pages/viewClientDetails";
+import ViewComments from "./pages/viewComments";
+import ViewTraining from "./pages/viewTraining";
 
 const { width } = Dimensions.get('window');
 const percent = (px: number, per: number)=>(per * px)/100;
@@ -44,6 +47,14 @@ type IState = {
     showQuestionDeleteUser: boolean;
     showSendComment: boolean;
     idActualSendComment: string;
+    viewComments: boolean;
+    dataComments: commentsData[];
+    excercisesList: dataExercise[];
+    viewTrainigsDetails: boolean;
+    dataTrainigsDetails: trainings[];
+    viewMoreDetailsVisible: boolean;
+    viewMoreDetailsTraining: DetailsTrainings;
+    viewMoreDetailsComment: commentsData | undefined;
 };
 
 export default class Page1 extends Component<IProps, IState> {
@@ -70,15 +81,28 @@ export default class Page1 extends Component<IProps, IState> {
             idActualDeleteClient: '',
             showQuestionDeleteUser: false,
             showSendComment: false,
-            idActualSendComment: ''
+            idActualSendComment: '',
+            viewComments: false,
+            dataComments: [],
+            excercisesList: [],
+            viewTrainigsDetails: false,
+            dataTrainigsDetails: [],
+            viewMoreDetailsVisible: false,
+            viewMoreDetailsTraining: this.reserve1,
+            viewMoreDetailsComment: undefined
         };
     }
+    private reserve1 = { id: '-1', date: { value: '-', status: -1, difference: undefined }, session_number: { value: '-', status: -1, difference: undefined }, rds: { value: '-', status: -1, difference: undefined }, rpe: { value: '-', status: -1, difference: undefined }, pulse: { value: '-', status: -1, difference: undefined }, repetitions: { value: '-', status: -1, difference: undefined }, kilage: { value: '-', status: -1, difference: undefined }, tonnage: { value: '-', status: -1, difference: undefined }, exercise: { name: 'No disponible', status: -1, description: '' } };
     private detailsClientDataDefault = { id: '', name: '', email: '', birthday: '', dni: '', phone: '', experience: '', image: '', type: '' };
+    private event: EmitterSubscription | null = null;
     componentDidMount() {
         this.loadData();
-        DeviceEventEmitter.addListener('adminPage1Reload', ()=>this.loadData());
+        this.event = DeviceEventEmitter.addListener('adminPage1Reload', ()=>this.loadData());
     }
-    componentWillUnmount() { this.setState({ showAddTraining: false, showSearchClient: false, isLoading: true, isError: false, messageError: '', userList: [], refreshing: false, loadingView: false, loadingText: '', }); }
+    componentWillUnmount() {
+        this.setState({ messageError: '', userList: [], loadingText: '', errorTitle: '', errorMessage: '', detailsClientData: this.detailsClientDataDefault, textSnackBar: '', idActualDeleteClient: '', idActualSendComment: '', dataComments: [], excercisesList: [], dataTrainigsDetails: [], viewMoreDetailsVisible: false, viewMoreDetailsTraining: this.reserve1, viewMoreDetailsComment: undefined });
+        this.event?.remove();
+    }
     goDetailsClient(idClient: string) {
         this.setState({ loadingView: true, loadingText: 'Cargando datos del usuario...' }, ()=>
             Account.admin_getUserData(idClient)
@@ -105,8 +129,31 @@ export default class Page1 extends Component<IProps, IState> {
             Account.admin_getListUser()
                 .then((data)=>this.setState({ isLoading: false, userList: data }))
                 .catch((error)=>this.setState({ isError: true, isLoading: false, messageError: error.cause }));
+            Exercise.getAll()
+                .then((data)=>this.setState({ excercisesList: data }))
+                .catch((error)=>this.setState({ isError: true, isLoading: false, messageError: error.cause }));
             if (this.state.refreshing) this.setState({ refreshing: false });
         });
+    }
+    reloadDataComment() {
+        this.setState({ loadingView: true, loadingText: 'Obteniendo información...' }, ()=>
+            Comment.admin_getAllAccount(this.state.detailsClientData.id)
+                .then((value)=>this.setState({ dataComments: value.reverse(), loadingView: false, loadingText: '' }))
+                .catch((error)=>this.setState({ errorView: true, errorTitle: 'Ocurrio un error', errorMessage: error.cause }))
+        );
+    }
+    reloadDataTraining() {
+        this.setState({ loadingView: true, loadingText: 'Obteniendo información...' }, ()=>
+            Training.admin_getAllAccount(this.state.detailsClientData.id)
+                .then((value)=>this.setState({ dataTrainigsDetails: value.reverse(), loadingView: false, loadingText: '' }))
+                .catch((error)=>this.setState({ errorView: true, errorTitle: 'Ocurrio un error', errorMessage: error.cause }))
+        );
+    }
+    openAddTraining() {
+        if (this.state.excercisesList.length !== 0)
+            this.setState({ showAddTraining: true });
+        else
+            this.setState({ errorView: true, errorTitle: 'Ocurrio un error', errorMessage: 'Debes añadir ejercicios en la lista antes de realizar cargas.' });
     }
     render(): ReactNode {
         return(<View style={{ flex: 1 }}>
@@ -117,10 +164,10 @@ export default class Page1 extends Component<IProps, IState> {
             <View style={{ flex: 2, overflow: 'hidden' }}>
                 <FlatList
                     data={this.state.userList}
-                    contentContainerStyle={{ flex: 3 }}
+                    contentContainerStyle={{ flex: (this.state.isLoading || this.state.isError || this.state.userList.length == 0)? 3: undefined }}
                     refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={this.state.refreshing} onRefresh={()=>this.setState({ refreshing: true }, ()=>this.loadData())} />}
                     ListEmptyComponent={(this.state.isLoading)? <ShowLoading />: (this.state.isError)? <CustomShowError message={this.state.messageError} />: <></>}
-                    ListHeaderComponent={<ButtonsHeaderList load={(this.state.isError)? false: !this.state.isLoading} click1={()=>this.setState({ showAddTraining: true })} click2={()=>this.setState({ showSearchClient: true })}/>}
+                    ListHeaderComponent={<ButtonsHeaderList load={(this.state.isError)? false: !this.state.isLoading} click1={()=>this.openAddTraining()} click2={()=>this.setState({ showSearchClient: true })}/>}
                     ListFooterComponent={(!this.state.isLoading)? <TouchableRipple onPress={()=>this.setState({ showAddNewUser: true })}><List.Item title={'Añadir nuevo usuario'} left={(props)=><List.Icon {...props} icon="account-plus" />} /></TouchableRipple>: <></>}
                     renderItem={({ item, index })=><CustomItemList2
                         key={index}
@@ -134,10 +181,32 @@ export default class Page1 extends Component<IProps, IState> {
                 <AddNewAccount show={this.state.showAddNewUser} close={()=>this.setState({ showAddNewUser: false })} />
                 <Snackbar visible={this.state.showSnackBar} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ showSnackBar: false })}><Text>{this.state.textSnackBar}</Text></Snackbar>
                 <DialogError show={this.state.errorView} close={()=>this.setState({ errorView: false })} title={this.state.errorTitle} message={this.state.errorMessage} />
-                <AddTraining show={this.state.showAddTraining} listUsers={this.state.userList} close={()=>this.setState({ showAddTraining: false })} />
+                <AddTraining show={this.state.showAddTraining} listUsers={this.state.userList} close={()=>this.setState({ showAddTraining: false })} listExercise={this.state.excercisesList}/>
                 <SearchClient show={this.state.showSearchClient} listUsers={this.state.userList} goDetailsClient={(idClient)=>this.goDetailsClient(idClient)} close={()=>this.setState({ showSearchClient: false })} showLoading={(visible, message, after)=>this.setState({ loadingView: visible, loadingText: message }, ()=>(after)&&after())} showSnackOut={(text)=>this.setState({ showSnackBar: true, textSnackBar: text })} />
                 <Global loadingView={this.state.loadingView} loadingText={this.state.loadingText} />
-                <ViewClietDetails show={this.state.detailsClientView} close={()=>this.setState({ detailsClientView: false })} completeClose={()=>setTimeout(()=>this.setState({ detailsClientData: this.detailsClientDataDefault }), 300)} userData={this.state.detailsClientData} />
+                <ViewClietDetails
+                    show={this.state.detailsClientView}
+                    close={()=>this.setState({ detailsClientView: false })}
+                    completeClose={()=>setTimeout(()=>this.setState({ detailsClientData: this.detailsClientDataDefault }), 600)}
+                    userData={this.state.detailsClientData}
+                    goLoading={(show, text, after)=>this.setState({ loadingView: show, loadingText: text }, ()=>(after)&&after())}
+                    openAllComment={(data)=>this.setState({ dataComments: data, viewComments: true })}
+                    openAllTrainings={(data)=>this.setState({ dataTrainigsDetails: data, viewTrainigsDetails: true })}
+                    showExternalSnackbar={(text, after)=>this.setState({ showSnackBar: true, textSnackBar: text }, ()=>(after)&&after())} />
+                <ViewComments show={this.state.viewComments} close={()=>this.setState({ viewComments: false })} closeComplete={()=>setTimeout(()=>this.setState({ dataComments: [] }), 600)} data={this.state.dataComments} reloadData={()=>this.reloadDataComment()} goLoading={(show, text, after)=>this.setState({ loadingView: show, loadingText: text }, ()=>(after)&&after())} />
+                <ViewTraining
+                    visible={this.state.viewTrainigsDetails}
+                    trainings={this.state.dataTrainigsDetails}
+                    close={()=>this.setState({ viewTrainigsDetails: false })}
+                    goLoading={(show, message, after)=>this.setState({ loadingView: show, loadingText: message }, ()=>(after)&&after())}
+                    reload={()=>this.reloadDataTraining()}
+                    goMoreDetails={(training, comment)=>this.setState({ viewMoreDetailsVisible: true, viewMoreDetailsTraining: training, viewMoreDetailsComment: comment })}
+                    accountId={this.state.detailsClientData.id} />
+                <ViewMoreDetails
+                    visible={this.state.viewMoreDetailsVisible}
+                    close={()=>this.setState({ viewMoreDetailsVisible: false, viewMoreDetailsTraining: this.reserve1, viewMoreDetailsComment: undefined })}
+                    dataShow={this.state.viewMoreDetailsTraining}
+                    commentData={this.state.viewMoreDetailsComment} />
                 <Portal>
                     <Dialog visible={this.state.showQuestionDeleteUser}>
                         <Dialog.Title>¡¡Advertencia!!</Dialog.Title>
@@ -158,7 +227,7 @@ export default class Page1 extends Component<IProps, IState> {
             </View>
         </View>);
     }
-};
+}
 
 class ShowLoading extends PureComponent {
     constructor(props: any) { super(props); }
@@ -168,6 +237,7 @@ class ShowLoading extends PureComponent {
         </View>);
     }
 }
+
 class ButtonsHeaderList extends PureComponent<{ load: boolean; click1: ()=>any; click2: ()=>any; }> {
     constructor(props: any) { super(props); }
     private styleCard: StyleProp<ViewStyle> = { width: percent(width, 50) - 18, marginTop: 18, backgroundColor: '#ED7035', height: 56 };

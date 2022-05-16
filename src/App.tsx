@@ -3,7 +3,7 @@ import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SystemNavigationBar from "react-native-system-navigation-bar";
-import { DeviceEventEmitter, Linking, StatusBar, View } from 'react-native';
+import { DeviceEventEmitter, EmitterSubscription, Linking, StatusBar, View } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import Client from './screens/client';
 import Profesional from './screens/profesional';
@@ -41,6 +41,7 @@ export default class App extends Component<IProps, IState> {
             textAnimVerify: 'Cargando'
         };
     }
+    private event: EmitterSubscription | null = null;
     verifyAccount() {
         Account.verify().then((value)=>{
             if (value) this.setState({ textAnimVerify: `Accediendo como "${decode(value.email).slice(0, 5)}...${decode(value.email).slice(decode(value.email).indexOf('@'), decode(value.email).length)}"` });
@@ -55,7 +56,7 @@ export default class App extends Component<IProps, IState> {
         SystemNavigationBar.setNavigationColor('#0f4577', true);
         this.verifyAccount();
         setTimeout(async() =>(await DeviceInfo.getApiLevel() < 26) && this.setState({ marginTop: StatusBar.currentHeight || 24, marginBottom: await getNavigationBarHeight() }));
-        DeviceEventEmitter.addListener('nowVerify', ()=>this.verifyAccount());
+        this.event = DeviceEventEmitter.addListener('nowVerify', ()=>this.verifyAccount());
         VersionCheck.needUpdate({ ignoreErrors: true }).then((value)=>(value.isNeeded)&&Linking.openURL(value.storeUrl));
     }
     componentWillUnmount() {
@@ -68,6 +69,7 @@ export default class App extends Component<IProps, IState> {
             showTextAnimVerify: true,
             textAnimVerify: 'Cargando'
         });
+        this.event?.remove();
         DeviceEventEmitter.removeAllListeners();
     }
     render(): React.ReactNode {

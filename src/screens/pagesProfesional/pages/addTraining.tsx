@@ -263,7 +263,7 @@ export default class AddTraining extends Component<IProps, IState> {
                 <Portal>
                     <Dialog visible={this.state.viewDialogDate} dismissable={true} onDismiss={()=>this.setState({ viewDialogDate: false })}>
                         <Dialog.Title>Fecha de nacimiento</Dialog.Title>
-                        <Dialog.Content>
+                        <Dialog.Content style={{ overflow: 'hidden' }}>
                             <DatePicker
                                 date={this.state.date}
                                 mode={'date'}

@@ -37,14 +37,18 @@ export default class AccountSystem {
                             resolve(datas);
                         });
                     } else {
-                        reject({ cause: data.cause, error: data.ok });
+                        reject({
+                            cause: (data.cause?.length !== undefined && data.cause?.length !== 0)? data.cause: 'Ocurrió un error inesperadamente.',
+                            error: false,
+                            action: (data.cause?.length !== undefined && data.cause?.length !== 0)? (data.cause?.toLocaleLowerCase().indexOf('mantenimiento'))? 0: 1: 1
+                        });
                     }
                 }).catch((error)=>{
                     console.log(error);
-                    reject({ cause: 'Error de conexión.', error });
+                    reject({ cause: 'Error de conexión.', error, action: 0 });
                 });
             } catch (error) {
-                reject({ cause: 'Ocurrió un error inesperadamente.', error });
+                reject({ cause: 'Ocurrió un error inesperadamente.', error, action: 1 });
             }
         });
     }
@@ -55,9 +59,9 @@ export default class AccountSystem {
                     if (!value) return reject({ cause: 'No se ha encontrado datos de inicio de sesión.', action: 1, error: false });
                     var datas: storageData = JSON.parse(decode(String(value)));
                     this.open(decode(datas.email), decode(datas.password)).then((value)=>resolve(value)).catch((error)=>reject(error));
-                }).catch((error)=>reject({ cause: 'Ocurrió un error al intentar consultar a los datos de sesión.', error }));
+                }).catch((error)=>reject({ cause: 'Ocurrió un error al intentar consultar a los datos de sesión.', error, action: 1 }));
             } catch (error) {
-                reject({ cause: 'Ocurrió un error inesperadamente.', error });
+                reject({ cause: 'Ocurrió un error inesperadamente.', error, action: 1 });
             }
         });
     }

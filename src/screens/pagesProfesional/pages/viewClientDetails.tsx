@@ -1,7 +1,7 @@
 import { decode } from "base-64";
 import moment from "moment";
 import React, { Component, PureComponent, ReactNode } from "react";
-import { DeviceEventEmitter, Dimensions, Image, Linking, StyleSheet, ToastAndroid, View } from "react-native";
+import { DeviceEventEmitter, Dimensions, Image, Linking, ScrollView, StyleSheet, ToastAndroid, View } from "react-native";
 import { Appbar, Provider as PaperProvider, Divider, Text, Card, IconButton, Button, Snackbar, Portal, Dialog, Paragraph } from "react-native-paper";
 import { Account, Comment, HostServer, Training } from "../../../scripts/ApiCorporal";
 import { commentsData, trainings, userData } from "../../../scripts/ApiCorporal/types";
@@ -93,7 +93,7 @@ export default class ViewClietDetails extends Component<IProps, IState> {
                         <Appbar.Action icon={'pencil'} onPress={()=>this.editData()} />
                         <Appbar.Action icon={'trash-can-outline'} onPress={()=>this.setState({ showQuestionDeleteUser: true })} />
                     </Appbar.Header>
-                    <View style={{ flex: 2, overflow: 'hidden' }}>
+                    <ScrollView style={{ flex: 2, overflow: 'hidden', paddingBottom: 16 }}>
                         <View style={{ margin: 20, height: 100, width: (width - 40), flexDirection: 'row' }}>
                             <View style={styles.imageProfile}>
                                 <Image style={{ width: '100%', height: '100%' }} source={{ uri: `${HostServer}/images/accounts/${decode(this.props.userData.image)}` }} />
@@ -151,7 +151,7 @@ export default class ViewClietDetails extends Component<IProps, IState> {
                         </Portal>
                         <DialogError show={this.state.errorView} close={()=>this.setState({ errorView: false })} title={this.state.errorTitle} message={this.state.errorMessage} />
                         <Snackbar visible={this.state.showSnackBar} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ showSnackBar: false })}><Text>{this.state.textSnackBar}</Text></Snackbar>
-                    </View>
+                    </ScrollView>
                 </View>
             </PaperProvider>
         </CustomModal>);

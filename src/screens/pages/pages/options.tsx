@@ -67,6 +67,9 @@ export default class Options extends Component<IProps, IState> {
             setTimeout(()=>BackHandler.exitApp(), 3000);
         }, 1200));
     }
+    editInfoUser() {
+        ToastAndroid.show('Función en desarrollo...', ToastAndroid.SHORT);
+    }
     render(): React.ReactNode {
         return(<CustomModal visible={this.props.show} onShow={()=>this.loadInfo()} onRequestClose={()=>this.props.close()}>
             <PaperProvider theme={CombinedTheme}>
@@ -76,7 +79,7 @@ export default class Options extends Component<IProps, IState> {
                         <Appbar.Content title="Opciones" />
                     </Appbar.Header>
                     <View style={{ flex: 2 }}>
-                        <Card style={{ marginTop: 16, marginLeft: 8, marginRight: 8 }} onPress={()=>console.log('click')}>
+                        <Card style={{ marginTop: 16, marginLeft: 8, marginRight: 8 }} onPress={()=>this.editInfoUser()}>
                             <Card.Content>
                                 <List.Item
                                     title={this.state.userInfo.name}

@@ -1,7 +1,7 @@
 import { decode, encode } from "base-64";
 import React, { PureComponent } from "react";
 import { Component, ReactNode } from "react";
-import { DeviceEventEmitter, FlatList, RefreshControl, View } from "react-native";
+import { DeviceEventEmitter, EmitterSubscription, FlatList, RefreshControl, View } from "react-native";
 import { ActivityIndicator, Appbar } from "react-native-paper";
 import { HostServer, Permission } from "../../scripts/ApiCorporal";
 import { permissionItem } from "../../scripts/ApiCorporal/types";
@@ -55,7 +55,9 @@ export default class Page2 extends Component<IProps, IState> {
             loadingText: ''
         };
     }
+    private event: EmitterSubscription | null = null;
     componentWillUnmount() {
+        this.event?.remove();
         this.setState({
             userList: [],
             isLoading: true,
@@ -71,7 +73,7 @@ export default class Page2 extends Component<IProps, IState> {
     }
     componentDidMount() {
         this.loadData();
-        DeviceEventEmitter.addListener('adminPage2Reload', ()=>this.loadData());
+        this.event = DeviceEventEmitter.addListener('adminPage2Reload', ()=>this.loadData());
     }
     loadData() {
         this.setState({ userList: [], isLoading: true, isError: false, messageError: '' }, ()=>{
@@ -111,7 +113,7 @@ export default class Page2 extends Component<IProps, IState> {
             <View style={{ flex: 2, overflow: 'hidden' }}>
                 <FlatList
                     data={this.state.userList}
-                    contentContainerStyle={{ flex: 3 }}
+                    contentContainerStyle={{ flex: (this.state.isLoading || this.state.isError)? 3: undefined }}
                     refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={this.state.refreshing} onRefresh={()=>this.setState({ refreshing: true }, ()=>this.loadData())} />}
                     ListEmptyComponent={(this.state.isLoading)? <ShowLoading />: (this.state.isError)? <CustomShowError message={this.state.messageError} />: <></>}
                     renderItem={({ item, index })=><CustomItemList3

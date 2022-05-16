@@ -1,7 +1,7 @@
 import { decode } from "base-64";
 import moment from "moment";
 import React, { Component } from "react";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { Appbar, Colors, Provider as PaperProvider, Text } from "react-native-paper";
 import utf8 from "utf8";
 import { HostServer } from "../../../scripts/ApiCorporal";
@@ -55,7 +55,7 @@ export default class ViewMoreDetails extends Component<IProps, IState> {
                         <Appbar.BackAction onPress={()=>this.props.close()} />
                         <Appbar.Content title={`Más detalles (${this.props.dataShow.date.value})`}/>
                     </Appbar.Header>
-                    <View style={{ flex: 2 }}>
+                    <ScrollView style={{ flex: 2, paddingBottom: 16 }}>
                         <View style={{ flexDirection: 'row' }}>
                             <View style={{ ...styles.row, paddingLeft: 8, paddingRight: 4 }}>
                                 <CustomCard4 style={styles.card} title={'RDS'} iconName={'arrow-up-thick'} value={this.processShow(this.props.dataShow.rds)} />
@@ -69,17 +69,17 @@ export default class ViewMoreDetails extends Component<IProps, IState> {
                             </View>
                         </View>
                         <CustomCard5 style={{ margin: 8 }} title={this.processTitle(this.props.dataShow.exercise.name)} paragraph={this.processParagraph(this.props.dataShow.exercise.description)} />
-                        <View style={{ marginTop: 8 }}>
+                        {(this.props.commentData)&&<View style={{ marginTop: 8 }}>
                             <View style={{ marginLeft: 8, marginBottom: 16 }}><Text style={{ fontSize: 18 }}>Comentario:</Text></View>
-                            {(this.props.commentData)&&<CustomCardComments
+                            <CustomCardComments
                                 source={{ uri: `${HostServer}/images/accounts/${decode(this.props.commentData?.accountData.image)}` }}
                                 accountName={`${decode(this.props.commentData?.accountData.name)} (${this.calcYears(decode(this.props.commentData?.accountData.birthday))} años)`}
                                 edit={this.props.commentData?.edit}
                                 date={decode(this.props.commentData?.date)}
                                 comment={decodeUtf8(decode(this.props.commentData?.comment))}
-                            />}
-                        </View>
-                    </View>
+                            />
+                        </View>}
+                    </ScrollView>
                 </View>
             </PaperProvider>
         </CustomModal>);

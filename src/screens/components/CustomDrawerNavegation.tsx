@@ -14,6 +14,7 @@ type IState = {
     nameUser: string;
     pictureUser: string;
     loadingUser: boolean;
+    widht: number;
 };
 export default class CustomDrawerNavegation extends Component<DrawerContentComponentProps, IState> {
     constructor(props: DrawerContentComponentProps) {
@@ -21,7 +22,8 @@ export default class CustomDrawerNavegation extends Component<DrawerContentCompo
         this.state = {
             nameUser: 'Cargando...',
             pictureUser: '',
-            loadingUser: false
+            loadingUser: false,
+            widht: 0
         };
     }
     private devUrl: string ='https://github.com/cervisebas';
@@ -49,12 +51,12 @@ export default class CustomDrawerNavegation extends Component<DrawerContentCompo
         }).catch(()=>this.setState({ nameUser: 'Error al cargar...' }));
     }
     render(): ReactNode {
-        return(<DrawerContentScrollView {...this.props} style={{ backgroundColor: '#1663AB' }}>
+        return(<DrawerContentScrollView onLayout={({ nativeEvent })=>this.setState({ widht: nativeEvent.layout.width })} {...this.props} style={{ backgroundColor: '#1663AB' }}>
             <View style={{ width: '100%', height: 150, backgroundColor: CombinedTheme.colors.background, position: 'relative', marginBottom: 8, marginTop: -4, overflow: 'hidden' }}>
                 <Image source={require('../../assets/background-picture-admin.gif')} style={{ width: '100%', height: '100%', opacity: 0.7 }} resizeMode={'cover'} />
                 <View style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', position: 'absolute', bottom: 18, width: '100%' }}>
                     <Avatar.Image size={46} source={(this.state.loadingUser)? { uri: this.state.pictureUser }: require('../../assets/profile.png')} style={{ marginLeft: 12 }} />
-                    <Title numberOfLines={1} style={{ marginLeft: 12 }}>{this.state.nameUser}</Title>
+                    <Title numberOfLines={1} style={{ marginLeft: 12, width: this.state.widht - 78 }}>{this.state.nameUser}</Title>
                 </View>
             </View>
             {this.props.state.routes.map((item, index)=>{

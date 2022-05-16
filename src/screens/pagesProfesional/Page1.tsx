@@ -153,7 +153,7 @@ export default class Page1 extends Component<IProps, IState> {
         if (this.state.excercisesList.length !== 0)
             this.setState({ showAddTraining: true });
         else
-            this.setState({ errorView: true, errorTitle: 'Ocurrio un error', errorMessage: 'Debes añadir ejercicios en la lista antes de realizar cargas.' });
+            this.setState({ errorView: true, errorTitle: '¡¡¡Atención!!!', errorMessage: 'Debes añadir ejercicios en la lista antes de realizar cargas.' });
     }
     render(): ReactNode {
         return(<View style={{ flex: 1 }}>

@@ -96,7 +96,7 @@ export default class Page3 extends Component<IProps, IState> {
                     refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={this.state.refreshing} onRefresh={()=>this.setState({ refreshing: true }, ()=>this.loadData())} />}
                     ListEmptyComponent={(this.state.isLoading)? <ShowLoading />: (this.state.isError)? <CustomShowError message={this.state.messageError} />: <></>}
                     ListFooterComponent={(!this.state.isLoading)? <TouchableRipple onPress={()=>this.setState({ showAddExercise: true })}><List.Item title={'Añadir nuevo ejercicio'} left={(props)=><List.Icon {...props} icon="plus" />} /></TouchableRipple>: <></>}
-                    renderItem={({ item, index })=><CustomItemList4
+                    renderItem={({ item })=><CustomItemList4
                         title={decode(item.name)}
                         actionViewDescription={()=>this.setState({ titleDescription: `Ver descripción: ${decode(item.name)}`, textDescription: (decode(item.description) == 'none')? 'No hay descripción disponible.': decode(item.description), viewDescription: true })}
                         actionDelete={()=>this.setState({ viewOk: true, actualDeleteId: item.id })}

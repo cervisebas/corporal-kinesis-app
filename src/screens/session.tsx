@@ -371,7 +371,7 @@ export class Session extends Component<IProps, IState> {
                 <Portal>
                     <Dialog visible={this.state.viewModalDate} dismissable={true} onDismiss={()=>this.setState({ viewModalDate: false })}>
                         <Dialog.Title>Fecha de nacimiento</Dialog.Title>
-                        <Dialog.Content>
+                        <Dialog.Content style={{ overflow: 'hidden' }}>
                             <DatePicker
                                 date={this.state.actualDatePicker}
                                 mode={'date'}

@@ -5,8 +5,7 @@ import { Appbar, Dialog, List, Paragraph, Portal, Button, TouchableRipple, Snack
 import { Exercise } from "../../scripts/ApiCorporal";
 import { dataExercise } from "../../scripts/ApiCorporal/types";
 import CombinedTheme from "../../Theme";
-import { CustomShowError, CustomItemList3, CustomItemList4 } from "../components/Components";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { CustomShowError, CustomItemList4 } from "../components/Components";
 import AddNewExercise from "./pages/addNewExcercise";
 import { Global } from "../../scripts/Global";
 
@@ -92,7 +91,7 @@ export default class Page3 extends Component<IProps, IState> {
             <View style={{ flex: 2, overflow: 'hidden' }}>
                 <FlatList
                     data={this.state.list}
-                    contentContainerStyle={{ flex: 3 }}
+                    contentContainerStyle={{ flex: (this.state.isLoading || this.state.isError)? 3: undefined }}
                     refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={this.state.refreshing} onRefresh={()=>this.setState({ refreshing: true }, ()=>this.loadData())} />}
                     ListEmptyComponent={(this.state.isLoading)? <ShowLoading />: (this.state.isError)? <CustomShowError message={this.state.messageError} />: <></>}
                     ListFooterComponent={(!this.state.isLoading)? <TouchableRipple onPress={()=>this.setState({ showAddExercise: true })}><List.Item title={'Añadir nuevo ejercicio'} left={(props)=><List.Icon {...props} icon="plus" />} /></TouchableRipple>: <></>}

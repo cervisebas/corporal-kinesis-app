@@ -4,6 +4,7 @@ import CommentSystem from "./ApiCorporal/comments";
 import { ExerciseSystem } from "./ApiCorporal/exercises";
 import PermissionSystem from "./ApiCorporal/permissions";
 import TrainingSystem from "./ApiCorporal/training";
+import SystemChangeLog from "./ChangeLog";
 
 //const HostServer: string = 'http://192.168.1.37/CorporalKinesisApi';
 const HostServer: string = 'https://api.corporalkinesis.com.ar';
@@ -14,6 +15,7 @@ const Training = new TrainingSystem(HostServer, keyAccess);
 const Permission = new PermissionSystem(HostServer, keyAccess);
 const Comment = new CommentSystem(HostServer, keyAccess);
 const Exercise = new ExerciseSystem(HostServer, keyAccess);
+const ChangeLogSystem = new SystemChangeLog();
 
 export {
     HostServer,
@@ -21,5 +23,6 @@ export {
     Training,
     Permission,
     Comment,
-    Exercise
+    Exercise,
+    ChangeLogSystem
 };

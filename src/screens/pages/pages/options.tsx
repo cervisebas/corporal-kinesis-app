@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { BackHandler, ToastAndroid, View } from "react-native";
+import { BackHandler, DeviceEventEmitter, ToastAndroid, View } from "react-native";
 import { Appbar, Text, Provider as PaperProvider, List, Avatar, Card, Button, Portal, Dialog } from "react-native-paper";
 import CombinedTheme from "../../../Theme";
 import CustomModal from "../../components/CustomModal";
@@ -9,6 +9,7 @@ import { decode } from "base-64";
 import { HostServer } from "../../../scripts/ApiCorporal";
 import { storageData } from "../../../scripts/ApiCorporal/types";
 import SplashScreen from "react-native-splash-screen";
+import { CardButton1 } from "../../components/Components";
 
 type IProps = {
     show: boolean;
@@ -87,10 +88,9 @@ export default class Options extends Component<IProps, IState> {
                                     left={(props)=><Avatar.Image {...props} size={64} source={(!this.state.loading)? require('../../../assets/profile.png'): { uri: this.state.userInfo.image }} />}
                                 />
                             </Card.Content>
-                            <Card.Actions style={{ marginTop: 8 }}>
-                                <Button onPress={()=>this.setState({ showDialog: true })} icon={'logout'} color="red">Cerrar sesión</Button>
-                            </Card.Actions>
                         </Card>
+                        <CardButton1 title={'VER LISTA DE CAMBIOS'} icon={'note-text-outline'} onPress={()=>DeviceEventEmitter.emit('openChangeLog')} />
+                        <CardButton1 title={'CERRAR SESIÓN'} icon={'logout'} color="red" onPress={()=>this.setState({ showDialog: true })} />
                         <Text style={{ width: '100%', textAlign: 'center', marginTop: 32 }}>Version {DeviceInfo.getVersion()}</Text>
                     </View>
                     <Portal>

@@ -1,7 +1,7 @@
 import { decode } from "base-64";
 import moment from "moment";
 import React, { Component, PureComponent } from "react";
-import { ScrollView, StyleProp, View, ViewStyle } from "react-native";
+import { ListViewComponent, ScrollView, StyleProp, View, ViewStyle } from "react-native";
 import { Avatar, Card, Colors, Text, IconButton, Paragraph, Title, List, Menu, Divider, TouchableRipple, Button } from "react-native-paper";
 import { AvatarImageSource } from "react-native-paper/lib/typescript/components/Avatar/AvatarImage";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
@@ -389,6 +389,52 @@ class CustomItemList5 extends PureComponent<IProps14, IState14> {
     }
 }
 
+type IProps15 = {
+    style?: StyleProp<ViewStyle>;
+    title: string;
+    subtitle: string;
+    message: string;
+};
+type IState15 = {};
+
+class CustomItemList6 extends PureComponent<IProps15, IState15> {
+    constructor(props: IProps15) {
+        super(props);
+    }
+    render(): React.ReactNode {
+        return(<Card accessible={true} style={[{ marginLeft: 8, marginRight: 8, marginTop: 12 }, this.props.style]} theme={{ dark: true }}>
+            <Card.Title title={this.props.title} subtitle={this.props.subtitle} subtitleStyle={{ marginLeft: 4 }} />
+            <Card.Content>
+                <Paragraph>{this.props.message}</Paragraph>
+            </Card.Content>
+        </Card>);
+    }
+}
+
+type IProps16 = {
+    icon?: string;
+    title: string;
+    color?: string;
+    onPress?: ()=>any;
+};
+type IState16 = {};
+
+class CardButton1 extends PureComponent<IProps16, IState16> {
+    constructor(props: IProps16) {
+        super(props);
+    }
+    render(): React.ReactNode {
+        return(<Card style={{ marginTop: 8, marginLeft: 8, marginRight: 8, overflow: 'hidden' }}>
+            <List.Item
+                left={(this.props.icon)? (props)=><List.Icon {...props} icon={String(this.props.icon)} color={this.props.color} />: undefined}
+                title={this.props.title}
+                titleStyle={(this.props.color)? { color: this.props.color }: undefined}
+                onPress={()=>(this.props.onPress)&&this.props.onPress()}
+            />
+        </Card>);
+    }
+}
+
 export {
     CustomCard1,
     CustomCardComments,
@@ -403,5 +449,7 @@ export {
     CustomCard3,
     CustomCard4,
     CustomCard5,
-    CustomItemList5
+    CustomItemList5,
+    CustomItemList6,
+    CardButton1
 };

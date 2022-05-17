@@ -8,7 +8,7 @@ import { Provider as PaperProvider } from 'react-native-paper';
 import Client from './screens/client';
 import Profesional from './screens/profesional';
 import CombinedTheme from './Theme';
-import { Account } from './scripts/ApiCorporal';
+import { Account, ChangeLogSystem } from './scripts/ApiCorporal';
 import { ExtraContents } from './ExtraContents';
 import SplashScreen from 'react-native-splash-screen';
 import { setLoadNow } from './scripts/Global';
@@ -26,6 +26,8 @@ type IState = {
     showVerify: boolean;
     showTextAnimVerify: boolean;
     textAnimVerify: string;
+
+    changeLoadView: boolean;
 };
 const Stack = createNativeStackNavigator();
 export default class App extends Component<IProps, IState> {
@@ -38,14 +40,18 @@ export default class App extends Component<IProps, IState> {
             openSession: false,
             showVerify: true,
             showTextAnimVerify: true,
-            textAnimVerify: 'Cargando'
+            textAnimVerify: 'Cargando',
+
+            changeLoadView: false
         };
     }
     private event: EmitterSubscription | null = null;
+    private event2: EmitterSubscription | null = null;
     verifyAccount() {
         Account.verify().then((value)=>{
             if (value) this.setState({ textAnimVerify: `Accediendo como "${decode(value.email).slice(0, 5)}...${decode(value.email).slice(decode(value.email).indexOf('@'), decode(value.email).length)}"` });
             setTimeout(()=>this.setState({ openSession: !value, showVerify: false }, ()=>(value) && setLoadNow(true)), 2500);
+            setTimeout(()=>(value)&&ChangeLogSystem.getVerify().then((value)=>(value) && this.setState({ changeLoadView: true }, ()=>ChangeLogSystem.setNewVersion())), 200);
         }).catch((error)=>{
             if (error.action == 1) return this.setState({ openSession: true });
             this.setState({ textAnimVerify: error.cause, showTextAnimVerify: false }, ()=>setTimeout(()=>this.setState({ openSession: true }), 1500));
@@ -57,6 +63,7 @@ export default class App extends Component<IProps, IState> {
         this.verifyAccount();
         setTimeout(async() =>(await DeviceInfo.getApiLevel() < 26) && this.setState({ marginTop: StatusBar.currentHeight || 24, marginBottom: await getNavigationBarHeight() }));
         this.event = DeviceEventEmitter.addListener('nowVerify', ()=>this.verifyAccount());
+        this.event2 = DeviceEventEmitter.addListener('openChangeLog', ()=>this.setState({ changeLoadView: true }));
         VersionCheck.needUpdate({ ignoreErrors: true }).then((value)=>(value.isNeeded)&&Linking.openURL(value.storeUrl));
     }
     componentWillUnmount() {
@@ -70,6 +77,7 @@ export default class App extends Component<IProps, IState> {
             textAnimVerify: 'Cargando'
         });
         this.event?.remove();
+        this.event2?.remove();
         DeviceEventEmitter.removeAllListeners();
     }
     render(): React.ReactNode {
@@ -84,6 +92,8 @@ export default class App extends Component<IProps, IState> {
                         showVerify={this.state.showVerify}
                         textVerify={this.state.textAnimVerify}
                         animTextVerify={this.state.showTextAnimVerify}
+                        visibleChangeLoad={this.state.changeLoadView}
+                        closeChangeLoad={()=>this.setState({ changeLoadView: false })}
                     />
                     <Stack.Navigator initialRouteName="c" screenOptions={{ headerShown: false, animation: 'fade_from_bottom', gestureEnabled: false }} >
                         <Stack.Screen name="c" component={Client} />

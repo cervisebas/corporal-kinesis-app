@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { View } from "react-native";
+import { ChangeLog } from "./screens/ChangeLog";
 import { Session } from "./screens/session";
 import { VerifyScreen } from "./screens/verify";
 import { Global } from "./scripts/Global";
@@ -14,6 +15,10 @@ type IProps = {
     showVerify: boolean;
     textVerify: string;
     animTextVerify: boolean;
+
+    // ChangeLoad
+    visibleChangeLoad: boolean;
+    closeChangeLoad: ()=>any;
 };
 type IState = {
     // Loading
@@ -51,6 +56,10 @@ export class ExtraContents extends Component<IProps, IState> {
             <Global
                 loadingView={this.state.viewLoading}
                 loadingText={this.state.textLoading}
+            />
+            <ChangeLog
+                visible={this.props.visibleChangeLoad}
+                close={()=>this.props.closeChangeLoad()}
             />
         </View>);
     }

@@ -1,5 +1,11 @@
 {
     "data": [{
+        "version": "1.4.1",
+        "date": "21/05/2022",
+        "changes": [
+            "Solucion de error de conexion."
+        ]
+    }, {
         "version": "1.4",
         "date": "21/05/2022",
         "changes": [

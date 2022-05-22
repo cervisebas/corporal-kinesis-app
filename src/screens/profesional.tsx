@@ -1,6 +1,6 @@
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useState } from "react";
+import { DeviceEventEmitter, StyleSheet, View } from "react-native";
 import { FAB } from "react-native-paper";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CustomDrawerNavegation from "./components/CustomDrawerNavegation";
@@ -8,6 +8,7 @@ import CustomDrawerNavegation from "./components/CustomDrawerNavegation";
 import Page1 from "./pagesProfesional/Page1";
 import Page2 from "./pagesProfesional/Page2";
 import Page3 from "./pagesProfesional/Page3";
+import Information from "./information";
 
 type IProps = {
     navigation: any;

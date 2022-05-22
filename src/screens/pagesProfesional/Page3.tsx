@@ -1,13 +1,15 @@
 import { decode } from "base-64";
 import React, { Component, PureComponent } from "react"
-import { ActivityIndicator, DeviceEventEmitter, EmitterSubscription, FlatList, RefreshControl, View } from "react-native";
-import { Appbar, Dialog, List, Paragraph, Portal, Button, TouchableRipple, Snackbar, Text } from "react-native-paper";
+import { DeviceEventEmitter, EmitterSubscription, FlatList, RefreshControl, ScrollView, View } from "react-native";
+import { Appbar, ActivityIndicator, Dialog, List, Paragraph, Portal, Button, TouchableRipple, Snackbar, Text } from "react-native-paper";
 import { Exercise } from "../../scripts/ApiCorporal";
 import { dataExercise } from "../../scripts/ApiCorporal/types";
 import CombinedTheme from "../../Theme";
 import { CustomShowError, CustomItemList4 } from "../components/Components";
 import AddNewExercise from "./pages/addNewExcercise";
 import { Global } from "../../scripts/Global";
+import EditExcercise from "./pages/editExcercise";
+import CustomModal from "../components/CustomModal";
 
 type IProps = {
     navigation: any;
@@ -29,6 +31,12 @@ type IState = {
     messageAlert: string;
     viewOk: boolean;
     actualDeleteId: string;
+    showEditExercise: boolean;
+    dataEditExercise: {
+        idExercise: string;
+        title: string;
+        message: string;
+    };
 };
 
 export default class Page3 extends Component<IProps, IState> {
@@ -49,7 +57,13 @@ export default class Page3 extends Component<IProps, IState> {
             showAlert: false,
             messageAlert: '',
             viewOk: false,
-            actualDeleteId: ''
+            actualDeleteId: '',
+            showEditExercise: false,
+            dataEditExercise: {
+                idExercise: '0',
+                title: '',
+                message: ''
+            }
         };
     }
     private event: EmitterSubscription | null = null;
@@ -95,23 +109,23 @@ export default class Page3 extends Component<IProps, IState> {
                     refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={this.state.refreshing} onRefresh={()=>this.setState({ refreshing: true }, ()=>this.loadData())} />}
                     ListEmptyComponent={(this.state.isLoading)? <ShowLoading />: (this.state.isError)? <CustomShowError message={this.state.messageError} />: <></>}
                     ListFooterComponent={(!this.state.isLoading)? <TouchableRipple onPress={()=>this.setState({ showAddExercise: true })}><List.Item title={'Añadir nuevo ejercicio'} left={(props)=><List.Icon {...props} icon="plus" />} /></TouchableRipple>: <></>}
-                    renderItem={({ item })=><CustomItemList4
+                    renderItem={({ item, index })=><CustomItemList4
+                        key={index.toString()}
                         title={decode(item.name)}
-                        actionViewDescription={()=>this.setState({ titleDescription: `Ver descripción: ${decode(item.name)}`, textDescription: (decode(item.description) == 'none')? 'No hay descripción disponible.': decode(item.description), viewDescription: true })}
+                        actionViewDescription={()=>this.setState({ titleDescription: decode(item.name), textDescription: (decode(item.description) == 'none')? 'No hay descripción disponible.': decode(item.description), viewDescription: true })}
                         actionDelete={()=>this.setState({ viewOk: true, actualDeleteId: item.id })}
+                        actionEdit={()=>this.setState({
+                            showEditExercise: true,
+                            dataEditExercise: {
+                                idExercise: item.id,
+                                title: item.name,
+                                message: item.description
+                            }
+                        })}
                     />}
                 />
                 <Portal>
-                    <Dialog visible={this.state.viewDescription}>
-                        <Dialog.Title>{this.state.titleDescription}</Dialog.Title>
-                        <Dialog.Content>
-                            <Paragraph>{this.state.textDescription}</Paragraph>
-                        </Dialog.Content>
-                        <Dialog.Actions>
-                            <Button onPress={()=>this.setState({ viewDescription: false })}>Cerrar</Button>
-                        </Dialog.Actions>
-                    </Dialog>
-                    <Dialog visible={this.state.viewOk}>
+                    <Dialog visible={this.state.viewOk} onDismiss={()=>this.setState({ viewOk: false })}>
                         <Dialog.Title>¡¡Advertencia!!</Dialog.Title>
                         <Dialog.Content>
                             <Paragraph>¿Estás seguro/a que quieres borrar este ejercicio?</Paragraph>
@@ -122,9 +136,16 @@ export default class Page3 extends Component<IProps, IState> {
                         </Dialog.Actions>
                     </Dialog>
                 </Portal>
+                <ViewDescription
+                    visible={this.state.viewDescription}
+                    close={()=>this.setState({ viewDescription: false })}
+                    name={this.state.titleDescription}
+                    description={this.state.textDescription}
+                />
                 <Snackbar visible={this.state.showAlert} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ showAlert: false })} duration={3000}><Text>{this.state.messageAlert}</Text></Snackbar>
                 <Global loadingView={this.state.loadingView} loadingText={this.state.loadingText} />
                 <AddNewExercise show={this.state.showAddExercise} close={()=>this.setState({ showAddExercise: false })} />
+                <EditExcercise visible={this.state.showEditExercise} data={this.state.dataEditExercise} close={()=>this.setState({ showEditExercise: false })} />
             </View>
         </View>);
     }
@@ -136,5 +157,30 @@ class ShowLoading extends PureComponent {
         return(<View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}>
             <ActivityIndicator size={'large'} color={CombinedTheme.colors.accent} />
         </View>);
+    }
+}
+
+type IProps2 = {
+    visible: boolean;
+    close: ()=>any;
+    name: string;
+    description: string;
+};
+class ViewDescription extends PureComponent<IProps2> {
+    constructor(props: IProps2) {
+        super(props);
+    }
+    render(): React.ReactNode {
+        return(<CustomModal visible={this.props.visible} style={{ marginLeft: 12, marginRight: 12 }} onRequestClose={()=>this.props.close()}>
+            <View style={{ backgroundColor: CombinedTheme.colors.background, borderRadius: 8, overflow: 'hidden', maxHeight: '90%' }}>
+                <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
+                    <Appbar.BackAction onPress={()=>this.props.close()} />
+                    <Appbar.Content title={this.props.name} />
+                </Appbar.Header>
+                <ScrollView style={{ paddingLeft: 10, paddingRight: 10 }}>
+                    <Paragraph style={{ marginTop: 14, marginBottom: 10 }}>{this.props.description}</Paragraph>
+                </ScrollView>
+            </View>
+        </CustomModal>);
     }
 }

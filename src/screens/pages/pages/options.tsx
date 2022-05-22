@@ -90,6 +90,7 @@ export default class Options extends Component<IProps, IState> {
                             </Card.Content>
                         </Card>
                         <CardButton1 title={'VER LISTA DE CAMBIOS'} icon={'note-text-outline'} onPress={()=>DeviceEventEmitter.emit('openChangeLog')} />
+                        <CardButton1 title={'INFORMACION'} icon={'information-outline'} onPress={()=>DeviceEventEmitter.emit('open-information')} />
                         <CardButton1 title={'CERRAR SESIÓN'} icon={'logout'} color="red" onPress={()=>this.setState({ showDialog: true })} />
                         <Text style={{ width: '100%', textAlign: 'center', marginTop: 32 }}>Version {DeviceInfo.getVersion()}</Text>
                     </View>

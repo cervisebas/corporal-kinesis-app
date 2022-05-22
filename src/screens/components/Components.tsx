@@ -227,7 +227,7 @@ class CustomCardComments2 extends PureComponent<IProps9> {
     }
 }
 
-type IProps10 = { title: string; actionDelete: ()=>any; actionViewDescription: ()=>any; };
+type IProps10 = { title: string; actionDelete: ()=>any; actionViewDescription: ()=>any; actionEdit?: ()=>any; };
 type IState10 = { viewMenu: boolean; };
 class CustomItemList4 extends PureComponent<IProps10, IState10> {
     constructor(props: IProps10) {
@@ -246,6 +246,7 @@ class CustomItemList4 extends PureComponent<IProps10, IState10> {
                     onDismiss={()=>this.setState({ viewMenu: false })}
                     anchor={<IconButton onPress={()=>this.setState({ viewMenu: true })} icon={'dots-vertical'} />}>
                     <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionViewDescription())} title={"Ver descripción"} />
+                    <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>(this.props.actionEdit)&&this.props.actionEdit())} title={"Editar (Beta)"} />
                     <Menu.Item style={{ backgroundColor: Colors.red500 }} onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionDelete())} title={"Borrar"} />
                 </Menu>}
             />
@@ -261,13 +262,17 @@ type IProps11 = {
 type IState11 = {
     clickColor: string;
     heightComponent: number;
+    widthCard: number;
+    widthViewButton: number;
 };
 class CustomCard3 extends PureComponent<IProps11, IState11> {
     constructor(props: IProps11) {
         super(props);
         this.state = {
             clickColor: CombinedTheme.colors.background,
-            heightComponent: 68
+            heightComponent: 68,
+            widthCard: 0,
+            widthViewButton: 0
         };
     }
     onPressClick() {
@@ -277,10 +282,12 @@ class CustomCard3 extends PureComponent<IProps11, IState11> {
         });
     }
     render(): React.ReactNode {
-        return(<Card onLayout={(layout)=>this.setState({ heightComponent: layout.nativeEvent.layout.height })} style={this.props.style} accessible={true} onPress={()=>this.onPressClick()}>
+        return(<Card onLayout={({ nativeEvent })=>this.setState({ heightComponent: nativeEvent.layout.height, widthCard: nativeEvent.layout.width })} style={this.props.style} accessible={true} onPress={()=>this.onPressClick()}>
             <Card.Content>
-                <Title>{this.props.title}</Title>
-                <View style={{ position: 'absolute', right: 16, height: 24, top: (this.state.heightComponent - 24)/2, alignItems: 'center', flexDirection: 'row' }}>
+                <View style={{ width: (this.state.widthCard - this.state.widthViewButton) - 40, overflow: 'hidden' }}>
+                    <Title numberOfLines={1}>{this.props.title}</Title>
+                </View>
+                <View onLayout={({ nativeEvent })=>this.setState({ widthViewButton: nativeEvent.layout.width })} style={{ position: 'absolute', right: 16, height: 24, top: (this.state.heightComponent - 24)/2, alignItems: 'center', flexDirection: 'row' }}>
                     <Text style={{ fontWeight: '700', color: this.state.clickColor }}>Ver más detalles</Text>
                     <Icon name="arrow-right" size={24} color={this.state.clickColor} style={{ marginLeft: 8 }} />
                 </View>

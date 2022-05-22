@@ -83,6 +83,11 @@ export default class ViewClietDetails extends Component<IProps, IState> {
             ToastAndroid.show('Debido a las políticas de usuario no puedes editar este perfil.', ToastAndroid.SHORT);
         }
     }
+    processTextTraining(num: string): string {
+        if (num == '0') return 'Ningún ejercicio evaluado';
+        if (num == '1') return '1 ejercicio evaluado';
+        return `${num}  ejercicios evaluados`; 
+    }
     render(): ReactNode {
         return(<CustomModal visible={this.props.show} onClose={()=>this.props.completeClose()} onRequestClose={()=>this.props.close()}>
             <PaperProvider theme={CombinedTheme}>
@@ -110,7 +115,7 @@ export default class ViewClietDetails extends Component<IProps, IState> {
                         <View style={{ marginBottom: 16 }}>
                             <Text style={{ margin: 14, marginLeft: 18, fontSize: 18 }}>Más información:</Text>
                             <View style={{ flexDirection: 'column' }}>
-                                <PointItemList textA="Experiencia" textB={decode(this.props.userData.experience)} />
+                                <PointItemList textA="Ejercicios" textB={this.processTextTraining(this.props.userData.num_trainings)} />
                                 <PointItemList textA="Cumpleaños" textB={`${decode(this.props.userData.birthday)} (${this.calcYears(decode(this.props.userData.birthday))} años)`} />
                                 <PointItemList textA="E-Mail" textB={decode(this.props.userData.email)} />
                                 <PointItemList textA="Teléfono" textB={decode(this.props.userData.phone)} />

@@ -28,6 +28,9 @@ type IState = {
     textAnimVerify: string;
 
     changeLoadView: boolean;
+
+    viewDialogUpdate: boolean;
+    storeUrl: string;
 };
 const Stack = createNativeStackNavigator();
 export default class App extends Component<IProps, IState> {
@@ -42,7 +45,10 @@ export default class App extends Component<IProps, IState> {
             showTextAnimVerify: true,
             textAnimVerify: 'Cargando',
 
-            changeLoadView: false
+            changeLoadView: false,
+
+            viewDialogUpdate: false,
+            storeUrl: ''
         };
     }
     private event: EmitterSubscription | null = null;
@@ -64,7 +70,7 @@ export default class App extends Component<IProps, IState> {
         setTimeout(async() =>(await DeviceInfo.getApiLevel() < 26) && this.setState({ marginTop: StatusBar.currentHeight || 24, marginBottom: await getNavigationBarHeight() }));
         this.event = DeviceEventEmitter.addListener('nowVerify', ()=>this.verifyAccount());
         this.event2 = DeviceEventEmitter.addListener('openChangeLog', ()=>this.setState({ changeLoadView: true }));
-        VersionCheck.needUpdate({ ignoreErrors: true }).then((value)=>(value.isNeeded)&&Linking.openURL(value.storeUrl));
+        VersionCheck.needUpdate({ ignoreErrors: true }).then((value)=>(value.isNeeded)&&this.setState({ viewDialogUpdate: true, storeUrl: value.storeUrl }));
     }
     componentWillUnmount() {
         setLoadNow(false);
@@ -94,6 +100,9 @@ export default class App extends Component<IProps, IState> {
                         animTextVerify={this.state.showTextAnimVerify}
                         visibleChangeLoad={this.state.changeLoadView}
                         closeChangeLoad={()=>this.setState({ changeLoadView: false })}
+                        viewDialogUpdate={this.state.viewDialogUpdate}
+                        closeDialogUpdate={()=>this.setState({ viewDialogUpdate: false })}
+                        storeUrl={this.state.storeUrl}
                     />
                     <Stack.Navigator initialRouteName="c" screenOptions={{ headerShown: false, animation: 'fade_from_bottom', gestureEnabled: false }} >
                         <Stack.Screen name="c" component={Client} />

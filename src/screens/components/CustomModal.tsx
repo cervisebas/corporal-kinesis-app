@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Dimensions, View } from "react-native";
+import { Dimensions, StyleProp, View, ViewStyle } from "react-native";
 import Modal from "react-native-modal";
 import DeviceDimensions from 'react-native-extra-dimensions-android';
 
@@ -11,6 +11,7 @@ type IProps = {
     animationIn?: ExtractProps<Modal>['animationIn'];
     animationOut?: ExtractProps<Modal>['animationOut'];
     onRequestClose?: ()=>any;
+    style?: StyleProp<ViewStyle>;
 };
 type IState = {};
 
@@ -32,12 +33,13 @@ export default class CustomModal extends Component<IProps, IState> {
             animationOut={(this.props.animationOut)? this.props.animationOut: 'fadeOutDown'}
             animationOutTiming={250}
             onBackButtonPress={()=>this.onRequestClose()}
+            onBackdropPress={()=>this.onRequestClose()}
             onModalWillShow={()=>this.onShow()}
             onModalHide={()=>this.onClose()}
             useNativeDriver={true}
             deviceWidth={width}
             deviceHeight={height}
-            style={{ margin: 0 }}>
+            style={[this.props.style, { margin: 0 }]}>
             {this.props.children}
         </Modal>);
     }

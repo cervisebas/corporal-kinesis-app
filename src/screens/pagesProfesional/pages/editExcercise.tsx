@@ -1,13 +1,19 @@
-import React, { Component, ReactNode } from "react";
-import { DeviceEventEmitter, Dimensions, ScrollView, StyleSheet, ToastAndroid, View } from "react-native";
-import { Appbar, Button, Provider as PaperProvider, Text, Snackbar, TextInput } from "react-native-paper";
+import { decode } from "base-64";
+import React, { Component } from "react";
+import { View, ToastAndroid, Text, StyleSheet, Dimensions, DeviceEventEmitter, Image } from "react-native";
+import { Appbar, TextInput, Button, Snackbar, Provider as PaperProvider, Banner } from "react-native-paper";
 import { Exercise } from "../../../scripts/ApiCorporal";
 import CombinedTheme from "../../../Theme";
 import CustomModal from "../../components/CustomModal";
 
 type IProps = {
-    show: boolean;
+    visible: boolean;
     close: ()=>any;
+    data: {
+        idExercise: string;
+        message: string;
+        title: string;
+    };
 };
 type IState = {
     name: string;
@@ -19,11 +25,12 @@ type IState = {
     showAlert: boolean;
     messageAlert: string;
     textButton: string;
+    showBanner: boolean;
 };
 
 const { width } = Dimensions.get('window');
 
-export default class AddNewExercise extends Component<IProps, IState> {
+export default class EditExcercise extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
@@ -35,7 +42,8 @@ export default class AddNewExercise extends Component<IProps, IState> {
             isError: false,
             showAlert: false,
             messageAlert: '',
-            textButton: 'Enviar'
+            textButton: 'Enviar',
+            showBanner: true
         };
     }
     closeModal() {
@@ -49,7 +57,8 @@ export default class AddNewExercise extends Component<IProps, IState> {
             isError: false,
             showAlert: false,
             messageAlert: '',
-            textButton: 'Enviar'
+            textButton: 'Enviar',
+            showBanner: true
         }, ()=>this.props.close());
     }
     async checkInputs(): Promise<boolean> {
@@ -68,7 +77,7 @@ export default class AddNewExercise extends Component<IProps, IState> {
     async sendResults() {
         if (!await this.checkInputs()) return;
         this.setState({ isLoading: true, isError: false, showAlert: false, messageAlert: '', textButton: 'Enviando...' }, ()=>{
-            Exercise.set(this.state.name, (this.state.description.length !== 0)? this.state.description: 'none')
+            Exercise.edit(this.props.data.idExercise, this.state.name, (this.state.description.length !== 0)? this.state.description: 'none')
                 .then(()=>this.setState({
                     name: '',
                     description: '',
@@ -79,6 +88,7 @@ export default class AddNewExercise extends Component<IProps, IState> {
                 }, ()=>{
                     DeviceEventEmitter.emit('adminPage3Reload');
                     DeviceEventEmitter.emit('adminPage1Reload');
+                    this.closeModal();
                 }))
                 .catch((error)=>this.setState({
                     isLoading: false,
@@ -89,15 +99,25 @@ export default class AddNewExercise extends Component<IProps, IState> {
                 }))
         });
     }
-    render(): ReactNode {
-        return(<CustomModal visible={this.props.show} onRequestClose={()=>this.closeModal()} animationIn={'slideInLeft'} animationOut={'slideOutRight'}>
+    render(): React.ReactNode {
+        return(<CustomModal visible={this.props.visible} onShow={()=>this.setState({ name: decode(this.props.data.title), description: (decode(this.props.data.message) == 'none')? '': decode(this.props.data.message) })} onRequestClose={()=>this.closeModal()}>
             <PaperProvider theme={CombinedTheme}>
                 <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background }}>
                     <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
                         <Appbar.BackAction onPress={()=>this.closeModal()}/>
-                        <Appbar.Content title={'Añadir nuevo ejercicio'} />
+                        <Appbar.Content title={'Editar ejercicio'} />
                     </Appbar.Header>
-                    <ScrollView style={{ flex: 2 }}>
+                    <View style={{ flex: 2 }}>
+                        <Banner
+                            visible={this.state.showBanner}
+                            actions={[{
+                                label: 'Ocultar',
+                                onPress: ()=>this.setState({ showBanner: false })
+                            }]}
+                            style={{ marginBottom: 12 }}
+                            icon={(props)=><Image {...props} source={require('../../../assets/information-dark.png')} />}>
+                            Esta función se encuentra en modo de pruebas, si se presenta un error al usarla por favor repórtelo.
+                        </Banner>
                         <TextInput
                             style={styles.textInput}
                             mode={'outlined'}
@@ -118,7 +138,7 @@ export default class AddNewExercise extends Component<IProps, IState> {
                             value={this.state.description}
                             disabled={this.state.isLoading}
                             onChangeText={(text)=>this.setState({ description: text })} />
-                        <View style={{ width: '100%', flex: 1, alignItems: 'center', marginBottom: 16 }}>
+                        <View style={{ width: '100%', flex: 1, alignItems: 'center' }}>
                             <Button
                                 loading={this.state.isLoading}
                                 mode={'contained'}
@@ -126,9 +146,9 @@ export default class AddNewExercise extends Component<IProps, IState> {
                                 style={{ width: (width / 2), marginTop: 8 }}
                                 onPress={()=>(!this.state.isLoading)? this.sendResults(): ToastAndroid.show('Espere...', ToastAndroid.SHORT)}>{this.state.textButton}</Button>
                         </View>
-                    </ScrollView>
+                    </View>
                 </View>
-                <Snackbar visible={this.state.showAlert} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ showAlert: false })} duration={3000}><Text>{this.state.messageAlert}</Text></Snackbar>
+                <Snackbar visible={this.state.showAlert} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ showAlert: false })} duration={(this.state.isError)? 6000: 3000}><Text>{this.state.messageAlert}</Text></Snackbar>
             </PaperProvider>
         </CustomModal>);
     }

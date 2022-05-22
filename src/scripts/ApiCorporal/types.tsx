@@ -104,6 +104,7 @@ type userData = {
     experience: string;
     image: string;
     type: string;
+    num_trainings: string;
 };
 
 type commentsData = {

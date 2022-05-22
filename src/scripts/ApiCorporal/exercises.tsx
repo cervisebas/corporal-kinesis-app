@@ -49,6 +49,25 @@ export class ExerciseSystem {
             }).catch((error)=>reject({ cause: 'Ocurrió un error al intentar consultar a los datos de sesión.', error }));
         });
     }
+    edit(idExercise: string, name: string, description: string): Promise<boolean> {
+        return new Promise((resolve, reject)=>{
+            AsyncStorage.getItem('account_session').then((value)=>{
+                if (!value) return reject({ cause: 'No se ha encontrado datos de inicio de sesión.', error: false });
+                var datas: storageData = JSON.parse(decode(String(value)));
+                var dataPost = { editExercise: true, email: datas.email, password: datas.password, idExercise, name: encode(name), description: encode(description) };
+                axios.post(`${this.urlBase}/index.php`, qs.stringify(dataPost), this.header_access).then((html)=>{
+                    try {
+                        var result: tipical = html.data;
+                        return (result.ok)? resolve(true): reject({ cause: (result.cause?.length !== undefined && result.cause?.length !== 0)? result.cause: 'Ocurrió un error inesperadamente.', error: false });
+                    } catch (error) {
+                        reject({ cause: 'Ocurrió un error inesperadamente.', error });
+                    }
+                }).catch((error)=>{
+                    reject({ cause: 'Error de conexión.', error });
+                });
+            }).catch((error)=>reject({ cause: 'Ocurrió un error al intentar consultar a los datos de sesión.', error }));
+        });
+    }
     getAll(): Promise<dataExercise[]> {
         return new Promise((resolve, reject)=>{
             AsyncStorage.getItem('account_session').then((value)=>{

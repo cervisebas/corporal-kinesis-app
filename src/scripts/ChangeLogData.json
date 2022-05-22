@@ -1,5 +1,20 @@
 {
     "data": [{
+        "version": "1.4",
+        "date": "21/05/2022",
+        "changes": [
+            "Corrección de errores.",
+            "Corrección de errores de interfaz.",
+            "Nuevos componentes.",
+            "Actualización de componentes.",
+            "Nueva ventana de información en el menú de opciones.",
+            "Nuevo cartel de dialogo para actualizar la aplicación.",
+            "Nueva función para administradores: “Editar ejercicios (Beta)”.",
+            "Nueva función para administradores: “Filtrar administradores”.",
+            "Nueva función para administradores: “Ver cantidad de ejercicios de los usuarios”.",
+            "Nueva función para administradores: “Nueva barra de opciones en el menú plegable”."
+        ]
+    }, {
         "version": "1.3",
         "date": "17/05/2022",
         "changes": [

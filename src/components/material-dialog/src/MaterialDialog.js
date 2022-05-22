@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import colors from './colors';
 import { material } from 'react-native-typography';
+import CustomModal from '../../../screens/components/CustomModal';
 
 const { height } = Dimensions.get('window');
 
@@ -24,7 +25,6 @@ const ActionButton = ({ testID, onPress, colorAccent, label }) => (
   <TouchableHighlight
     testID={testID}
     style={styles.actionContainer}
-    underlayColor={colors.androidPressedUnderlay}
     onPress={onPress}
   >
     <Text style={[material.button, { color: colorAccent }]}>{label}</Text>
@@ -45,13 +45,11 @@ const MaterialDialog = ({
   cancelLabel,
   children,
 }) => (
-  <Modal
-    animationType={'fade'}
-    transparent
-    hardwareAccelerated
+  <CustomModal
+    animationIn={'fadeIn'}
+    animationOut={'fadeOut'}
     visible={visible}
     onRequestClose={onCancel}
-    supportedOrientations={['portrait', 'landscape']}
   >
     <TouchableWithoutFeedback onPress={onCancel}>
       <View style={styles.backgroundOverlay}>
@@ -106,7 +104,7 @@ const MaterialDialog = ({
         </KeyboardAvoidingView>
       </View>
     </TouchableWithoutFeedback>
-  </Modal>
+  </CustomModal>
 );
 
 const styles = StyleSheet.create({

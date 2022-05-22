@@ -38,7 +38,7 @@ export default class SystemChangeLog {
         changes.forEach((value)=>{
             strchanges += `\n   • ${value}`;
         });
-        return `Nuevos cambios:${strchanges}`;
+        return `Nuevos cambios:${strchanges}\n\nCambios: ${changes.length}`;
     }
     async setNewVersion() {
         var actualVersion = await this.getActualVersion();

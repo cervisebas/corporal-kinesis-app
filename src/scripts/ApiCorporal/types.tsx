@@ -77,6 +77,11 @@ type statisticData = {
     }[],
     exercises: dataExercise[];
 };
+type statisticData2 = {
+    exercise: string;
+    separate: { labels: string[]; values: number[]; };
+    singles: { label: string; value: string; }[];
+};
 type listUsers = {
     ok?: boolean;
     cause?: string;
@@ -177,5 +182,6 @@ export type {
     getAllPermissions,
     dataExercise,
     getAllExercises,
-    details
+    details,
+    statisticData2
 };

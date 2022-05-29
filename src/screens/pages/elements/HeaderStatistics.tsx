@@ -37,6 +37,7 @@ export default class HeaderStatistics extends PureComponent<IProps, IState> {
         this.animText = 0;
         clearInterval(this.animText);
         this.setState({ loadAnimation: 'Cargando' });
+        return false;
     }
     render(): ReactNode {
         return(<>

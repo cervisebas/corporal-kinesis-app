@@ -2,6 +2,7 @@ import { encode } from "base-64";
 import AccountSystem from "./ApiCorporal/accounts";
 import CommentSystem from "./ApiCorporal/comments";
 import { ExerciseSystem } from "./ApiCorporal/exercises";
+import SystemNotifications from "./ApiCorporal/notifications";
 import PermissionSystem from "./ApiCorporal/permissions";
 import TrainingSystem from "./ApiCorporal/training";
 import SystemChangeLog from "./ChangeLog";
@@ -15,6 +16,7 @@ const Training = new TrainingSystem(HostServer, keyAccess);
 const Permission = new PermissionSystem(HostServer, keyAccess);
 const Comment = new CommentSystem(HostServer, keyAccess);
 const Exercise = new ExerciseSystem(HostServer, keyAccess);
+const Notification = new SystemNotifications();
 const ChangeLogSystem = new SystemChangeLog();
 
 export {
@@ -24,5 +26,6 @@ export {
     Permission,
     Comment,
     Exercise,
-    ChangeLogSystem
+    ChangeLogSystem,
+    Notification
 };

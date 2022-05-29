@@ -9,6 +9,7 @@ type IProps = {
     value: string;
     title: string;
     disabled?: boolean;
+    mode?: "dialog" | "dropdown" | undefined;
 };
 type IState = {
     colorsClick: string[];
@@ -113,7 +114,7 @@ export class CustomPicker2 extends PureComponent<IProps, IState2> {
                     selectedValue={this.props.value}
                     enabled={!this.props.disabled}
                     onValueChange={(itemValue)=>this.props.onChange(itemValue)}
-                    mode={'dialog'}
+                    mode={(this.props.mode)? this.props.mode: 'dialog'}
                     dropdownIconColor={(!this.props.disabled)? this.state.borderClick[this.state.indexColors]: 'rgba(255, 255, 255, 0.30)'}
                     dropdownIconRippleColor={'rgba(0,0,0,0)'}
                 >

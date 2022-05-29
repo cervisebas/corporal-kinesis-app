@@ -37,6 +37,8 @@ export default class CustomModal extends Component<IProps, IState> {
             onModalWillShow={()=>this.onShow()}
             onModalHide={()=>this.onClose()}
             useNativeDriver={true}
+            useNativeDriverForBackdrop={true}
+            backdropColor={'#121212'}
             deviceWidth={width}
             deviceHeight={height}
             style={[this.props.style, { margin: 0 }]}>

@@ -1,18 +1,18 @@
 import { decode, encode } from "base-64";
 import moment from "moment";
 import React, { Component } from "react";
-import { View, FlatList } from "react-native";
+import { View, FlatList, EmitterSubscription, DeviceEventEmitter } from "react-native";
 import { Appbar, Divider, Menu, ProgressBar, Snackbar, Text } from "react-native-paper";
 import utf8 from "utf8";
 import { NoComment } from "../../assets/icons";
 import { Comment, HostServer, Training } from "../../scripts/ApiCorporal";
-import { commentsData, dataExercise, DetailsTrainings, statisticData } from "../../scripts/ApiCorporal/types";
+import { commentsData, DetailsTrainings, statisticData, statisticData2 } from "../../scripts/ApiCorporal/types";
 import { LoadNow } from "../../scripts/Global";
 import CombinedTheme from "../../Theme";
 import { CustomCardComments, EmptyListComments } from "../components/Components";
 import HeaderStatistics from "./elements/HeaderStatistics";
 import ViewMoreDetails from "./pages/viewMoreDetails";
-import { Statistics } from "./statistics/statistic";
+import { Statistics2 } from "./statistics/statistic2";
 
 type IProps = {
     showLoading: (show: boolean, text: string)=>any;
@@ -25,6 +25,7 @@ type IState = {
     visibleStatistics: boolean;
     titleStatistics: string;
     statistics: statisticData;
+    statistics2: statisticData2[];
 
     // Dialog Error
     dialogShow: boolean;
@@ -56,6 +57,7 @@ export class Tab1 extends Component<IProps, IState> {
             visibleStatistics: false,
             titleStatistics: '',
             statistics: { singles: [], separate: { labels: [], values: [] }, exercises: [] },
+            statistics2: [],
             dialogShow: false,
             messageDialog: '',
             commentsLoading: true,
@@ -63,11 +65,17 @@ export class Tab1 extends Component<IProps, IState> {
             viewMoreDetailsVisible: false
         };
     }
+    private event: EmitterSubscription | null = null;
     private timeLoad: number = 512;
     private loading = setInterval(()=>{ if (LoadNow == true) setTimeout(()=>this.goLoading(), 256) }, this.timeLoad);
     private _isMount: boolean = true;
     private reserve1 = { id: '-1', date: { value: '-', status: -1, difference: undefined }, session_number: { value: '-', status: -1, difference: undefined }, rds: { value: '-', status: -1, difference: undefined }, rpe: { value: '-', status: -1, difference: undefined }, pulse: { value: '-', status: -1, difference: undefined }, repetitions: { value: '-', status: -1, difference: undefined }, kilage: { value: '-', status: -1, difference: undefined }, tonnage: { value: '-', status: -1, difference: undefined }, exercise: { name: 'No disponible', status: -1, description: '' } };
     private reserve2 = { id: '-1', date: { value: 'n/a', status: -1, difference: undefined }, session_number: { value: 'n/a', status: -1, difference: undefined }, rds: { value: 'n/a', status: -1, difference: undefined }, rpe: { value: 'n/a', status: -1, difference: undefined }, pulse: { value: 'n/a', status: -1, difference: undefined }, repetitions: { value: 'n/a', status: -1, difference: undefined }, kilage: { value: 'n/a', status: -1, difference: undefined }, tonnage: { value: 'n/a', status: -1, difference: undefined }, exercise: { name: 'No disponible', status: -1, description: '' } };
+    componentDidMount() {
+        this.event = DeviceEventEmitter.addListener('tab1reload', ()=>{
+            this.setState({ showLoading: true, commentsLoading: true, dataComments: [], visiblemenu: false }, ()=>this.goLoading());
+        });
+    }
     componentWillUnmount() {
         this._isMount = false;
         this.timeLoad = 512;
@@ -83,15 +91,16 @@ export class Tab1 extends Component<IProps, IState> {
             commentsLoading: true,
             dataComments: []
         });
+        this.event?.remove();
     }
     goStatistics(data: number, titleStatistics: string) {
         this.props.showLoading(true, 'Cargando estadísticas...');
-        Training.getAllOne(data).then((value)=>{
+        Training.getAllOne2(data).then((value)=>{
             this.props.showLoading(false, '');
             this.setState({
                 visibleStatistics: true,
                 titleStatistics: titleStatistics,
-                statistics: value
+                statistics2: value
             });
         }).catch((error)=>{
             this.props.showLoading(false, '');
@@ -158,9 +167,10 @@ export class Tab1 extends Component<IProps, IState> {
                     comment={decodeUtf8(decode(item.comment))}
                 />}
             />
-            <Statistics
+            <Statistics2
                 visible={this.state.visibleStatistics}
-                datas={this.state.statistics}
+                exercise={this.state.dataShow.exercise.name}
+                datas={this.state.statistics2}
                 title={this.state.titleStatistics}
                 close={()=>this.setState({ visibleStatistics: false })}
             />

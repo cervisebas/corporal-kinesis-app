@@ -1,6 +1,7 @@
 import { encode, decode } from "base-64";
 import { dataListUsers, getUserData, listUsers, openAccount, storageData, tipical, userData } from "./types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import SystemNotifications from "./notifications";
 import axios from "axios";
 import qs from "qs";
 
@@ -27,7 +28,14 @@ export default class AccountSystem {
     open(email: string, password: string): Promise<storageData> {
         return new Promise(async(resolve, reject)=>{
             try {
-                var data = { openAccount: true, email: encode(email), password: encode(password) };
+                var Notifications = new SystemNotifications();
+                var data = {
+                    openAccount: true,
+                    email: encode(email),
+                    password: encode(password),
+                    updateToken: true,
+                    deviceToken: await Notifications.getTokenDevice()
+                };
                 axios.post(`${this.urlBase}/index.php`, qs.stringify(data), this.header_access).then((result)=>{
                     var data: openAccount = result.data;
                     if (data.ok) {

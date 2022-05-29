@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1089070528604",
+    "project_id": "corporal-kinesis",
+    "storage_bucket": "corporal-kinesis.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1089070528604:android:b41593cc205695c5970e99",
+        "android_client_info": {
+          "package_name": "com.corporalkinesis"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1089070528604-4m4vv649cfumt4ciq7dlr9akkhjnltaj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.corporalkinesis",
+            "certificate_hash": "883db36a50c1d638f8ee256b07f092b84937c58a"
+          }
+        },
+        {
+          "client_id": "1089070528604-3pfdh1tpf3p8527fao54ea5vbt5sbotv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2YXvZgcVdNqQDjxdTa0TYSnNbpyQgc9w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1089070528604-3pfdh1tpf3p8527fao54ea5vbt5sbotv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -2,8 +2,9 @@ import { decode, encode } from "base-64";
 import axios from "axios";
 import qs from 'qs';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { commentsData, dataExercise, DetailsTrainings, statisticData, storageData, tipical, trainingData, trainings, trainingsData } from "./types";
+import { commentsData, dataExercise, DetailsTrainings, statisticData, statisticData2, storageData, tipical, trainingData, trainings, trainingsData } from "./types";
 import CommentSystem from "./comments";
+import moment from "moment";
 
 const parseOrUndefinded = (number: string | undefined)=>(number !== undefined)? parseFloat(decode(number)): undefined;
 
@@ -49,9 +50,9 @@ export default class TrainingSystem {
                 var datas: storageData = JSON.parse(decode(String(value)));
                 axios.post(`${this.urlBase}/index.php`, qs.stringify({ getAllTraining: true, email: datas.email, password: datas.password }), this.header_access).then((value)=>{
                     try {
-                        var datas: trainingData = value.data;
+                        var datas: trainingsData = value.data;
                         if (datas.ok) {
-                            var trainings: any = datas.trainings;
+                            var trainings: trainings[] = (datas.trainings)?datas.trainings: [];
                             if (trainings.length == 0) {
                                 var results: DetailsTrainings = { id: '-1', date: { value: 'Sin datos', status: -1, difference: undefined }, session_number: { value: 'Sin datos', status: -1, difference: undefined }, rds: { value: 'Sin datos', status: -1, difference: undefined }, rpe: { value: 'Sin datos', status: -1, difference: undefined }, pulse: { value: 'Sin datos', status: -1, difference: undefined }, repetitions: { value: 'Sin datos', status: -1, difference: undefined }, kilage: { value: 'Sin datos', status: -1, difference: undefined }, tonnage: { value: 'Sin datos', status: -1, difference: undefined }, exercise: { name: 'No se encontro', description: '', status: -1 } };
                                 return resolve(results);
@@ -71,7 +72,39 @@ export default class TrainingSystem {
                                 };
                                 return resolve(results);
                             }
+                            var exerciseActual: string = decode(trainings[trainings.length - 1].exercise.name);
+                            var exercisesActuals: trainings[] = [];
+                            trainings.forEach((training: trainings)=>(exerciseActual == decode(training.exercise.name)) && exercisesActuals.push(training));
+
+                            if (exercisesActuals.length == 1) {
+                                var results: DetailsTrainings = {
+                                    id: trainings[trainings.length - 1].id,
+                                    date: { value: decode(trainings[trainings.length - 1].date), status: -1, difference: -9999999999 },
+                                    session_number: { value: decode(trainings[trainings.length - 1].session_number), status: -1, difference: -9999999999 },
+                                    rds: { value: decode(trainings[trainings.length - 1].rds), status: 0, difference: -9999999999 },
+                                    rpe: { value: decode(trainings[trainings.length - 1].rpe), status: 0, difference: -9999999999 },
+                                    pulse: { value: decode(trainings[trainings.length - 1].pulse), status: 0, difference: -9999999999 },
+                                    repetitions: { value: decode(trainings[trainings.length - 1].repetitions), status: 0, difference: -9999999999 },
+                                    kilage: { value: decode(trainings[trainings.length - 1].kilage), status: 0, difference: -9999999999 },
+                                    tonnage: { value: decode(trainings[trainings.length - 1].tonnage), status: 0, difference: -9999999999 },
+                                    exercise: { name: decode(trainings[trainings.length - 1].exercise.name), status: 0, description: decode(trainings[trainings.length - 1].exercise.description) },
+                                };
+                                return resolve(results);
+                            }
+                            
                             var results: DetailsTrainings = {
+                                id: exercisesActuals[exercisesActuals.length - 1].id,
+                                date: { value: decode(exercisesActuals[exercisesActuals.length - 1].date), status: -1, difference: undefined },
+                                session_number: { value: decode(exercisesActuals[exercisesActuals.length - 1].session_number), status: -1, difference: undefined },
+                                rds: { value: decode(exercisesActuals[exercisesActuals.length - 1].rds), status: this.calculate('RDS', parseOrUndefinded((exercisesActuals[exercisesActuals.length - 2])&&exercisesActuals[exercisesActuals.length - 2].rds), parseFloat(decode(exercisesActuals[exercisesActuals.length - 1].rds))), difference: this.calculate2('RDS', parseOrUndefinded((exercisesActuals[exercisesActuals.length - 2])&&exercisesActuals[exercisesActuals.length - 2].rds), parseFloat(decode(exercisesActuals[exercisesActuals.length - 1].rds))) },
+                                rpe: { value: decode(exercisesActuals[exercisesActuals.length - 1].rpe), status: this.calculate('RPE', parseOrUndefinded((exercisesActuals[exercisesActuals.length - 2])&&exercisesActuals[exercisesActuals.length - 2].rpe), parseFloat(decode(exercisesActuals[exercisesActuals.length - 1].rpe))), difference: this.calculate2('RPE', parseOrUndefinded((exercisesActuals[exercisesActuals.length - 2])&&exercisesActuals[exercisesActuals.length - 2].rpe), parseFloat(decode(exercisesActuals[exercisesActuals.length - 1].rpe))) },
+                                pulse: { value: decode(exercisesActuals[exercisesActuals.length - 1].pulse), status: this.calculate('Pulso', parseOrUndefinded((exercisesActuals[exercisesActuals.length - 2])&&exercisesActuals[exercisesActuals.length - 2].pulse), parseFloat(decode(exercisesActuals[exercisesActuals.length - 1].pulse))), difference: this.calculate2('Pulso', parseOrUndefinded((exercisesActuals[exercisesActuals.length - 2])&&exercisesActuals[exercisesActuals.length - 2].pulse), parseFloat(decode(exercisesActuals[exercisesActuals.length - 1].pulse))) },
+                                repetitions: { value: decode(exercisesActuals[exercisesActuals.length - 1].repetitions), status: this.calculate('RDS', parseOrUndefinded((exercisesActuals[exercisesActuals.length - 2])&&exercisesActuals[exercisesActuals.length - 2].repetitions), parseFloat(decode(exercisesActuals[exercisesActuals.length - 1].repetitions))), difference: this.calculate2('RDS', parseOrUndefinded((exercisesActuals[exercisesActuals.length - 2])&&exercisesActuals[exercisesActuals.length - 2].repetitions), parseFloat(decode(exercisesActuals[exercisesActuals.length - 1].repetitions))) },
+                                kilage: { value: decode(exercisesActuals[exercisesActuals.length - 1].kilage), status: this.calculate('Kilaje', parseOrUndefinded((exercisesActuals[exercisesActuals.length - 2])&&exercisesActuals[exercisesActuals.length - 2].kilage), parseFloat(decode(exercisesActuals[exercisesActuals.length - 1].kilage))), difference: this.calculate2('Kilaje', parseOrUndefinded((exercisesActuals[exercisesActuals.length - 2])&&exercisesActuals[exercisesActuals.length - 2].kilage), parseFloat(decode(exercisesActuals[exercisesActuals.length - 1].kilage))) },
+                                tonnage: { value: decode(exercisesActuals[exercisesActuals.length - 1].tonnage), status: this.calculate('Tonelaje', parseOrUndefinded((exercisesActuals[exercisesActuals.length - 2])&&exercisesActuals[exercisesActuals.length - 2].tonnage), parseFloat(decode(exercisesActuals[exercisesActuals.length - 1].tonnage))), difference: this.calculate2('Tonelaje', parseOrUndefinded((exercisesActuals[exercisesActuals.length - 2])&&exercisesActuals[exercisesActuals.length - 2].tonnage), parseFloat(decode(exercisesActuals[exercisesActuals.length - 1].tonnage))) },
+                                exercise: { name: decode(exercisesActuals[exercisesActuals.length - 1].exercise.name), status: 0, description: decode(exercisesActuals[exercisesActuals.length - 1].exercise.description) },
+                            };
+                            /*var results: DetailsTrainings = {
                                 id: trainings[trainings.length -1].id,
                                 date: { value: decode(trainings[trainings.length - 1].date), status: -1, difference: undefined },
                                 session_number: { value: decode(trainings[trainings.length - 1].session_number), status: -1, difference: undefined },
@@ -82,7 +115,7 @@ export default class TrainingSystem {
                                 kilage: { value: decode(trainings[trainings.length - 1].kilage), status: this.calculate('Kilaje', parseOrUndefinded((trainings[trainings.length - 2])&&trainings[trainings.length - 2].kilage), parseFloat(decode(trainings[trainings.length - 1].kilage))), difference: this.calculate2('Kilaje', parseOrUndefinded((trainings[trainings.length - 2])&&trainings[trainings.length - 2].kilage), parseFloat(decode(trainings[trainings.length - 1].kilage))) },
                                 tonnage: { value: decode(trainings[trainings.length - 1].tonnage), status: this.calculate('Tonelaje', parseOrUndefinded((trainings[trainings.length - 2])&&trainings[trainings.length - 2].tonnage), parseFloat(decode(trainings[trainings.length - 1].tonnage))), difference: this.calculate2('Tonelaje', parseOrUndefinded((trainings[trainings.length - 2])&&trainings[trainings.length - 2].tonnage), parseFloat(decode(trainings[trainings.length - 1].tonnage))) },
                                 exercise: { name: decode(trainings[trainings.length - 1].exercise.name), status: 0, description: decode(trainings[trainings.length - 1].exercise.description) },
-                            };
+                            };*/
                             return resolve(results);
                         } else {
                             return reject({ cause: datas.cause, error: datas.ok });
@@ -125,6 +158,62 @@ export default class TrainingSystem {
                 }).catch((error)=>reject({ cause: 'Error de conexión.', error }));
             }).catch((error)=>reject({ cause: 'Ocurrió un error al intentar consultar a los datos de sesión.', error }));
         });
+    }
+    getAllOne2(get: number): Promise<statisticData2[]> {
+        return new Promise((resolve, reject)=>{
+            AsyncStorage.getItem('account_session').then((value)=>{
+                var datas: storageData = JSON.parse(decode(String(value)));
+                axios.post(`${this.urlBase}/index.php`, qs.stringify({ getAllTraining: true, email: datas.email, password: datas.password }), this.header_access).then((value)=>{
+                    try {
+                        var datas: trainingsData = value.data;
+                        if (datas.ok) {
+                            var types_exercises = this.system_separateExercises((datas.trainings)? datas.trainings: []);
+                            var result: statisticData2[] = [];
+                            types_exercises.forEach((element)=>{
+                                var labels: string[] = [];
+                                var values: string[] = [];
+                                var singles: { label: string, value: string }[] = [];
+                                var vals: number[] = [];
+                                element.trainings.forEach((v)=>{
+                                    let medite: string = (get == 1)? '': (get == 2)? '': (get == 3)? '': (get == 4)? '': (get == 5)? 'PPM': (get == 6)? '': (get == 7)? 'kg': 't';
+                                    let val = decode((get == 1)? v.date: (get == 2)? v.session_number: (get == 3)? v.rds: (get == 4)? v.rpe: (get == 5)? v.pulse: (get == 6)? v.repetitions: (get == 7)? v.kilage: v.tonnage);
+                                    values.push(val+medite);
+                                    vals.push(parseFloat(val));
+                                    labels.push(moment(decode(v.date), 'DD/MM/YYYY').format('DD/MM'));
+                                    singles.push({ label: decode(v.date), value: val+medite });
+                                });
+                                result.push({ exercise: decode(element.type), separate: { labels, values: vals }, singles: singles });
+                            });
+                            return resolve(result);
+                        } else {
+                            return reject({ cause: datas.cause, error: datas.ok });
+                        }
+                    } catch (error) {
+                        reject({ cause: 'Ocurrió un error inesperadamente.', error });
+                    }
+                }).catch((error)=>reject({ cause: 'Error de conexión.', error }));
+            }).catch((error)=>reject({ cause: 'Ocurrió un error al intentar consultar a los datos de sesión.', error }));
+        });
+    }
+    system_separateExercises(datas: trainings[]) {
+        try {
+            var result: { type: string; trainings: trainings[] }[] = [];
+            datas.forEach((value)=>{
+                var index: number | undefined = result.findIndex((f)=>f.type == value.exercise.name);
+                if (index !== undefined && index !== -1) return result[index].trainings.push(value);
+                var tAdd: trainings[] = [];
+                tAdd.push(value);
+                result.push({
+                    type: value.exercise.name,
+                    trainings: tAdd
+                });
+            });
+            return result;
+        } catch (_e) {
+            console.log(_e);
+            return [];
+        }
+        
     }
     admin_getEspecificTraining(idTraining: string, idAccount: string): Promise<{ t: DetailsTrainings, c: commentsData | undefined }> {
         return new Promise(async(resolve, reject)=>{
@@ -223,7 +312,7 @@ export default class TrainingSystem {
     }
 
     calculate(name: string, past: number | undefined, actual: number | undefined) {
-        if (name == 'RPE') return (past !== undefined)? (actual !== undefined)? (past == actual)? 3: (actual < past)? 2: 1: 0: 0;
+        if (name == 'RPE') return (past !== undefined)? (actual !== undefined)? (past == actual)? 3: (actual < past)? 1: 2: 0: 0;
         return (past !== undefined)? (actual !== undefined)? (past == actual)? 3: (actual > past)? 1: 2: 0: 0;
     }
     calculate2(name: string, past: number | undefined, actual: number | undefined): number {

@@ -30,15 +30,12 @@ export default class ViewMoreDetails extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
     }
-    processShow(data: details): any {
+    processShow(data: details, isRPE?: boolean): any {
+        if (isRPE) return(<Text>{data.value} <Text style={{ color: (data.difference)&&(data.difference > 0)? (data.difference == -9999999999)? Colors.yellow500: Colors.red500: Colors.green500 }}>{`(${(data.difference == -9999999999)? '~': data.difference})`}</Text></Text>);
         return(<Text>{data.value} <Text style={{ color: (data.difference)&&(data.difference < 0)? (data.difference == -9999999999)? Colors.yellow500: Colors.red500: Colors.green500 }}>{`(${(data.difference == -9999999999)? '~': data.difference})`}</Text></Text>);
     }
-    processTitle(exercise: string): any {
-        return(<Text>Ejercicio realizado: <Text style={{ fontWeight: '700' }}>{exercise}</Text></Text>);
-    }
-    processParagraph(paragraph: string) {
-        return (paragraph == 'none')? 'No hay descripción disponible.': paragraph;
-    }
+    processTitle(exercise: string): any { return(<Text>Ejercicio realizado: <Text style={{ fontWeight: '700' }}>{exercise}</Text></Text>); }
+    processParagraph(paragraph: string) { return (paragraph == 'none')? 'No hay descripción disponible.': paragraph; }
     calcYears(date: string): string {
         var dateNow = new Date();
         var processDate = moment(date, 'DD-MM-YYYY').toDate();
@@ -63,7 +60,7 @@ export default class ViewMoreDetails extends Component<IProps, IState> {
                                 <CustomCard4 style={styles.card} title={'Kilaje'} iconName={'dumbbell'} value={this.processShow(this.props.dataShow.kilage)} />
                             </View>
                             <View style={{ ...styles.row, paddingLeft: 4, paddingRight: 8 }}>
-                                <CustomCard4 style={styles.card} title={'RPE'} iconName={'arrow-down-thick'} value={this.processShow(this.props.dataShow.rpe)} />
+                                <CustomCard4 style={styles.card} title={'RPE'} iconName={'arrow-down-thick'} value={this.processShow(this.props.dataShow.rpe, true)} />
                                 <CustomCard4 style={styles.card} title={'Repeticiones'} iconName={'autorenew'} value={this.processShow(this.props.dataShow.repetitions)} />
                                 <CustomCard4 style={styles.card} title={'Tonelaje'} iconName={'weight'} value={this.processShow(this.props.dataShow.tonnage)} />
                             </View>

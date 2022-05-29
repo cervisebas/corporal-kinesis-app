@@ -8,7 +8,7 @@ import { Provider as PaperProvider } from 'react-native-paper';
 import Client from './screens/client';
 import Profesional from './screens/profesional';
 import CombinedTheme from './Theme';
-import { Account, ChangeLogSystem } from './scripts/ApiCorporal';
+import { Account, ChangeLogSystem, Notification } from './scripts/ApiCorporal';
 import { ExtraContents } from './ExtraContents';
 import SplashScreen from 'react-native-splash-screen';
 import { setLoadNow } from './scripts/Global';
@@ -70,7 +70,9 @@ export default class App extends Component<IProps, IState> {
         setTimeout(async() =>(await DeviceInfo.getApiLevel() < 26) && this.setState({ marginTop: StatusBar.currentHeight || 24, marginBottom: await getNavigationBarHeight() }));
         this.event = DeviceEventEmitter.addListener('nowVerify', ()=>this.verifyAccount());
         this.event2 = DeviceEventEmitter.addListener('openChangeLog', ()=>this.setState({ changeLoadView: true }));
-        VersionCheck.needUpdate({ ignoreErrors: true }).then((value)=>(value.isNeeded)&&this.setState({ viewDialogUpdate: true, storeUrl: value.storeUrl }));
+        Notification.init();
+        (!__DEV__) && VersionCheck.needUpdate({ ignoreErrors: true }).then((value)=>(value.isNeeded)&&this.setState({ viewDialogUpdate: true, storeUrl: value.storeUrl }));
+        console.log(`Dev Mode: ${__DEV__}`);
     }
     componentWillUnmount() {
         setLoadNow(false);

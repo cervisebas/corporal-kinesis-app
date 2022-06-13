@@ -1,8 +1,8 @@
 import { decode } from "base-64";
 import moment from "moment";
-import React, { Component, PureComponent } from "react";
-import { ListViewComponent, ScrollView, StyleProp, View, ViewStyle } from "react-native";
-import { Avatar, Card, Colors, Text, IconButton, Paragraph, Title, List, Menu, Divider, TouchableRipple, Button } from "react-native-paper";
+import React, { PureComponent } from "react";
+import { ScrollView, StyleProp, View, ViewStyle } from "react-native";
+import { Avatar, Card, Colors, Text, IconButton, Paragraph, Title, List, Menu, Button } from "react-native-paper";
 import { AvatarImageSource } from "react-native-paper/lib/typescript/components/Avatar/AvatarImage";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -47,7 +47,7 @@ class CustomCardComments extends PureComponent<IProps1> {
         super(props);
     }
     render(): React.ReactNode {
-        return(<Card style={{ marginLeft: 12, marginBottom: 12, marginRight: 12 }}>
+        return(<Card style={{ marginLeft: 8, marginBottom: 10, marginRight: 8 }}>
             <Card.Title
                 title={this.props.accountName}
                 subtitle={`${this.props.date}${(this.props.edit)? ' (editado)': ''}`}
@@ -79,7 +79,7 @@ class CustomItemList extends PureComponent<IProps3, IState3> {
     componentDidMount() { this.setState({ mount: true }); }
     componentWillUnmount() { this.setState({ mount: false }); }
     render(): React.ReactNode {
-        return(<View>
+        return(<View style={{ height: 72 }}>
             {(this.state.mount)? (!this.props.loading)? <List.Item
                 style={{ paddingLeft: 16 }}
                 title={this.props.label}
@@ -137,21 +137,25 @@ class CustomItemList2 extends PureComponent<IProps6, IState6> {
             viewMenu: false
         };
     }
+    componentWillUnmount() {
+        this.setState({ viewMenu: false });
+    }
     render(): React.ReactNode {
-        return(<TouchableRipple onPress={()=>this.props.onPress()}>
-            <List.Item
-                left={(props)=><Avatar.Image {...props} size={48} source={(!this.props.image)? require('../../assets/profile.png'): { uri: `${HostServer}/images/accounts/${decode(this.props.image)}` }} />}
-                title={this.props.title}
-                right={()=><Menu
-                    visible={this.state.viewMenu}
-                    onDismiss={()=>this.setState({ viewMenu: false })}
-                    anchor={<IconButton onPress={()=>this.setState({ viewMenu: true })} icon={'dots-vertical'} />}>
-                    <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.onPress())} title={"Ver perfil"} />
-                    <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionComment())} title={"Dejar comentario"} />
-                    <Menu.Item style={{ backgroundColor: Colors.red500 }} onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionDelete())} title={"Eliminar"} />
-                </Menu>}
-            />
-        </TouchableRipple>);
+        return(<List.Item
+            title={this.props.title}
+            onPress={()=>this.props.onPress()}
+            onLongPress={()=>this.setState({ viewMenu: true })}
+            style={{ height: 64 }}
+            left={(props)=><Avatar.Image {...props} size={48} source={(!this.props.image)? require('../../assets/profile.png'): { uri: `${HostServer}/images/accounts/${decode(this.props.image)}` }} />}
+            right={()=><Menu
+                visible={this.state.viewMenu}
+                onDismiss={()=>this.setState({ viewMenu: false })}
+                anchor={<IconButton onPress={()=>this.setState({ viewMenu: true })} icon={'dots-vertical'} />}>
+                <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.onPress())} title={"Ver perfil"} />
+                <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionComment())} title={"Dejar comentario"} />
+                <Menu.Item style={{ backgroundColor: Colors.red500 }} onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionDelete())} title={"Eliminar"} />
+            </Menu>}
+        />);
     }
 }
 
@@ -169,29 +173,20 @@ class CustomShowError extends PureComponent<IProps7> {
     }
 }
 
-type IProps8 = { title: string; subtitle: string; image: string; onPress: ()=>any; };
-type IState8 = { viewMenu: boolean; };
-class CustomItemList3 extends PureComponent<IProps8, IState8> {
+type IProps8 = { title: string; subtitle: string; type: string; image: string; onPress: ()=>any; };
+class CustomItemList3 extends PureComponent<IProps8> {
     constructor(props: IProps8) {
         super(props);
-        this.state = {
-            viewMenu: false
-        };
     }
     render(): React.ReactNode {
-        return(<TouchableRipple onPress={()=>this.setState({ viewMenu: true })}>
-            <List.Item
-                left={(props)=><Avatar.Image {...props} size={48} source={(!this.props.image)? require('../../assets/profile.png'): { uri: `${HostServer}/images/accounts/${decode(this.props.image)}` }} />}
-                title={this.props.title}
-                description={this.props.subtitle}
-                right={()=><Menu
-                    visible={this.state.viewMenu}
-                    onDismiss={()=>this.setState({ viewMenu: false })}
-                    anchor={<IconButton onPress={()=>this.setState({ viewMenu: true })} icon={'dots-vertical'} />}>
-                    <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.onPress())} title={"Cambiar permisos"} />
-                </Menu>}
-            />
-        </TouchableRipple>);
+        return(<List.Item
+            title={this.props.title}
+            description={this.props.subtitle}
+            onPress={()=>this.props.onPress()}
+            style={{ height: 72 }}
+            left={(props)=><Avatar.Image {...props} size={56} source={(!this.props.image)? require('../../assets/profile.png'): { uri: `${HostServer}/images/accounts/${decode(this.props.image)}` }} />}
+            right={(props)=><List.Icon {...props} icon={(this.props.type == '0')? 'account-outline': 'shield-crown-outline'} />}
+        />);
     }
 }
 
@@ -209,7 +204,7 @@ class CustomCardComments2 extends PureComponent<IProps9> {
         super(props);
     }
     render(): React.ReactNode {
-        return(<Card style={{ marginLeft: 12, marginBottom: 12, marginRight: 12 }}>
+        return(<Card style={{ marginLeft: 10, marginBottom: 10, marginRight: 10 }}>
             <Card.Title
                 title={this.props.accountName}
                 subtitle={`${this.props.date}${(this.props.edit)? ' (editado)': ''}`}
@@ -237,20 +232,20 @@ class CustomItemList4 extends PureComponent<IProps10, IState10> {
         };
     }
     render(): React.ReactNode {
-        return(<TouchableRipple onPress={()=>this.setState({ viewMenu: true })}>
-            <List.Item
-                left={(props)=><List.Icon {...props} icon="calendar-check-outline" />}
-                title={this.props.title}
-                right={()=><Menu
-                    visible={this.state.viewMenu}
-                    onDismiss={()=>this.setState({ viewMenu: false })}
-                    anchor={<IconButton onPress={()=>this.setState({ viewMenu: true })} icon={'dots-vertical'} />}>
-                    <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionViewDescription())} title={"Ver descripción"} />
-                    <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>(this.props.actionEdit)&&this.props.actionEdit())} title={"Editar (Beta)"} />
-                    <Menu.Item style={{ backgroundColor: Colors.red500 }} onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionDelete())} title={"Borrar"} />
-                </Menu>}
-            />
-        </TouchableRipple>);
+        return(<List.Item
+            title={this.props.title}
+            onPress={()=>this.props.actionViewDescription()}
+            left={(props)=><List.Icon {...props} icon={'calendar-outline'} />}
+            style={{ height: 64 }}
+            right={()=><Menu
+                visible={this.state.viewMenu}
+                onDismiss={()=>this.setState({ viewMenu: false })}
+                anchor={<IconButton onPress={()=>this.setState({ viewMenu: true })} icon={'dots-vertical'} />}>
+                <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionViewDescription())} title={"Ver descripción"} />
+                <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>(this.props.actionEdit)&&this.props.actionEdit())} title={"Editar"} />
+                <Menu.Item style={{ backgroundColor: Colors.red500 }} onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionDelete())} title={"Borrar"} />
+            </Menu>}
+        />);
     }
 }
 
@@ -364,11 +359,14 @@ type IState14 = { title: string; };
 class CustomItemList5 extends PureComponent<IProps14, IState14> {
     constructor(props: IProps14) {
         super(props);
+        this.state = {
+            title: 'Cargando...'
+        };
+    }
+    componentDidMount() {
         var date: Date = moment(decode(this.props.data.date), 'DD/MM/YYYY').toDate();
         var strDate: string = moment(date).format('dddd D [de] MMMM [del] YYYY');
-        this.state = {
-            title: strDate.charAt(0).toUpperCase() + strDate.slice(1)
-        };
+        this.setState({ title: strDate.charAt(0).toUpperCase() + strDate.slice(1) });
     }
     render(): React.ReactNode {
         return(<Card style={{ marginLeft: 8, marginRight: 8, marginTop: 12, height: 182 }} theme={{ dark: true }}>

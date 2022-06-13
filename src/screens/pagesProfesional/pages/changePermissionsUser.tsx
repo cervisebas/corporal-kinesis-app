@@ -17,7 +17,7 @@ type IProps = {
         image: string;
         birthday: string;
         actualStatus: string;
-    };
+    } | undefined;
     showLoading: (visible: boolean, text: string, after?: ()=>any)=>any;
 };
 type IState = {
@@ -70,18 +70,22 @@ export default class ChangePermissionsUser extends Component<IProps, IState> {
         return tag;
     }
     loadNow() {
-        this.setState({
-            actualTagUser: this.adminTag(this.props.infoUser.actualStatus),
-            newPermission: this.props.infoUser.actualStatus
-        });
+        if (this.props.infoUser) {
+            this.setState({
+                actualTagUser: this.adminTag(this.props.infoUser.actualStatus),
+                newPermission: this.props.infoUser.actualStatus
+            });
+        }
     }
     updatePermissions() {
-        if (this.state.newPermission == this.props.infoUser.actualStatus) return ToastAndroid.show('No se han detectado cambios', ToastAndroid.SHORT);
-        this.props.showLoading(true, 'Cambiando permisos del usuario...', ()=>
-            Permission.admin_updateAccount(this.props.infoUser.id, this.state.newPermission)
-                .then(()=>this.props.showLoading(false, '', ()=>{ this.props.close(); DeviceEventEmitter.emit('adminPage2Reload'); }))
-                .catch((error)=>this.props.showLoading(false, '', ()=>this.props.showLoading(false, '', ()=>this.setState({ errorView: true, errorTitle: 'Ocurrió un error', errorMessage: error.cause }, ()=>this.loadNow()))))
-        );
+        if (this.props.infoUser) {
+            if (this.state.newPermission == this.props.infoUser.actualStatus) return ToastAndroid.show('No se han detectado cambios', ToastAndroid.SHORT);
+            this.props.showLoading(true, 'Cambiando permisos del usuario...', ()=>(this.props.infoUser)&&
+                Permission.admin_updateAccount(this.props.infoUser.id, this.state.newPermission)
+                    .then(()=>this.props.showLoading(false, '', ()=>{ this.props.close(); DeviceEventEmitter.emit('adminPage2Reload'); }))
+                    .catch((error)=>this.props.showLoading(false, '', ()=>this.props.showLoading(false, '', ()=>this.setState({ errorView: true, errorTitle: 'Ocurrió un error', errorMessage: error.cause }, ()=>this.loadNow()))))
+            );
+        }
     }
     render(): ReactNode {
         return(<CustomModal visible={this.props.visible} onShow={()=>this.loadNow()} onClose={()=>this.props.closeComplete()} onRequestClose={()=>this.props.close()}>
@@ -91,13 +95,13 @@ export default class ChangePermissionsUser extends Component<IProps, IState> {
                         <Appbar.BackAction onPress={()=>this.props.close()} />
                         <Appbar.Content title={'Buscar cliente'} />
                     </Appbar.Header>
-                    <View style={{ flex: 2 }}>
+                    {(this.props.infoUser)&&<View style={{ flex: 2 }}>
                         <Card style={{ marginTop: 16, marginLeft: 8, marginRight: 8 }}>
                             <Card.Content>
                                 <List.Item
                                     title={decode(this.props.infoUser.name)}
                                     description={this.state.actualTagUser}
-                                    left={(props)=><Avatar.Image {...props} size={64} source={{ uri: `${HostServer}/images/accounts/${decode(this.props.infoUser.image)}` }} />}
+                                    left={(props)=><Avatar.Image {...props} size={64} source={{ uri: `${HostServer}/images/accounts/${(this.props.infoUser)? decode(this.props.infoUser.image): ''}` }} />}
                                 />
                             </Card.Content>
                         </Card>
@@ -114,7 +118,7 @@ export default class ChangePermissionsUser extends Component<IProps, IState> {
                             </Button>
                         </View>
                         <DialogError show={this.state.errorView} close={()=>this.setState({ errorView: false })} title={this.state.errorTitle} message={this.state.errorMessage} />
-                    </View>
+                    </View>}
                 </View>
             </PaperProvider>
         </CustomModal>);

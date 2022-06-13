@@ -1,8 +1,8 @@
 import React, { Component, ReactNode } from "react";
 import { decode } from "base-64";
-import { DeviceEventEmitter, View } from "react-native";
+import { DeviceEventEmitter, ListRenderItemInfo, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-import { Button, Appbar, Searchbar, Provider as PaperProvider, Dialog, Paragraph, Portal, Snackbar, Text } from "react-native-paper";
+import { Button, Appbar, Searchbar, Provider as PaperProvider, Dialog, Paragraph, Portal, Snackbar, Text, Divider } from "react-native-paper";
 import { dataListUsers } from "../../../scripts/ApiCorporal/types";
 import CombinedTheme from "../../../Theme";
 import { CustomItemList2 } from "../../components/Components";
@@ -44,24 +44,37 @@ export default class SearchClient extends Component<IProps, IState> {
         this.state = {
             searchQuery: '',
             listUsers: [],
-
             idActualDeleteClient: '0',
             idActualSendComment: '0',
             showQuestionDeleteUser: false,
             showSendComment: false,
-
             showSnackBar: false,
             textSnackBar: '',
-
             errorView: false,
             errorTitle: '',
             errorMessage: ''
         };
+        this._renderItem = this._renderItem.bind(this);
+    }
+    componentWillUnmount() {
+        this.setState({
+            searchQuery: '',
+            listUsers: [],
+            idActualDeleteClient: '0',
+            idActualSendComment: '0',
+            textSnackBar: '',
+            errorTitle: '',
+            errorMessage: ''
+        });
     }
     onChangeSearch(Query: string) {
-        const formattedQuery = Query.toLowerCase();
-        const data = filter(this.props.listUsers, (user)=>this.contains(decode(user.name).toLowerCase(), formattedQuery));
-        this.setState({ searchQuery: Query, listUsers: data });
+        if (this.state.searchQuery.length > Query.length) return this.setState({ searchQuery: Query, listUsers: this.props.listUsers });
+        this.setState({ searchQuery: Query });
+    }
+    goSearch(Query: string) {
+        const formattedQuery = Query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const data = filter(this.props.listUsers, (user)=>this.contains(decode(user.name).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""), formattedQuery));
+        this.setState({ listUsers: data });
     }
     contains(nameUser: string, query: string) {
         if (nameUser.includes(query) || nameUser.includes(query) || nameUser.includes(query)) {
@@ -107,6 +120,21 @@ export default class SearchClient extends Component<IProps, IState> {
         });
     }
 
+    /*###### FlatList Control ######*/
+    _getItemLayout(_i: any, index: number) { return { length: 64, offset: 64 * index, index }; }
+    _keyExtractor(item: dataListUsers, _i: number) { return `p1-admin-${item.id}`; }
+    _renderItem({ item }: ListRenderItemInfo<dataListUsers>) {
+        return(<CustomItemList2
+            key={`p1-admin-${item.id}`}
+            title={decode(item.name)}
+            image={item.image}
+            onPress={()=>this.props.goDetailsClient(item.id)}
+            actionDelete={()=>this.setState({ idActualDeleteClient: item.id, showQuestionDeleteUser: true })}
+            actionComment={()=>this.setState({ idActualSendComment: item.id, showSendComment: true })}
+        />);
+    }    
+    /*##############################*/
+
     render(): ReactNode {
         return(<CustomModal visible={this.props.show} onShow={()=>this.loadData()} onRequestClose={()=>this.closeModal()}>
             <PaperProvider theme={CombinedTheme}>
@@ -118,20 +146,18 @@ export default class SearchClient extends Component<IProps, IState> {
                     <View style={{ flex: 2 }}>
                         <FlatList
                             data={this.state.listUsers}
-                            renderItem={({ item, index })=><CustomItemList2
-                                key={index}
-                                title={decode(item.name)}
-                                image={item.image}
-                                onPress={()=>this.props.goDetailsClient(item.id)}
-                                actionDelete={()=>this.setState({ idActualDeleteClient: item.id, showQuestionDeleteUser: true })}
-                                actionComment={()=>this.setState({ idActualSendComment: item.id, showSendComment: true })}
-                            />}
+                            keyExtractor={this._keyExtractor}
+                            getItemLayout={this._getItemLayout}
+                            removeClippedSubviews={true}
+                            ItemSeparatorComponent={(props)=><Divider {...props} />}
                             ListHeaderComponent={<Searchbar
                                 value={this.state.searchQuery}
-                                style={{ margin: 8 }}
+                                style={{ marginTop: 8, marginLeft: 8, marginRight: 8, marginBottom: 12 }}
                                 placeholder={'Escribe para buscar...'}
                                 onChangeText={(query: string)=>this.onChangeSearch(query)}
+                                onSubmitEditing={({ nativeEvent })=>this.goSearch(nativeEvent.text)}
                             />}
+                            renderItem={this._renderItem}
                         />
                         <DialogError show={this.state.errorView} close={()=>this.setState({ errorView: false })} title={this.state.errorTitle} message={this.state.errorMessage} />
                         <Snackbar visible={this.state.showSnackBar} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ showSnackBar: false })}><Text>{this.state.textSnackBar}</Text></Snackbar>

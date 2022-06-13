@@ -1,5 +1,5 @@
 import React, { Component, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { DeviceEventEmitter, StyleSheet, View } from "react-native";
 import { BottomNavigation, FAB } from "react-native-paper";
 import { Permission } from "../scripts/ApiCorporal";
 import { Global } from "../scripts/Global";
@@ -7,8 +7,6 @@ import Options from "./pages/pages/options";
 import { LoadNow } from "../scripts/Global";
 import { Tab1 } from "./pages/Tab1";
 import { Tab2 } from "./pages/Tab2";
-import { Tab3 } from "./pages/Tab3";
-import { Tab4 } from "./pages/Tab4";
 
 type IProps = {
     navigation: any;
@@ -27,23 +25,19 @@ const Client = (props: IProps) => {
     
     const [routes] = React.useState([
         { key: 'statistics', title: 'Estadísticas', icon: 'chart-bar' },
-        { key: 'schedules-shifts', title: 'Horarios/Turnos', icon: 'calendar-month' },
-        { key: 'planning', title: 'Planificación', icon: 'book-open-variant' },
-        { key: 'payments', title: 'Pagos', icon: 'cash-multiple' }
+        { key: 'account', title: 'Mi cuenta', icon: 'account-outline' }
     ]);
     const renderScene = ({ route }: any) => {
         switch (route.key) {
             case 'statistics':
                 return(<Tab1
                     showLoading={(show, text)=>{ setViewLoading(show); setTextLoading(text); }}
+                />);
+            case 'account':
+                return(<Tab2
+                    showLoading={(show, text)=>{ setViewLoading(show); setTextLoading(text); }}
                     openOptions={()=>setViewOptions(true)}
                 />);
-            case 'schedules-shifts':
-                return(<Tab2 />);
-            case 'planning':
-                return(<Tab3 />);
-            case 'payments':
-                return <Tab4 />;
         }
     };
     const verifyAdmin = ()=>{
@@ -63,6 +57,8 @@ const Client = (props: IProps) => {
             clearInterval(readyVerifyAdmin);
         }
     }, 512);
+
+    DeviceEventEmitter.addListener('goToHome', ()=>setIndex(0));
 
     return(<View style={{ flex: 2 }}>
         <Global

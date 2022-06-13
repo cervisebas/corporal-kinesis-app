@@ -128,10 +128,10 @@ export default class ViewClietDetails extends Component<IProps, IState> {
                                 <Card.Title title="Medios de contacto:" />
                                 <Card.Content>
                                     <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 12 }}>
-                                        <IconButton animated icon={'phone'} style={styles.buttonsContacts} onPress={()=>Linking.openURL(`tel:+549${decode(this.props.userData.phone)}`)}/>
-                                        <IconButton animated icon={'message'} style={styles.buttonsContacts} onPress={()=>Linking.openURL(`sms:+549${decode(this.props.userData.phone)}`)}/>
-                                        <IconButton animated icon={'whatsapp'} style={styles.buttonsContacts} onPress={()=>Linking.openURL(`whatsapp://send?phone=+549${decode(this.props.userData.phone)}`)}/>
-                                        <IconButton animated icon={'email'} style={styles.buttonsContacts} onPress={()=>Linking.openURL(`mailto:${decode(this.props.userData.email)}`)}/>
+                                        <IconButton color="#15b2f7" animated icon={'phone'} style={styles.buttonsContacts} onPress={()=>Linking.openURL(`tel:+549${decode(this.props.userData.phone)}`)}/>
+                                        <IconButton color="#eb5c23" animated icon={'message'} style={styles.buttonsContacts} onPress={()=>Linking.openURL(`sms:+549${decode(this.props.userData.phone)}`)}/>
+                                        <IconButton color="#25D366" animated icon={'whatsapp'} style={styles.buttonsContacts} onPress={()=>Linking.openURL(`whatsapp://send?phone=+549${decode(this.props.userData.phone)}`)}/>
+                                        <IconButton color="#ffce00" animated icon={'email'} style={styles.buttonsContacts} onPress={()=>Linking.openURL(`mailto:${decode(this.props.userData.email)}`)}/>
                                     </View>
                                 </Card.Content>
                             </Card>

@@ -18,7 +18,7 @@ type IProps = {
     close: ()=>any;
 };
 type IState = {
-    dataView: { label: string; value: string; icon: string; color: string; }[];
+    dataView: { label: string; value: string; id: string; icon: string; color: string; }[];
     isLoading: boolean;
     isLoadingGraphics: boolean;
     dataUse: statisticData2;
@@ -57,12 +57,13 @@ export class Statistics2 extends Component<IProps, IState> {
         var listExercises = this.props.datas.map((value)=>value.exercise);
         if (dataUse) {
             var dataUse2 = dataUse;
-            this.setState({ dataView: dataUse.singles.map(()=>({ label: '', value: '', icon: '', color: '' })), dataUse: dataUse2, listExercises, exercise: dataUse2.exercise }, ()=>{
-                var datas: { label: string; value: string; icon: string; color: string; }[] = [];
+            this.setState({ dataView: dataUse.singles.map((_i, index)=>({ label: '', value: '', id: `load-${index.toString()}`, icon: '', color: '' })), dataUse: dataUse2, listExercises, exercise: dataUse2.exercise }, ()=>{
+                var datas: { label: string; value: string; id: string; icon: string; color: string; }[] = [];
                 dataUse2.singles.forEach((value, index)=>{
                     datas.push({
                         label: value.label,
                         value: value.value,
+                        id: value.id,
                         icon: this.getIconItem(parseFloat(dataUse2.singles[index - 1]?.value), parseFloat(value.value)),
                         color: this.getColorItem(parseFloat(dataUse2.singles[index - 1]?.value), parseFloat(value.value))
                     });
@@ -113,8 +114,21 @@ export class Statistics2 extends Component<IProps, IState> {
                                 exercise={this.state.exercise}
                                 changeExercise={(v)=>this.setState({ isLoading: true, exercise: v }, ()=>this.loadData(v))}
                             />}
+                            keyExtractor={(item)=>`stat-user-${item.id}`}
+                            getItemLayout={(_i, index)=>({
+                                length: 72,
+                                offset: 72 * index,
+                                index,
+                            })}
                             ListEmptyComponent={<this.listEmptyComponent isLoading={this.state.isLoading} />}
-                            renderItem={({ item, index })=><CustomItemList key={index} value={item.value} label={item.label} icon={item.icon} color={item.color} loading={this.state.isLoading} />}
+                            renderItem={({ item })=><CustomItemList
+                                key={`stat-user-${item.id}`}
+                                value={item.value}
+                                label={item.label}
+                                icon={item.icon}
+                                color={item.color}
+                                loading={this.state.isLoading}
+                            />}
                         />
                     </View> : <View style={{ ...styles.contentError, width: width, height: '90%' }}>
                         <View style={styles.contentError}>

@@ -1,7 +1,7 @@
 import { decode } from "base-64";
 import React, { Component, PureComponent } from "react"
-import { DeviceEventEmitter, EmitterSubscription, FlatList, RefreshControl, ScrollView, View } from "react-native";
-import { Appbar, ActivityIndicator, Dialog, List, Paragraph, Portal, Button, TouchableRipple, Snackbar, Text } from "react-native-paper";
+import { DeviceEventEmitter, EmitterSubscription, FlatList, RefreshControl, ScrollView, StyleSheet, View } from "react-native";
+import { Appbar, ActivityIndicator, Dialog, List, Paragraph, Portal, Button, TouchableRipple, Snackbar, Text, Divider } from "react-native-paper";
 import { Exercise } from "../../scripts/ApiCorporal";
 import { dataExercise } from "../../scripts/ApiCorporal/types";
 import CombinedTheme from "../../Theme";
@@ -105,12 +105,20 @@ export default class Page3 extends Component<IProps, IState> {
             <View style={{ flex: 2, overflow: 'hidden' }}>
                 <FlatList
                     data={this.state.list}
+                    keyExtractor={(item)=>`p3-admin-${item.id}`}
+                    getItemLayout={(_i, index)=>({
+                        length: 64,
+                        offset: 64 * index,
+                        index,
+                    })}
+                    removeClippedSubviews={true}
                     contentContainerStyle={{ flex: (this.state.isLoading || this.state.isError)? 3: undefined }}
                     refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={this.state.refreshing} onRefresh={()=>this.setState({ refreshing: true }, ()=>this.loadData())} />}
+                    ItemSeparatorComponent={(props)=><Divider {...props} />}
                     ListEmptyComponent={(this.state.isLoading)? <ShowLoading />: (this.state.isError)? <CustomShowError message={this.state.messageError} />: <></>}
                     ListFooterComponent={(!this.state.isLoading)? <TouchableRipple onPress={()=>this.setState({ showAddExercise: true })}><List.Item title={'Añadir nuevo ejercicio'} left={(props)=><List.Icon {...props} icon="plus" />} /></TouchableRipple>: <></>}
-                    renderItem={({ item, index })=><CustomItemList4
-                        key={index.toString()}
+                    renderItem={({ item })=><CustomItemList4
+                        key={`p3-admin-${item.id}`}
                         title={decode(item.name)}
                         actionViewDescription={()=>this.setState({ titleDescription: decode(item.name), textDescription: (decode(item.description) == 'none')? 'No hay descripción disponible.': decode(item.description), viewDescription: true })}
                         actionDelete={()=>this.setState({ viewOk: true, actualDeleteId: item.id })}
@@ -171,8 +179,8 @@ class ViewDescription extends PureComponent<IProps2> {
         super(props);
     }
     render(): React.ReactNode {
-        return(<CustomModal visible={this.props.visible} style={{ marginLeft: 12, marginRight: 12 }} onRequestClose={()=>this.props.close()}>
-            <View style={{ backgroundColor: CombinedTheme.colors.background, borderRadius: 8, overflow: 'hidden', maxHeight: '90%' }}>
+        return(<CustomModal visible={this.props.visible} onRequestClose={()=>this.props.close()} animationIn={'slideInLeft'} animationOut={'slideOutRight'}>
+            <View style={{ ...styles.content, backgroundColor: CombinedTheme.colors.background }}>
                 <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
                     <Appbar.BackAction onPress={()=>this.props.close()} />
                     <Appbar.Content title={this.props.name} />
@@ -184,3 +192,21 @@ class ViewDescription extends PureComponent<IProps2> {
         </CustomModal>);
     }
 }
+
+const styles = StyleSheet.create({
+    content: {
+        maxHeight: '90%',
+        marginLeft: 8,
+        marginRight: 8,
+        borderRadius: 8,
+        overflow: 'hidden',
+        shadowColor: "#FFFFFF",
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.22,
+        shadowRadius: 2.22,
+        elevation: 3
+    }
+});

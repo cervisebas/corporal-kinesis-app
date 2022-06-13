@@ -88,10 +88,11 @@ export default class ViewComments extends Component<IProps, IState> {
                     <View style={{ flex: 2 }}>
                         <FlatList
                             data={this.props.data}
+                            keyExtractor={(item)=>`viewC-admin-${item.id}`}
                             contentContainerStyle={{ paddingTop: (this.props.data.length !== 0)? 16: undefined, flex: (this.props.data.length == 0)? 3: undefined }}
                             ListEmptyComponent={<this.listEmptyComponent />}
-                            renderItem={({ item, index })=><CustomCardComments2
-                                key={index}
+                            renderItem={({ item })=><CustomCardComments2
+                                key={`viewC-admin-${item.id}`}
                                 accountName={decode(item.accountData.name)}
                                 source={{ uri: `${HostServer}/images/accounts/${decode(item.accountData.image)}` }}
                                 edit={item.edit}

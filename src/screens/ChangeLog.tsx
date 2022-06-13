@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import CustomModal from "./components/CustomModal";
 import { JSON } from '../scripts/ChangeLog';
-import { Dimensions, View } from "react-native";
+import { Dimensions, StyleSheet, View } from "react-native";
 import { Appbar, Colors } from "react-native-paper";
 import { FlatList } from "react-native-gesture-handler";
 import { CustomItemList6 } from "./components/Components";
@@ -28,8 +28,8 @@ export class ChangeLog extends Component<IProps, IState> {
         this.setState({ data });
     }
     render(): React.ReactNode {
-        return(<CustomModal visible={this.props.visible} style={{ marginRight: 16, marginLeft: 16, marginTop: 32, marginBottom: 32, borderRadius: 8, overflow: 'hidden' }} onShow={()=>this.dataLoad()} onRequestClose={()=>this.props.close()}>
-            <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background }}>
+        return(<CustomModal visible={this.props.visible} style={{ marginTop: 32, marginBottom: 32 }} onShow={()=>this.dataLoad()} onRequestClose={()=>this.props.close()}>
+            <View style={{ ...styles.content, flex: 1, backgroundColor: CombinedTheme.colors.background }}>
                 <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
                     <Appbar.BackAction onPress={()=>this.props.close()} />
                     <Appbar.Content title={`Lista de cambios`}/>
@@ -50,3 +50,20 @@ export class ChangeLog extends Component<IProps, IState> {
         </CustomModal>);
     }
 }
+
+const styles = StyleSheet.create({
+    content: {
+        marginLeft: 8,
+        marginRight: 8,
+        borderRadius: 8,
+        overflow: 'hidden',
+        shadowColor: "#FFFFFF",
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.22,
+        shadowRadius: 2.22,
+        elevation: 3
+    }
+});

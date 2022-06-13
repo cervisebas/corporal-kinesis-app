@@ -53,6 +53,7 @@ export class CustomPicker1 extends PureComponent<IProps, IState> {
                     dropdownIconColor={(!this.props.disabled)? this.state.borderClick[this.state.indexColors]: 'rgba(255, 255, 255, 0.30)'}
                     dropdownIconRippleColor={'rgba(0,0,0,0)'}
                 >
+                    <Picker.Item label="-" value="-" />
                     <Picker.Item label="5" value="5" />
                     <Picker.Item label="5.5" value="5.5" />
                     <Picker.Item label="6" value="6" />

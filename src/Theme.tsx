@@ -14,6 +14,7 @@ const CombinedTheme = {
         surface: '#0B0C0E',
         accent: '#ED7035',
         onSurface: '#0B0C0E',
+        notification: '#B8B8B8'
     },
     dark: true
 };

@@ -3,9 +3,9 @@ import { DrawerContentComponentProps, DrawerContentScrollView, DrawerItem } from
 import { CommonActions, DrawerActions } from "@react-navigation/native";
 import { decode } from "base-64";
 import React, { Component, ReactNode } from "react";
-import { DeviceEventEmitter, Image, Linking, ToastAndroid, View } from "react-native";
+import { DeviceEventEmitter, Linking, View } from "react-native";
+import FastImage from "react-native-fast-image";
 import { Appbar, Avatar, Title } from "react-native-paper";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { HostServer } from "../../scripts/ApiCorporal";
 import { storageData } from "../../scripts/ApiCorporal/types";
 import CombinedTheme from "../../Theme";
@@ -54,7 +54,7 @@ export default class CustomDrawerNavegation extends Component<DrawerContentCompo
         return(<View style={{ flex: 1, position: 'relative' }}>
             <DrawerContentScrollView onLayout={({ nativeEvent })=>this.setState({ widht: nativeEvent.layout.width })} {...this.props} style={{ backgroundColor: '#1663AB' }}>
                 <View style={{ width: '100%', height: 150, backgroundColor: CombinedTheme.colors.background, position: 'relative', marginBottom: 8, marginTop: -4, overflow: 'hidden' }}>
-                    <Image source={require('../../assets/background-picture-admin.gif')} style={{ width: '100%', height: '100%', opacity: 0.7 }} resizeMode={'cover'} />
+                    <FastImage source={require('../../assets/background-picture-admin.gif')} style={{ width: '100%', height: '100%', opacity: 0.7 }} resizeMode={'cover'} />
                     <View style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', position: 'absolute', bottom: 18, width: '100%' }}>
                         <Avatar.Image size={46} source={(this.state.loadingUser)? { uri: this.state.pictureUser }: require('../../assets/profile.png')} style={{ marginLeft: 12 }} />
                         <Title numberOfLines={1} style={{ marginLeft: 12, width: this.state.widht - 78 }}>{this.state.nameUser}</Title>
@@ -71,18 +71,10 @@ export default class CustomDrawerNavegation extends Component<DrawerContentCompo
                         onPress={()=>this.props.navigation.dispatch({ ...(index == this.props.state.index)? DrawerActions.closeDrawer(): CommonActions.navigate(item.name), target: this.props.state.key })}
                     />);
                 })}
-                <DrawerItem
-                    label={'Creado por SCApps'}
-                    {...this.colors}
-                    inactiveTintColor={'#ff5733'}
-                    style={{ marginTop: 8 }}
-                    icon={(props)=><Icon {...props} name={'code-tags'} />}
-                    onPress={()=>Linking.openURL(this.devUrl)}
-                />
             </DrawerContentScrollView>
             <Appbar style={{ position: 'absolute', left: 0, bottom: 0, width: '100%', backgroundColor: CombinedTheme.colors.accent }}>
-                <Appbar.Content title={"Más opciones"} titleStyle={{ fontSize: 17 }} />
-                <Appbar.Action icon={'note-search-outline'} onPress={()=>ToastAndroid.show('Función en desarrollo...', ToastAndroid.SHORT)} />
+                <Appbar.Content title={"Creado por SCApps"} titleStyle={{ fontSize: 17 }} />
+                <Appbar.Action icon={'web'} onPress={()=>Linking.openURL(this.devUrl)} />
                 <Appbar.Action icon={'information-outline'} onPress={()=>DeviceEventEmitter.emit('open-information')} />
             </Appbar>
         </View>);

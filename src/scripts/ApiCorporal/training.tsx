@@ -104,18 +104,6 @@ export default class TrainingSystem {
                                 tonnage: { value: decode(exercisesActuals[exercisesActuals.length - 1].tonnage), status: this.calculate('Tonelaje', parseOrUndefinded((exercisesActuals[exercisesActuals.length - 2])&&exercisesActuals[exercisesActuals.length - 2].tonnage), parseFloat(decode(exercisesActuals[exercisesActuals.length - 1].tonnage))), difference: this.calculate2('Tonelaje', parseOrUndefinded((exercisesActuals[exercisesActuals.length - 2])&&exercisesActuals[exercisesActuals.length - 2].tonnage), parseFloat(decode(exercisesActuals[exercisesActuals.length - 1].tonnage))) },
                                 exercise: { name: decode(exercisesActuals[exercisesActuals.length - 1].exercise.name), status: 0, description: decode(exercisesActuals[exercisesActuals.length - 1].exercise.description) },
                             };
-                            /*var results: DetailsTrainings = {
-                                id: trainings[trainings.length -1].id,
-                                date: { value: decode(trainings[trainings.length - 1].date), status: -1, difference: undefined },
-                                session_number: { value: decode(trainings[trainings.length - 1].session_number), status: -1, difference: undefined },
-                                rds: { value: decode(trainings[trainings.length - 1].rds), status: this.calculate('RDS', parseOrUndefinded((trainings[trainings.length - 2])&&trainings[trainings.length - 2].rds), parseFloat(decode(trainings[trainings.length - 1].rds))), difference: this.calculate2('RDS', parseOrUndefinded((trainings[trainings.length - 2])&&trainings[trainings.length - 2].rds), parseFloat(decode(trainings[trainings.length - 1].rds))) },
-                                rpe: { value: decode(trainings[trainings.length - 1].rpe), status: this.calculate('RPE', parseOrUndefinded((trainings[trainings.length - 2])&&trainings[trainings.length - 2].rpe), parseFloat(decode(trainings[trainings.length - 1].rpe))), difference: this.calculate2('RPE', parseOrUndefinded((trainings[trainings.length - 2])&&trainings[trainings.length - 2].rpe), parseFloat(decode(trainings[trainings.length - 1].rpe))) },
-                                pulse: { value: decode(trainings[trainings.length - 1].pulse), status: this.calculate('Pulso', parseOrUndefinded((trainings[trainings.length - 2])&&trainings[trainings.length - 2].pulse), parseFloat(decode(trainings[trainings.length - 1].pulse))), difference: this.calculate2('Pulso', parseOrUndefinded((trainings[trainings.length - 2])&&trainings[trainings.length - 2].pulse), parseFloat(decode(trainings[trainings.length - 1].pulse))) },
-                                repetitions: { value: decode(trainings[trainings.length - 1].repetitions), status: this.calculate('RDS', parseOrUndefinded((trainings[trainings.length - 2])&&trainings[trainings.length - 2].repetitions), parseFloat(decode(trainings[trainings.length - 1].repetitions))), difference: this.calculate2('RDS', parseOrUndefinded((trainings[trainings.length - 2])&&trainings[trainings.length - 2].repetitions), parseFloat(decode(trainings[trainings.length - 1].repetitions))) },
-                                kilage: { value: decode(trainings[trainings.length - 1].kilage), status: this.calculate('Kilaje', parseOrUndefinded((trainings[trainings.length - 2])&&trainings[trainings.length - 2].kilage), parseFloat(decode(trainings[trainings.length - 1].kilage))), difference: this.calculate2('Kilaje', parseOrUndefinded((trainings[trainings.length - 2])&&trainings[trainings.length - 2].kilage), parseFloat(decode(trainings[trainings.length - 1].kilage))) },
-                                tonnage: { value: decode(trainings[trainings.length - 1].tonnage), status: this.calculate('Tonelaje', parseOrUndefinded((trainings[trainings.length - 2])&&trainings[trainings.length - 2].tonnage), parseFloat(decode(trainings[trainings.length - 1].tonnage))), difference: this.calculate2('Tonelaje', parseOrUndefinded((trainings[trainings.length - 2])&&trainings[trainings.length - 2].tonnage), parseFloat(decode(trainings[trainings.length - 1].tonnage))) },
-                                exercise: { name: decode(trainings[trainings.length - 1].exercise.name), status: 0, description: decode(trainings[trainings.length - 1].exercise.description) },
-                            };*/
                             return resolve(results);
                         } else {
                             return reject({ cause: datas.cause, error: datas.ok });
@@ -172,7 +160,7 @@ export default class TrainingSystem {
                             types_exercises.forEach((element)=>{
                                 var labels: string[] = [];
                                 var values: string[] = [];
-                                var singles: { label: string, value: string }[] = [];
+                                var singles: { label: string; value: string; id: string; }[] = [];
                                 var vals: number[] = [];
                                 element.trainings.forEach((v)=>{
                                     let medite: string = (get == 1)? '': (get == 2)? '': (get == 3)? '': (get == 4)? '': (get == 5)? 'PPM': (get == 6)? '': (get == 7)? 'kg': 't';
@@ -180,7 +168,11 @@ export default class TrainingSystem {
                                     values.push(val+medite);
                                     vals.push(parseFloat(val));
                                     labels.push(moment(decode(v.date), 'DD/MM/YYYY').format('DD/MM'));
-                                    singles.push({ label: decode(v.date), value: val+medite });
+                                    singles.push({
+                                        label: decode(v.date),
+                                        value: val+medite,
+                                        id: v.id
+                                    });
                                 });
                                 result.push({ exercise: decode(element.type), separate: { labels, values: vals }, singles: singles });
                             });

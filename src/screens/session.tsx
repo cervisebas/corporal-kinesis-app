@@ -1,7 +1,7 @@
 import { decode } from "base-64";
 import moment from "moment";
 import React, { Component } from "react";
-import { DeviceEventEmitter, Dimensions, KeyboardAvoidingView, StyleSheet, View, TextInput as NativeTextInput } from "react-native";
+import { DeviceEventEmitter, Dimensions, KeyboardAvoidingView, StyleSheet, View, TextInput as NativeTextInput, TouchableWithoutFeedback, Keyboard } from "react-native";
 import DatePicker from "react-native-date-picker";
 import { Button, Dialog, Paragraph, Portal, Provider as PaperProvider, Text, TextInput } from "react-native-paper";
 import SplashScreen from "react-native-splash-screen";
@@ -10,6 +10,7 @@ import { Account } from "../scripts/ApiCorporal";
 import { setLoadNow } from "../scripts/Global";
 import CombinedTheme from "../Theme";
 import CustomModal from "./components/CustomModal";
+import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 
 type IProps = {
     visible: boolean;
@@ -43,9 +44,7 @@ type IState = {
     registerAlertTel: boolean;
 
     // Interfaz
-    viewModalDate: boolean;
     actualDatePicker: Date;
-    actualDate: string;
     viewPanel: number;
 
     // Dialog
@@ -84,9 +83,7 @@ export class Session extends Component<IProps, IState> {
             registerAlertDate: false,
             registerAlertTel: false,
 
-            viewModalDate: false,
             actualDatePicker: date,
-            actualDate: moment(date).format('DD/MM/YYYY'),
             viewPanel: 1,
 
             dialogShow: false,
@@ -108,7 +105,7 @@ export class Session extends Component<IProps, IState> {
 
     closeModal() {
         var date = new Date();
-        this.setState({ sessionEmail: '', sessionPassword: '', sessionAlertEmail: false, sessionAlertPassword: false, registerName: '', registerEmail: '', registerPassword: '', registerConfirmPassword: '', registerDni: '', registerDate: `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`, registerTel: '', registerAlertName: false, registerAlertEmail: false, registerAlertPassword: false, registerAlertConfirmPassword: false, registerAlertDni: false, registerAlertDate: false, registerAlertTel: false, viewModalDate: false, actualDatePicker: date, actualDate: '', viewPanel: 1, dialogShow: false, dialogTitle: '', dialogText: '', dialogShowContinue: false });
+        this.setState({ sessionEmail: '', sessionPassword: '', sessionAlertEmail: false, sessionAlertPassword: false, registerName: '', registerEmail: '', registerPassword: '', registerConfirmPassword: '', registerDni: '', registerDate: `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`, registerTel: '', registerAlertName: false, registerAlertEmail: false, registerAlertPassword: false, registerAlertConfirmPassword: false, registerAlertDni: false, registerAlertDate: false, registerAlertTel: false, actualDatePicker: date, viewPanel: 1, dialogShow: false, dialogTitle: '', dialogText: '', dialogShowContinue: false });
     }
     calcYears(date: string) {
         var dateProcess = moment(date, 'DD/MM/YYYY').toDate();
@@ -201,14 +198,12 @@ export class Session extends Component<IProps, IState> {
             var email: string = decode(value.email);
             setTimeout(()=>{
                 this.props.setLoading(true, `Accediendo como "${email.slice(0, 5)}...${email.slice(email.indexOf('@'), email.length)}"...`);
-                SplashScreen.show();
                 setLoadNow(true);
                 DeviceEventEmitter.emit('nowVerify');
                 setTimeout(()=>{
                     this.props.setLoading(false, '');
                     this.props.close();
-                    setTimeout(()=>SplashScreen.hide(), 128);
-                }, 2048);
+                }, 1024);
             }, 128);
         }).catch((data)=>{
             this.props.setLoading(false, '');
@@ -237,154 +232,153 @@ export class Session extends Component<IProps, IState> {
                 break;
         }
     }
+    openDatePicker() {
+        DateTimePickerAndroid.open({
+            value: this.state.actualDatePicker,
+            mode: 'date',
+            onChange: ({ type }, date?)=>{
+                if (type == 'dismissed') return;
+                (date)&&this.setState({
+                    actualDatePicker: moment(date).toDate(),
+                    registerDate: moment(date).format('DD/MM/YYYY')
+                });
+            }
+        });
+    }
     render(): React.ReactNode {
-        return(<CustomModal visible={this.props.visible} animationIn={'fadeIn'} animationOut={'fadeOut'}>
+        return(<CustomModal visible={this.props.visible} style={{ backgroundColor: '#0B0C0E' }} animationIn={'fadeIn'} animationOut={'fadeOut'}>
             <PaperProvider theme={CombinedTheme}>
-                <KeyboardAvoidingView style={{ flex: 1 }} behavior={'height'} keyboardVerticalOffset={0}>
-                    <View style={styles.contain}>
-                        <View style={{ ...styles.card, display: (this.state.viewPanel == 1)? 'flex': 'none' }}>
-                            <Logo width={128} height={128} />
-                            <View style={styles.form}>
-                                <TextInput
-                                    style={styles.textInput}
-                                    mode={'outlined'}
-                                    label={'Email o teléfono'}
-                                    autoCapitalize={'none'}
-                                    textContentType={'emailAddress'}
-                                    value={this.state.sessionEmail}
-                                    keyboardType={'email-address'}
-                                    render={(props)=><NativeTextInput {...props} ref={(ref)=>this.sessionInputEmail = ref} />}
-                                    returnKeyType={'next'}
-                                    onSubmitEditing={()=>this.sessionInputPassword?.focus()}
-                                    onChangeText={(text)=>this.setState({ sessionEmail: text.replace(/\ /gi, '') })} />
-                                <TextInput
-                                    style={styles.textInput}
-                                    mode={'outlined'}
-                                    secureTextEntry={true}
-                                    autoCapitalize={'none'}
-                                    label={'Contraseña'}
-                                    value={this.state.sessionPassword}
-                                    textContentType={'password'}
-                                    render={(props)=><NativeTextInput {...props} ref={(ref)=>this.sessionInputPassword = ref} />}
-                                    returnKeyType={'send'}
-                                    onSubmitEditing={()=>this.goSession()}
-                                    onChangeText={(text)=>this.setState({ sessionPassword: text })} />
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+                    <KeyboardAvoidingView style={{ flex: 1 }} behavior={'height'} keyboardVerticalOffset={0}>
+                        <View style={styles.contain}>
+                            <View style={{ ...styles.card, display: (this.state.viewPanel == 1)? 'flex': 'none' }}>
+                                <Logo width={128} height={128} />
+                                <View style={styles.form}>
+                                    <TextInput
+                                        style={styles.textInput}
+                                        mode={'outlined'}
+                                        label={'Email o teléfono'}
+                                        autoCapitalize={'none'}
+                                        textContentType={'emailAddress'}
+                                        value={this.state.sessionEmail}
+                                        keyboardType={'email-address'}
+                                        render={(props)=><NativeTextInput {...props} ref={(ref)=>this.sessionInputEmail = ref} />}
+                                        returnKeyType={'next'}
+                                        onSubmitEditing={()=>this.sessionInputPassword?.focus()}
+                                        onChangeText={(text)=>this.setState({ sessionEmail: text.replace(/\ /gi, '') })} />
+                                    <TextInput
+                                        style={styles.textInput}
+                                        mode={'outlined'}
+                                        secureTextEntry={true}
+                                        autoCapitalize={'none'}
+                                        label={'Contraseña'}
+                                        value={this.state.sessionPassword}
+                                        textContentType={'password'}
+                                        render={(props)=><NativeTextInput {...props} ref={(ref)=>this.sessionInputPassword = ref} />}
+                                        returnKeyType={'send'}
+                                        onSubmitEditing={()=>this.goSession()}
+                                        onChangeText={(text)=>this.setState({ sessionPassword: text })} />
+                                </View>
+                                <View style={styles.formButtons}>
+                                    <Button onPress={()=>this.goSession()} mode={'contained'}>Iniciar Sesión</Button>
+                                    <Button onPress={()=>this.setState({ viewPanel: 2 })} style={{ marginTop: 8 }}>Registrarse</Button>
+                                </View>
                             </View>
-                            <View style={styles.formButtons}>
-                                <Button onPress={()=>this.goSession()} mode={'contained'}>Iniciar Sesión</Button>
-                                <Button onPress={()=>this.setState({ viewPanel: 2 })} style={{ marginTop: 8 }}>Registrarse</Button>
+                            <View style={{ ...styles.card, display: (this.state.viewPanel == 2)? 'flex': 'none' }}>
+                                <Text style={{ fontSize: 28, color: '#ED7035', textAlign: 'center' }}>{'Bienvenid@ a \nCorporal Kinesis App'}</Text>
+                                <View style={styles.form2}>
+                                    <TextInput
+                                        style={styles.textInput}
+                                        mode={'outlined'}
+                                        label={'Nombre y apellido'}
+                                        textContentType={'nickname'}
+                                        error={this.state.registerAlertName}
+                                        keyboardType={'default'}
+                                        render={(props)=><NativeTextInput {...props} ref={(ref)=>this.registerInputName = ref} />}
+                                        returnKeyType={'next'}
+                                        onSubmitEditing={()=>this.registerInputEmail?.focus()}
+                                        value={this.state.registerName}
+                                        onChangeText={(text)=>this.setState({ registerName: text })} />
+                                    <TextInput
+                                        style={styles.textInput}
+                                        mode={'outlined'}
+                                        label={'Correo electrónico'}
+                                        autoCapitalize={'none'}
+                                        textContentType={'emailAddress'}
+                                        error={this.state.registerAlertEmail}
+                                        keyboardType={'email-address'}
+                                        render={(props)=><NativeTextInput {...props} ref={(ref)=>this.registerInputEmail = ref} />}
+                                        returnKeyType={'next'}
+                                        onSubmitEditing={()=>this.registerInputPassword?.focus()}
+                                        value={this.state.registerEmail}
+                                        onChangeText={(text)=>this.setState({ registerEmail: text.replace(/\ /gi, '') })} />
+                                    <TextInput
+                                        style={styles.textInput}
+                                        mode={'outlined'}
+                                        secureTextEntry={true}
+                                        label={'Contraseña'}
+                                        autoCapitalize={'none'}
+                                        textContentType={'password'}
+                                        error={this.state.registerAlertPassword}
+                                        render={(props)=><NativeTextInput {...props} ref={(ref)=>this.registerInputPassword = ref} />}
+                                        returnKeyType={'next'}
+                                        onSubmitEditing={()=>this.registerInputConfirmPassword?.focus()}
+                                        value={this.state.registerPassword}
+                                        onChangeText={(text)=>this.setState({ registerPassword: text })} />
+                                    <TextInput
+                                        style={styles.textInput}
+                                        mode={'outlined'}
+                                        secureTextEntry={true}
+                                        autoCapitalize={'none'}
+                                        label={'Confirmar contraseña'}
+                                        textContentType={'password'}
+                                        error={this.state.registerAlertConfirmPassword}
+                                        render={(props)=><NativeTextInput {...props} ref={(ref)=>this.registerInputConfirmPassword = ref} />}
+                                        returnKeyType={'next'}
+                                        onSubmitEditing={()=>this.registerInputDNI?.focus()}
+                                        value={this.state.registerConfirmPassword}
+                                        onChangeText={(text)=>this.setState({ registerConfirmPassword: text })} />
+                                    <TextInput
+                                        style={styles.textInput}
+                                        mode={'outlined'}
+                                        label={'D.N.I'}
+                                        keyboardType={'numeric'}
+                                        error={this.state.registerAlertDni}
+                                        render={(props)=><NativeTextInput {...props} ref={(ref)=>this.registerInputDNI = ref} />}
+                                        returnKeyType={'next'}
+                                        onSubmitEditing={()=>this.openDatePicker()}
+                                        value={this.state.registerDni}
+                                        onChangeText={(text)=>this.setState({ registerDni: text })} />
+                                    <TextInput
+                                        style={styles.textInput}
+                                        mode={'outlined'}
+                                        label={'Fecha de nacimiento'}
+                                        error={this.state.registerAlertDate}
+                                        value={this.state.registerDate}
+                                        editable={false}
+                                        right={<TextInput.Icon name="calendar-range" onPress={()=>this.openDatePicker()} />} />
+                                    <TextInput
+                                        style={styles.textInput}
+                                        mode={'outlined'}
+                                        label={'Número de teléfono'}
+                                        textContentType={'telephoneNumber'}
+                                        keyboardType={'phone-pad'}
+                                        error={this.state.registerAlertTel}
+                                        render={(props)=><NativeTextInput {...props} ref={(ref)=>this.registerInputPhone = ref} />}
+                                        returnKeyType={'send'}
+                                        onSubmitEditing={()=>this.goRegister()}
+                                        value={this.state.registerTel}
+                                        onChangeText={(text)=>this.setState({ registerTel: text })} />
+                                </View>
+                                <View style={styles.formButtons}>
+                                    <Button onPress={()=>this.goRegister()} mode={'contained'}>Registrarse</Button>
+                                    <Button onPress={()=>this.setState({ viewPanel: 1 })} style={{ marginTop: 8 }}>¿Ya estas registrado?</Button>
+                                </View>
                             </View>
                         </View>
-                        <View style={{ ...styles.card, display: (this.state.viewPanel == 2)? 'flex': 'none' }}>
-                            <Text style={{ fontSize: 28, color: '#ED7035', textAlign: 'center' }}>{'Bienvenid@ a \nCorporal Kinesis App'}</Text>
-                            <View style={styles.form2}>
-                                <TextInput
-                                    style={styles.textInput}
-                                    mode={'outlined'}
-                                    label={'Nombre y apellido'}
-                                    textContentType={'nickname'}
-                                    error={this.state.registerAlertName}
-                                    keyboardType={'default'}
-                                    render={(props)=><NativeTextInput {...props} ref={(ref)=>this.registerInputName = ref} />}
-                                    returnKeyType={'next'}
-                                    onSubmitEditing={()=>this.registerInputEmail?.focus()}
-                                    value={this.state.registerName}
-                                    onChangeText={(text)=>this.setState({ registerName: text })} />
-                                <TextInput
-                                    style={styles.textInput}
-                                    mode={'outlined'}
-                                    label={'Correo electrónico'}
-                                    autoCapitalize={'none'}
-                                    textContentType={'emailAddress'}
-                                    error={this.state.registerAlertEmail}
-                                    keyboardType={'email-address'}
-                                    render={(props)=><NativeTextInput {...props} ref={(ref)=>this.registerInputEmail = ref} />}
-                                    returnKeyType={'next'}
-                                    onSubmitEditing={()=>this.registerInputPassword?.focus()}
-                                    value={this.state.registerEmail}
-                                    onChangeText={(text)=>this.setState({ registerEmail: text.replace(/\ /gi, '') })} />
-                                <TextInput
-                                    style={styles.textInput}
-                                    mode={'outlined'}
-                                    secureTextEntry={true}
-                                    label={'Contraseña'}
-                                    autoCapitalize={'none'}
-                                    textContentType={'password'}
-                                    error={this.state.registerAlertPassword}
-                                    render={(props)=><NativeTextInput {...props} ref={(ref)=>this.registerInputPassword = ref} />}
-                                    returnKeyType={'next'}
-                                    onSubmitEditing={()=>this.registerInputConfirmPassword?.focus()}
-                                    value={this.state.registerPassword}
-                                    onChangeText={(text)=>this.setState({ registerPassword: text })} />
-                                <TextInput
-                                    style={styles.textInput}
-                                    mode={'outlined'}
-                                    secureTextEntry={true}
-                                    autoCapitalize={'none'}
-                                    label={'Confirmar contraseña'}
-                                    textContentType={'password'}
-                                    error={this.state.registerAlertConfirmPassword}
-                                    render={(props)=><NativeTextInput {...props} ref={(ref)=>this.registerInputConfirmPassword = ref} />}
-                                    returnKeyType={'next'}
-                                    onSubmitEditing={()=>this.registerInputDNI?.focus()}
-                                    value={this.state.registerConfirmPassword}
-                                    onChangeText={(text)=>this.setState({ registerConfirmPassword: text })} />
-                                <TextInput
-                                    style={styles.textInput}
-                                    mode={'outlined'}
-                                    label={'D.N.I'}
-                                    keyboardType={'numeric'}
-                                    error={this.state.registerAlertDni}
-                                    render={(props)=><NativeTextInput {...props} ref={(ref)=>this.registerInputDNI = ref} />}
-                                    returnKeyType={'next'}
-                                    onSubmitEditing={()=>this.setState({ viewModalDate: true })}
-                                    value={this.state.registerDni}
-                                    onChangeText={(text)=>this.setState({ registerDni: text })} />
-                                <TextInput
-                                    style={styles.textInput}
-                                    mode={'outlined'}
-                                    label={'Fecha de nacimiento'}
-                                    error={this.state.registerAlertDate}
-                                    value={this.state.registerDate}
-                                    editable={false}
-                                    right={<TextInput.Icon name="calendar-range" onPress={()=>this.setState({ viewModalDate: true })} />} />
-                                <TextInput
-                                    style={styles.textInput}
-                                    mode={'outlined'}
-                                    label={'Número de teléfono'}
-                                    textContentType={'telephoneNumber'}
-                                    keyboardType={'phone-pad'}
-                                    error={this.state.registerAlertTel}
-                                    render={(props)=><NativeTextInput {...props} ref={(ref)=>this.registerInputPhone = ref} />}
-                                    returnKeyType={'send'}
-                                    onSubmitEditing={()=>this.goRegister()}
-                                    value={this.state.registerTel}
-                                    onChangeText={(text)=>this.setState({ registerTel: text })} />
-                            </View>
-                            <View style={styles.formButtons}>
-                                <Button onPress={()=>this.goRegister()} mode={'contained'}>Registrarse</Button>
-                                <Button onPress={()=>this.setState({ viewPanel: 1 })} style={{ marginTop: 8 }}>¿Ya estas registrado?</Button>
-                            </View>
-                        </View>
-                    </View>
-                </KeyboardAvoidingView>
+                    </KeyboardAvoidingView>
+                </TouchableWithoutFeedback>
                 <Portal>
-                    <Dialog visible={this.state.viewModalDate} dismissable={true} onDismiss={()=>this.setState({ viewModalDate: false })}>
-                        <Dialog.Title>Fecha de nacimiento</Dialog.Title>
-                        <Dialog.Content style={{ overflow: 'hidden' }}>
-                            <DatePicker
-                                date={this.state.actualDatePicker}
-                                mode={'date'}
-                                fadeToColor={'#323335'}
-                                textColor={'#FFFFFF'}
-                                onDateChange={(date)=>this.setState({ actualDatePicker: date, actualDate: moment(date).format('DD/MM/YYYY') })}
-                            />
-                        </Dialog.Content>
-                        <Dialog.Actions>
-                            <Button onPress={()=>this.setState({ viewModalDate: false })}>Cancelar</Button>
-                            <Button onPress={()=>this.setState({ registerDate: this.state.actualDate, viewModalDate: false })}>Aceptar</Button>
-                        </Dialog.Actions>
-                    </Dialog>
                     <Dialog visible={this.state.dialogShow} dismissable={true} onDismiss={()=>this.setState({ dialogShow: false })}>
                         <Dialog.Title>{this.state.dialogTitle}</Dialog.Title>
                         <Dialog.Content>

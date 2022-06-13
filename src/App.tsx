@@ -24,8 +24,7 @@ type IState = {
 
     openSession: boolean;
     showVerify: boolean;
-    showTextAnimVerify: boolean;
-    textAnimVerify: string;
+    textAnimVerify: string | undefined;
 
     changeLoadView: boolean;
 
@@ -39,14 +38,10 @@ export default class App extends Component<IProps, IState> {
         this.state = {
             marginTop: 0,
             marginBottom: 0,
-
             openSession: false,
             showVerify: true,
-            showTextAnimVerify: true,
-            textAnimVerify: 'Cargando',
-
+            textAnimVerify: undefined,
             changeLoadView: false,
-
             viewDialogUpdate: false,
             storeUrl: ''
         };
@@ -60,7 +55,7 @@ export default class App extends Component<IProps, IState> {
             setTimeout(()=>(value)&&ChangeLogSystem.getVerify().then((value)=>(value) && this.setState({ changeLoadView: true }, ()=>ChangeLogSystem.setNewVersion())), 200);
         }).catch((error)=>{
             if (error.action == 1) return this.setState({ openSession: true });
-            this.setState({ textAnimVerify: error.cause, showTextAnimVerify: false }, ()=>setTimeout(()=>this.setState({ openSession: true }), 1500));
+            this.setState({ textAnimVerify: error.cause }, ()=>setTimeout(()=>this.setState({ openSession: true }), 1500));
         });
     }
     componentDidMount() {
@@ -81,8 +76,7 @@ export default class App extends Component<IProps, IState> {
             marginBottom: 0,
             openSession: false,
             showVerify: true,
-            showTextAnimVerify: true,
-            textAnimVerify: 'Cargando'
+            textAnimVerify: undefined
         });
         this.event?.remove();
         this.event2?.remove();
@@ -99,7 +93,6 @@ export default class App extends Component<IProps, IState> {
                         setLoadData={(data)=>setLoadNow(data)}
                         showVerify={this.state.showVerify}
                         textVerify={this.state.textAnimVerify}
-                        animTextVerify={this.state.showTextAnimVerify}
                         visibleChangeLoad={this.state.changeLoadView}
                         closeChangeLoad={()=>this.setState({ changeLoadView: false })}
                         viewDialogUpdate={this.state.viewDialogUpdate}

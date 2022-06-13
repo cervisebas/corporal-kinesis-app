@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, ActivityIndicator, Modal, StyleProp, ViewStyle } from 'react-native';
+import CustomModal from '../../screens/components/CustomModal';
 
 interface Props {
   show: boolean;
@@ -34,7 +35,7 @@ const defaultProps: Props = {
 };
 
 const LoadingController: React.FC<Props> = (props: Props) => {
-  return(<Modal visible={props.show} style={props.style} animationType={props.animationType} transparent statusBarTranslucent={true}>
+  return(<CustomModal visible={props.show} style={props.style} animationIn={'fadeIn'} animationOut={'fadeOut'} transparent>
     <View style={{ flex: 1, backgroundColor: props.backgroundOverlayColor, alignItems: 'center', justifyContent: 'center' }}>
       <View style={{ padding: props.loadingPaddingView, backgroundColor: props.backgroundColor, borderRadius: props.borderRadius }}>
         <View style={{ flexDirection: props.loaderContentDirection, alignItems: 'center' }}>
@@ -43,7 +44,7 @@ const LoadingController: React.FC<Props> = (props: Props) => {
         </View>
       </View>
     </View>
-  </Modal>);
+  </CustomModal>);
 };
 
 LoadingController.defaultProps = defaultProps;

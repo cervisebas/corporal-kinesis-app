@@ -1,4 +1,3 @@
-import { decode } from "base-64";
 import React, { Component, ReactNode } from "react";
 import { FlatList, View } from "react-native";
 import { Button, Appbar, Dialog, Paragraph, Portal, Snackbar, Provider as PaperProvider } from "react-native-paper";
@@ -62,7 +61,7 @@ export default class ViewTraining extends Component<IProps, IState> {
                     <View style={{ flex: 2 }}>
                         <FlatList
                             data={this.props.trainings}
-                            keyExtractor={(item)=>item.id}
+                            keyExtractor={(item)=>`viewT-admin-${item.id}`}
                             contentContainerStyle={{ flex: (this.props.trainings.length == 0)? 3: undefined, paddingBottom: (this.props.trainings.length != 0)? 12: undefined }}
                             ListEmptyComponent={<this.listEmptyComponent />}
                             getItemLayout={(_data, index)=>({
@@ -70,14 +69,12 @@ export default class ViewTraining extends Component<IProps, IState> {
                                 offset: 182 * index,
                                 index
                             })}
-                            renderItem={({ item, index })=>
-                                <CustomItemList5
-                                    key={index}
-                                    data={item}
-                                    deleteButton={()=>this.setState({ confirmView: true, actualId: item.id })}
-                                    viewButton={()=>this.goMoreDetails(item.id)}
-                                />
-                            }
+                            renderItem={({ item })=><CustomItemList5
+                                key={`viewT-admin-${item.id}`}
+                                data={item}
+                                deleteButton={()=>this.setState({ confirmView: true, actualId: item.id })}
+                                viewButton={()=>this.goMoreDetails(item.id)}
+                            />}
                         />
                         <Portal>
                             <Dialog visible={this.state.confirmView} onDismiss={()=>this.setState({ confirmView: false })}>

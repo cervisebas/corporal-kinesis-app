@@ -2,8 +2,8 @@ import { decode } from "base-64";
 import React, { PureComponent } from "react";
 import { Component, ReactNode } from "react";
 import { DeviceEventEmitter, EmitterSubscription, FlatList, RefreshControl, ToastAndroid, View } from "react-native";
-import { ActivityIndicator, Appbar } from "react-native-paper";
-import { Permission } from "../../scripts/ApiCorporal";
+import { ActivityIndicator, Appbar, Divider } from "react-native-paper";
+import { Options, Permission } from "../../scripts/ApiCorporal";
 import { permissionItem } from "../../scripts/ApiCorporal/types";
 import { Global } from "../../scripts/Global";
 import CombinedTheme from "../../Theme";
@@ -28,7 +28,7 @@ type IState = {
         image: string;
         birthday: string;
         actualStatus: string;
-    };
+    } | undefined;
 
     loadingView: boolean;
     loadingText: string;
@@ -47,13 +47,7 @@ export default class Page2 extends Component<IProps, IState> {
             messageError: '',
             refreshing: false,
             viewChangePermission: false,
-            dataChangePermission: {
-                id: '',
-                name: '',
-                image: '',
-                birthday: '',
-                actualStatus: ''
-            },
+            dataChangePermission: undefined,
             loadingView: false,
             loadingText: '',
             oldList: [],
@@ -63,17 +57,17 @@ export default class Page2 extends Component<IProps, IState> {
     private event: EmitterSubscription | null = null;
     componentWillUnmount() {
         this.event?.remove();
+        this.event = null;
         this.setState({
             userList: [],
             isLoading: true,
-            viewChangePermission: false,
-            dataChangePermission: {
-                id: '',
-                name: '',
-                image: '',
-                birthday: '',
-                actualStatus: ''
-            }
+            isError: false,
+            messageError: '',
+            refreshing: false,
+            dataChangePermission: undefined,
+            loadingText: '',
+            oldList: [],
+            isFilter: false
         });
     }
     componentDidMount() {
@@ -81,9 +75,9 @@ export default class Page2 extends Component<IProps, IState> {
         this.event = DeviceEventEmitter.addListener('adminPage2Reload', ()=>this.loadData());
     }
     loadData() {
-        this.setState({ userList: [], isLoading: true, isError: false, messageError: '' }, ()=>{
+        this.setState({ userList: [], isLoading: true, isFilter: false, isError: false, messageError: '' }, ()=>{
             Permission.getAll()
-                .then((list)=>this.setState({ userList: list, isLoading: false }))
+                .then((list)=>this.setState({ userList: list, isLoading: false }, ()=>Options.getAll().then((vals)=>(vals.activeFilters)&&this.goFilter())))
                 .catch((error)=>this.setState({ userList: [], isLoading: false, isError: true, messageError: error.cause }));
             if (this.state.refreshing) this.setState({ refreshing: false });
         }); 
@@ -122,6 +116,12 @@ export default class Page2 extends Component<IProps, IState> {
             this.setState({ userList: newUserList, isFilter: true, isLoading: false });
         }));
     }
+
+    /*###### FlatList Control ######*/
+    _getItemLayout(_i: any, index: number) { return { length: 72, offset: 72 * index, index }; }
+    _keyExtractor(item: permissionItem, _i: number) { return `p2-admin-${item.id}`; }
+    /*##############################*/
+
     render(): ReactNode {
         return(<View style={{ flex: 1 }}>
             <Appbar style={{ backgroundColor: '#1663AB', height: 56 }}>
@@ -132,12 +132,17 @@ export default class Page2 extends Component<IProps, IState> {
             <View style={{ flex: 2, overflow: 'hidden' }}>
                 <FlatList
                     data={this.state.userList}
+                    keyExtractor={this._keyExtractor}
+                    getItemLayout={this._getItemLayout}
+                    removeClippedSubviews={true}
                     contentContainerStyle={{ flex: (this.state.isLoading || this.state.isError)? 3: undefined }}
+                    ItemSeparatorComponent={(props)=><Divider {...props} />}
                     refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={this.state.refreshing} onRefresh={()=>this.setState({ refreshing: true }, ()=>this.loadData())} />}
                     ListEmptyComponent={(this.state.isLoading)? <ShowLoading />: (this.state.isError)? <CustomShowError message={this.state.messageError} />: <></>}
-                    renderItem={({ item, index })=><CustomItemList3
-                        key={index}
+                    renderItem={({ item })=><CustomItemList3
+                        key={`p2-admin-${item.id}`}
                         subtitle={this.adminTag(item.permission)}
+                        type={item.permission}
                         image={item.accountData.image}
                         title={decode(item.accountData.name)}
                         onPress={()=>this.setState({
@@ -157,7 +162,7 @@ export default class Page2 extends Component<IProps, IState> {
                     visible={this.state.viewChangePermission}
                     infoUser={this.state.dataChangePermission}
                     close={()=>this.setState({ viewChangePermission: false })}
-                    closeComplete={()=>setTimeout(()=>this.setState({ dataChangePermission: { id: '', name: '', image: '', birthday: '', actualStatus: '' } }), 300)}
+                    closeComplete={()=>setTimeout(()=>this.setState({ dataChangePermission: undefined }), 300)}
                     showLoading={(visible, text, after)=>this.setState({ loadingView: visible, loadingText: text }, ()=>(after)&&after())}
                 />
             </View>

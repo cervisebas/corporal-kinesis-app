@@ -1,5 +1,5 @@
 import { encode, decode } from "base-64";
-import { dataListUsers, getUserData, listUsers, openAccount, storageData, tipical, userData } from "./types";
+import { dataListUsers, getUserData, infoAccount, listUsers, openAccount, storageData, tipical, userData } from "./types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SystemNotifications from "./notifications";
 import axios from "axios";
@@ -8,9 +8,11 @@ import qs from "qs";
 export default class AccountSystem {
     private urlBase: string = '';
     private header_access: { headers: { Authorization: string } } = { headers: { Authorization: '' } };
+    private header_access2: { headers: { Authorization: string; 'Content-Type': string; } } = { headers: { Authorization: '', 'Content-Type': `multipart/form-data` } };
     constructor(setUrl: string, setHeaderAccess: string) {
         this.urlBase = setUrl;
         this.header_access.headers.Authorization = setHeaderAccess;
+        this.header_access2.headers.Authorization = setHeaderAccess;
     }
     create(name: string, email: string, password: string, birthday: string, dni: string, phone: string): Promise<boolean> {
         return new Promise((resolve, reject)=>{
@@ -70,6 +72,57 @@ export default class AccountSystem {
                 }).catch((error)=>reject({ cause: 'Ocurrió un error al intentar consultar a los datos de sesión.', error, action: 1 }));
             } catch (error) {
                 reject({ cause: 'Ocurrió un error inesperadamente.', error, action: 1 });
+            }
+        });
+    }
+    modify(dataPost: FormData): Promise<boolean> {
+        return new Promise((resolve, reject)=>{
+            try {
+                AsyncStorage.getItem('account_session').then((value)=>{
+                    if (!value) return reject({ cause: 'No se ha encontrado datos de inicio de sesión.', error: false });
+                    var datas: storageData = JSON.parse(decode(String(value)));
+                    var postDatas = dataPost;
+                    postDatas.append('email', datas.email);
+                    postDatas.append('password', datas.password);
+                    postDatas.append('editUser', '1');
+                    axios.post(`${this.urlBase}/index.php`, postDatas, this.header_access2).then((result)=>{
+                        var data: tipical = result.data;
+                        if (data.ok) {
+                            this.getInfo().then((new2)=>{
+                                if (new2) {
+                                    AsyncStorage.setItem('account_session', encode(JSON.stringify({ name: new2.name, email: datas.email, password: datas.password, image: new2.image })))
+                                        .then(()=>resolve(true))
+                                        .catch((error)=>reject({ cause: 'Ocurrió un error al intentar consultar a los datos de sesión.', error }));
+                                }
+                            }).catch((error)=>reject(error));
+                            return;
+                        }
+                        return reject({ cause: (data.cause?.length !== undefined && data.cause?.length !== 0)? data.cause: 'Ocurrió un error inesperadamente.', error: false });
+                    }).catch((error)=>{
+                        console.log(error);
+                        reject({ cause: 'Error de conexión.', error });
+                    });
+                }).catch((error)=>reject({ cause: 'Ocurrió un error al intentar consultar a los datos de sesión.', error }));
+            } catch (error) {
+                reject({ cause: 'Ocurrió un error inesperadamente.', error });
+            }
+        });
+    }
+    getInfo(): Promise<infoAccount | undefined> {
+        return new Promise((resolve, reject)=>{
+            try {
+                AsyncStorage.getItem('account_session').then((value)=>{
+                    if (!value) return reject({ cause: 'No se ha encontrado datos de inicio de sesión.', error: false });
+                    var datas: storageData = JSON.parse(decode(String(value)));
+                    var postDatas = { getInfoAccount: true, email: datas.email, password: datas.password };
+                    axios.post(`${this.urlBase}/index.php`, qs.stringify(postDatas), this.header_access).then((result)=>{
+                        var data: tipical = result.data;
+                        if (data.ok) return resolve(data.datas);
+                        return reject({ cause: (data.cause?.length !== undefined && data.cause?.length !== 0)? data.cause: 'Ocurrió un error inesperadamente.', error: false });
+                    }).catch((error)=>reject({ cause: 'Error de conexión.', error }));
+                }).catch((error)=>reject({ cause: 'Ocurrió un error al intentar consultar a los datos de sesión.', error }));
+            } catch (error) {
+                reject({ cause: 'Ocurrió un error inesperadamente.', error });
             }
         });
     }

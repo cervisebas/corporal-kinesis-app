@@ -1,7 +1,7 @@
 import { decode } from "base-64";
 import React, { Component } from "react";
-import { View, ToastAndroid, Text, StyleSheet, Dimensions, DeviceEventEmitter, Image } from "react-native";
-import { Appbar, TextInput, Button, Snackbar, Provider as PaperProvider, Banner } from "react-native-paper";
+import { View, ToastAndroid, Text, StyleSheet, Dimensions, DeviceEventEmitter } from "react-native";
+import { Appbar, TextInput, Button, Snackbar } from "react-native-paper";
 import { Exercise } from "../../../scripts/ApiCorporal";
 import CombinedTheme from "../../../Theme";
 import CustomModal from "../../components/CustomModal";
@@ -25,7 +25,6 @@ type IState = {
     showAlert: boolean;
     messageAlert: string;
     textButton: string;
-    showBanner: boolean;
 };
 
 const { width } = Dimensions.get('window');
@@ -42,8 +41,7 @@ export default class EditExcercise extends Component<IProps, IState> {
             isError: false,
             showAlert: false,
             messageAlert: '',
-            textButton: 'Enviar',
-            showBanner: true
+            textButton: 'Enviar'
         };
     }
     closeModal() {
@@ -57,8 +55,7 @@ export default class EditExcercise extends Component<IProps, IState> {
             isError: false,
             showAlert: false,
             messageAlert: '',
-            textButton: 'Enviar',
-            showBanner: true
+            textButton: 'Enviar'
         }, ()=>this.props.close());
     }
     async checkInputs(): Promise<boolean> {
@@ -100,56 +97,54 @@ export default class EditExcercise extends Component<IProps, IState> {
         });
     }
     render(): React.ReactNode {
-        return(<CustomModal visible={this.props.visible} onShow={()=>this.setState({ name: decode(this.props.data.title), description: (decode(this.props.data.message) == 'none')? '': decode(this.props.data.message) })} onRequestClose={()=>this.closeModal()}>
-            <PaperProvider theme={CombinedTheme}>
-                <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background }}>
-                    <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
-                        <Appbar.BackAction onPress={()=>this.closeModal()}/>
-                        <Appbar.Content title={'Editar ejercicio'} />
-                    </Appbar.Header>
-                    <View style={{ flex: 2 }}>
-                        <Banner
-                            visible={this.state.showBanner}
-                            actions={[{
-                                label: 'Ocultar',
-                                onPress: ()=>this.setState({ showBanner: false })
-                            }]}
-                            style={{ marginBottom: 12 }}
-                            icon={(props)=><Image {...props} source={require('../../../assets/information-dark.png')} />}>
-                            Esta función se encuentra en modo de pruebas, si se presenta un error al usarla por favor repórtelo.
-                        </Banner>
-                        <TextInput
-                            style={styles.textInput}
-                            mode={'outlined'}
-                            label={'Nombre'}
-                            textContentType={'nickname'}
-                            error={this.state.alertName}
-                            keyboardType={'default'}
-                            value={this.state.name}
+        return(<CustomModal visible={this.props.visible} onShow={()=>this.setState({ name: decode(this.props.data.title), description: (decode(this.props.data.message) == 'none')? '': decode(this.props.data.message) })} onRequestClose={()=>this.closeModal()} animationIn={'slideInLeft'} animationOut={'slideOutRight'}>
+            <View style={{ ...styles.content, backgroundColor: CombinedTheme.colors.background }}>
+                <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
+                    <Appbar.BackAction onPress={()=>this.closeModal()}/>
+                    <Appbar.Content title={'Editar ejercicio'} />
+                </Appbar.Header>
+                <View style={{ paddingBottom: 8 }}>
+                    <TextInput
+                        style={styles.textInput}
+                        mode={'outlined'}
+                        label={'Nombre'}
+                        textContentType={'nickname'}
+                        error={this.state.alertName}
+                        keyboardType={'default'}
+                        value={this.state.name}
+                        disabled={this.state.isLoading}
+                        onChangeText={(text)=>this.setState({ name: text, alertName: false })} />
+                    <TextInput
+                        style={styles.textInput}
+                        mode={'outlined'}
+                        label={'Descripción (Opcional)'}
+                        multiline={true}
+                        numberOfLines={8}
+                        keyboardType={'default'}
+                        value={this.state.description}
+                        disabled={this.state.isLoading}
+                        onChangeText={(text)=>this.setState({ description: text })} />
+                    <View style={{ width: '100%', alignItems: 'center' }}>
+                        <Button
+                            loading={this.state.isLoading}
+                            mode={'contained'}
                             disabled={this.state.isLoading}
-                            onChangeText={(text)=>this.setState({ name: text, alertName: false })} />
-                        <TextInput
-                            style={styles.textInput}
-                            mode={'outlined'}
-                            label={'Descripción (Opcional)'}
-                            multiline={true}
-                            numberOfLines={8}
-                            keyboardType={'default'}
-                            value={this.state.description}
-                            disabled={this.state.isLoading}
-                            onChangeText={(text)=>this.setState({ description: text })} />
-                        <View style={{ width: '100%', flex: 1, alignItems: 'center' }}>
-                            <Button
-                                loading={this.state.isLoading}
-                                mode={'contained'}
-                                disabled={this.state.isLoading}
-                                style={{ width: (width / 2), marginTop: 8 }}
-                                onPress={()=>(!this.state.isLoading)? this.sendResults(): ToastAndroid.show('Espere...', ToastAndroid.SHORT)}>{this.state.textButton}</Button>
-                        </View>
+                            style={{ width: (width / 2), marginTop: 8 }}
+                            onPress={()=>(!this.state.isLoading)? this.sendResults(): ToastAndroid.show('Espere...', ToastAndroid.SHORT)}>{this.state.textButton}</Button>
                     </View>
                 </View>
-                <Snackbar visible={this.state.showAlert} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ showAlert: false })} duration={(this.state.isError)? 6000: 3000}><Text>{this.state.messageAlert}</Text></Snackbar>
-            </PaperProvider>
+                <Snackbar
+                    visible={this.state.showAlert}
+                    style={{ backgroundColor: '#1663AB' }}
+                    onDismiss={()=>this.setState({ showAlert: false })}
+                    action={{
+                        label: 'OCULTAR',
+                        onPress: ()=>this.setState({ showAlert: false })
+                    }}
+                    duration={(this.state.isError)? 6000: 3000}>
+                    <Text>{this.state.messageAlert}</Text>
+                </Snackbar>
+            </View>
         </CustomModal>);
     }
 }
@@ -160,5 +155,19 @@ const styles = StyleSheet.create({
         marginRight: 16,
         marginBottom: 4,
         marginTop: 4,
+    },
+    content: {
+        marginLeft: 8,
+        marginRight: 8,
+        borderRadius: 8,
+        overflow: 'hidden',
+        shadowColor: "#FFFFFF",
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.22,
+        shadowRadius: 2.22,
+        elevation: 3
     }
 });

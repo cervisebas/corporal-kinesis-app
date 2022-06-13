@@ -80,7 +80,7 @@ type statisticData = {
 type statisticData2 = {
     exercise: string;
     separate: { labels: string[]; values: number[]; };
-    singles: { label: string; value: string; }[];
+    singles: { label: string; value: string; id: string; }[];
 };
 type listUsers = {
     ok?: boolean;
@@ -93,6 +93,7 @@ type dataListUsers = {
     experience: string;
     email: string;
     image: string;
+    permission: string;
 };
 type getUserData = {
     ok?: boolean;
@@ -162,6 +163,29 @@ type getAllExercises = {
     data?: dataExercise[];
 };
 
+type infoAccount = {
+    id: string;
+    name: string;
+    email: string;
+    birthday: string;
+    dni: string;
+    phone: string;
+    experience: string;
+    image: string;
+    type: string; 
+};
+type getInfoAccount = {
+    ok?: boolean;
+    cause?: string;
+    data?: infoAccount
+};
+
+type TypeOptions = {
+    viewAdmins1: boolean;
+    viewAdmins2: boolean;
+    activeFilters: boolean;
+};
+
 export type {
     tipical,
     openAccount,
@@ -183,5 +207,8 @@ export type {
     dataExercise,
     getAllExercises,
     details,
-    statisticData2
+    statisticData2,
+    infoAccount,
+    getInfoAccount,
+    TypeOptions
 };

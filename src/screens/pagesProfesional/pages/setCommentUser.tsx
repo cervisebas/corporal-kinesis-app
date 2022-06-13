@@ -1,7 +1,6 @@
 import { encode } from "base-64";
-import React, { Component, RefObject } from "react";
-import { createRef } from "react";
-import { ToastAndroid, TextInput as TextInputReact } from "react-native";
+import React, { Component } from "react";
+import { ToastAndroid } from "react-native";
 import { Button, Dialog, TextInput } from "react-native-paper";
 
 type IProps = {

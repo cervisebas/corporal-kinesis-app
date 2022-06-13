@@ -18,9 +18,6 @@ export default class HeaderList extends PureComponent<IProps, IState> {
     constructor(props: IProps) {
         super(props);
     }
-    componentWillUnmount() {
-        return false;
-    }
     render(): React.ReactNode {
         return(<View style={{ flexDirection: 'column' }}>
             <View style={{ marginTop: 12, marginBottom: 8, marginLeft: 8, marginRight: 8 }}>

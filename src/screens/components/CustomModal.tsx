@@ -12,6 +12,7 @@ type IProps = {
     animationOut?: ExtractProps<Modal>['animationOut'];
     onRequestClose?: ()=>any;
     style?: StyleProp<ViewStyle>;
+    transparent?: boolean;
 };
 type IState = {};
 
@@ -38,6 +39,7 @@ export default class CustomModal extends Component<IProps, IState> {
             onModalHide={()=>this.onClose()}
             useNativeDriver={true}
             useNativeDriverForBackdrop={true}
+            backdropOpacity={(this.props.transparent)? 0: undefined}
             backdropColor={'#121212'}
             deviceWidth={width}
             deviceHeight={height}

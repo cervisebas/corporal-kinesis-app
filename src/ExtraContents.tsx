@@ -17,8 +17,7 @@ type IProps = {
 
     // Verify
     showVerify: boolean;
-    textVerify: string;
-    animTextVerify: boolean;
+    textVerify: string | undefined;
 
     // ChangeLoad
     visibleChangeLoad: boolean;
@@ -53,7 +52,8 @@ export class ExtraContents extends Component<IProps, IState> {
         this.event?.remove();
         this.setState({
             viewLoading: false,
-            textLoading: ''
+            textLoading: '',
+            showInfoApp: false
         });
     }
     render(): React.ReactNode {
@@ -67,7 +67,6 @@ export class ExtraContents extends Component<IProps, IState> {
             <VerifyScreen
                 visible={this.props.showVerify}
                 textShow={this.props.textVerify}
-                showAnimText={this.props.animTextVerify}
             />
             <Global
                 loadingView={this.state.viewLoading}

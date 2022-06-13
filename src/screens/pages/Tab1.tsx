@@ -1,12 +1,12 @@
 import { decode, encode } from "base-64";
 import moment from "moment";
 import React, { Component } from "react";
-import { View, FlatList, EmitterSubscription, DeviceEventEmitter } from "react-native";
+import { View, FlatList, EmitterSubscription, DeviceEventEmitter, RefreshControl } from "react-native";
 import { Appbar, Divider, Menu, ProgressBar, Snackbar, Text } from "react-native-paper";
 import utf8 from "utf8";
 import { NoComment } from "../../assets/icons";
 import { Comment, HostServer, Training } from "../../scripts/ApiCorporal";
-import { commentsData, DetailsTrainings, statisticData, statisticData2 } from "../../scripts/ApiCorporal/types";
+import { commentsData, DetailsTrainings, statisticData2 } from "../../scripts/ApiCorporal/types";
 import { LoadNow } from "../../scripts/Global";
 import CombinedTheme from "../../Theme";
 import { CustomCardComments, EmptyListComments } from "../components/Components";
@@ -16,7 +16,6 @@ import { Statistics2 } from "./statistics/statistic2";
 
 type IProps = {
     showLoading: (show: boolean, text: string)=>any;
-    openOptions: ()=>any;
 };
 type IState = {
     visiblemenu: boolean;
@@ -24,8 +23,8 @@ type IState = {
     dataShow: DetailsTrainings;
     visibleStatistics: boolean;
     titleStatistics: string;
-    statistics: statisticData;
     statistics2: statisticData2[];
+    refreshing: boolean;
 
     // Dialog Error
     dialogShow: boolean;
@@ -56,8 +55,8 @@ export class Tab1 extends Component<IProps, IState> {
             dataShow: this.reserve1,
             visibleStatistics: false,
             titleStatistics: '',
-            statistics: { singles: [], separate: { labels: [], values: [] }, exercises: [] },
             statistics2: [],
+            refreshing: false,
             dialogShow: false,
             messageDialog: '',
             commentsLoading: true,
@@ -68,7 +67,6 @@ export class Tab1 extends Component<IProps, IState> {
     private event: EmitterSubscription | null = null;
     private timeLoad: number = 512;
     private loading = setInterval(()=>{ if (LoadNow == true) setTimeout(()=>this.goLoading(), 256) }, this.timeLoad);
-    private _isMount: boolean = true;
     private reserve1 = { id: '-1', date: { value: '-', status: -1, difference: undefined }, session_number: { value: '-', status: -1, difference: undefined }, rds: { value: '-', status: -1, difference: undefined }, rpe: { value: '-', status: -1, difference: undefined }, pulse: { value: '-', status: -1, difference: undefined }, repetitions: { value: '-', status: -1, difference: undefined }, kilage: { value: '-', status: -1, difference: undefined }, tonnage: { value: '-', status: -1, difference: undefined }, exercise: { name: 'No disponible', status: -1, description: '' } };
     private reserve2 = { id: '-1', date: { value: 'n/a', status: -1, difference: undefined }, session_number: { value: 'n/a', status: -1, difference: undefined }, rds: { value: 'n/a', status: -1, difference: undefined }, rpe: { value: 'n/a', status: -1, difference: undefined }, pulse: { value: 'n/a', status: -1, difference: undefined }, repetitions: { value: 'n/a', status: -1, difference: undefined }, kilage: { value: 'n/a', status: -1, difference: undefined }, tonnage: { value: 'n/a', status: -1, difference: undefined }, exercise: { name: 'No disponible', status: -1, description: '' } };
     componentDidMount() {
@@ -77,7 +75,6 @@ export class Tab1 extends Component<IProps, IState> {
         });
     }
     componentWillUnmount() {
-        this._isMount = false;
         this.timeLoad = 512;
         this.setState({
             visiblemenu: false,
@@ -85,13 +82,13 @@ export class Tab1 extends Component<IProps, IState> {
             dataShow: this.reserve1,
             visibleStatistics: false,
             titleStatistics: '',
-            statistics: { singles: [], separate: { labels: [], values: [] }, exercises: [] },
             dialogShow: false,
             messageDialog: '',
             commentsLoading: true,
             dataComments: []
         });
         this.event?.remove();
+        this.event = null;
     }
     goStatistics(data: number, titleStatistics: string) {
         this.props.showLoading(true, 'Cargando estadísticas...');
@@ -107,12 +104,17 @@ export class Tab1 extends Component<IProps, IState> {
             this.setState({ dialogShow: true, messageDialog: error.cause });
         });
     }
-    goLoading() {
+    goLoading(refreshing?: boolean) {
         Training.getActual().then((value)=>{
-            this.setState({ dataShow: (value)? { id: value.id, date: value.date, session_number: value.session_number, rds: value.rds, rpe: value.rpe, pulse: value.pulse, repetitions: value.repetitions, kilage: value.kilage, tonnage: value.tonnage, exercise: value.exercise }: this.reserve1, showLoading: false });
+            this.setState({
+                dataShow: (value)? { id: value.id, date: value.date, session_number: value.session_number, rds: value.rds, rpe: value.rpe, pulse: value.pulse, repetitions: value.repetitions, kilage: value.kilage, tonnage: value.tonnage, exercise: value.exercise }: this.reserve1,
+                showLoading: false
+            });
+            (refreshing)&&this.setState({ refreshing: false });
             clearInterval(this.loading);
         }).catch((error)=>{
             this.setState({ dataShow: this.reserve2, showLoading: false, dialogShow: true, messageDialog: error.cause });
+            (refreshing)&&this.setState({ refreshing: false });
             clearInterval(this.loading);
             var loadNow = LoadNow;
             this.timeLoad *= 2;
@@ -141,38 +143,36 @@ export class Tab1 extends Component<IProps, IState> {
         var years = dateNow.getFullYear() - processDate.getFullYear();
         var months = dateNow.getMonth() - processDate.getMonth();
         if (months < 0 || (months === 0 && dateNow.getDate() < processDate.getDate())) years--;
-        return String(years);
+        return years.toString();
     }
     render(): React.ReactNode {
-        return((this._isMount)? <View style={{ flex: 2 }}>
+        return(<View style={{ flex: 1 }}>
             <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
                 <Appbar.Content title="Estadísticas" />
-                <Menu visible={this.state.visiblemenu} onDismiss={()=>this.setState({ visiblemenu: false })} anchor={<Appbar.Action icon="dots-vertical" color={'#FFFFFF'} onPress={()=>this.setState({ visiblemenu: true })} />} >
-                    <Menu.Item onPress={()=>this.setState({ showLoading: true, commentsLoading: true, dataComments: [], visiblemenu: false }, ()=>this.goLoading())} title="Actualizar" icon={'refresh'} />
-                    <Menu.Item onPress={()=>this.setState({ visiblemenu: false }, ()=>this.props.openOptions())} title="Opciones" icon={'cog'} />
-                    <Divider />
-                    <Menu.Item onPress={() => {}} title="¿Qué es esto?" icon={'information-outline'} />
-                </Menu>
             </Appbar.Header>
-            <FlatList
-                data={this.state.dataComments}
-                ListHeaderComponent={<HeaderStatistics dataShow={this.state.dataShow} showLoading={this.state.showLoading} goStatistics={(data, title)=>this.goStatistics(data, title)} openDetails={()=>this.setState({ viewMoreDetailsVisible: true })} />}
-                ListEmptyComponent={()=>(!this.state.commentsLoading)? <EmptyListComments message={'No hay comentarios para mostrar'} icon={<NoComment width={96} height={96} />} style={{ marginTop: 32 }} />: <View><ProgressBar indeterminate={true} /></View>}
-                renderItem={({ item, index })=><CustomCardComments
-                    key={index}
-                    source={(item.id !== '-1')? { uri: `${HostServer}/images/accounts/${decode(item.accountData.image)}` }: require('../../assets/profile.png')}
-                    accountName={(item.id !== '-1')? `${decode(item.accountData.name)} (${this.calcYears(decode(item.accountData.birthday))} años)`: decode(item.accountData.name)}
-                    edit={item.edit}
-                    date={decode(item.date)}
-                    comment={decodeUtf8(decode(item.comment))}
-                />}
-            />
+            <View style={{ flex: 2, overflow: 'hidden' }}>
+                <FlatList
+                    data={this.state.dataComments}
+                    keyExtractor={(item)=>`t1-user-${item.id}`}
+                    refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={this.state.refreshing} onRefresh={()=>this.setState({ showLoading: true, commentsLoading: true, dataComments: [], refreshing: true }, ()=>this.goLoading(true))} />}
+                    ListHeaderComponent={<HeaderStatistics dataShow={this.state.dataShow} showLoading={this.state.showLoading} goStatistics={(data, title)=>this.goStatistics(data, title)} openDetails={()=>this.setState({ viewMoreDetailsVisible: true })} />}
+                    ListEmptyComponent={()=>(!this.state.commentsLoading)? <EmptyListComments message={'No hay comentarios para mostrar'} icon={<NoComment width={96} height={96} />} style={{ marginTop: 32 }} />: <View><ProgressBar indeterminate={true} /></View>}
+                    renderItem={({ item })=><CustomCardComments
+                        key={`t1-user-${item.id}`}
+                        source={(item.id !== '-1')? { uri: `${HostServer}/images/accounts/${decode(item.accountData.image)}` }: require('../../assets/profile.png')}
+                        accountName={(item.id !== '-1')? `${decode(item.accountData.name)} (${this.calcYears(decode(item.accountData.birthday))} años)`: decode(item.accountData.name)}
+                        edit={item.edit}
+                        date={decode(item.date)}
+                        comment={decodeUtf8(decode(item.comment))}
+                    />}
+                />
+            </View>
             <Statistics2
                 visible={this.state.visibleStatistics}
                 exercise={this.state.dataShow.exercise.name}
                 datas={this.state.statistics2}
                 title={this.state.titleStatistics}
-                close={()=>this.setState({ visibleStatistics: false })}
+                close={()=>this.setState({ visibleStatistics: false, statistics2: [] })}
             />
             <ViewMoreDetails
                 visible={this.state.viewMoreDetailsVisible}
@@ -189,6 +189,6 @@ export class Tab1 extends Component<IProps, IState> {
                 action={{ label: 'Aceptar', onPress: ()=>this.setState({ dialogShow: false }) }}>
                 <Text>{this.state.messageDialog}</Text>
             </Snackbar>
-        </View>: <></>);
+        </View>);
     }
 };

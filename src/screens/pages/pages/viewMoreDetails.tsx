@@ -29,6 +29,7 @@ const decodeUtf8 = (str: string)=>{
 export default class ViewMoreDetails extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
+        this.state = {};
     }
     processShow(data: details, isRPE?: boolean): any {
         if (isRPE) return(<Text>{data.value} <Text style={{ color: (data.difference)&&(data.difference > 0)? (data.difference == -9999999999)? Colors.yellow500: Colors.red500: Colors.green500 }}>{`(${(data.difference == -9999999999)? '~': data.difference})`}</Text></Text>);
@@ -52,7 +53,7 @@ export default class ViewMoreDetails extends Component<IProps, IState> {
                         <Appbar.BackAction onPress={()=>this.props.close()} />
                         <Appbar.Content title={`Más detalles (${this.props.dataShow.date.value})`}/>
                     </Appbar.Header>
-                    <ScrollView style={{ flex: 2, paddingBottom: 16 }}>
+                    {(this.props.visible)&&<ScrollView style={{ flex: 2, paddingBottom: 16 }}>
                         <View style={{ flexDirection: 'row' }}>
                             <View style={{ ...styles.row, paddingLeft: 8, paddingRight: 4 }}>
                                 <CustomCard4 style={styles.card} title={'RDS'} iconName={'arrow-up-thick'} value={this.processShow(this.props.dataShow.rds)} />
@@ -76,7 +77,7 @@ export default class ViewMoreDetails extends Component<IProps, IState> {
                                 comment={decodeUtf8(decode(this.props.commentData?.comment))}
                             />
                         </View>}
-                    </ScrollView>
+                    </ScrollView>}
                 </View>
             </PaperProvider>
         </CustomModal>);

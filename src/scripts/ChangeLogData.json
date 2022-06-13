@@ -1,5 +1,42 @@
 {
     "data": [{
+        "version": "1.6.0",
+        "date": "13/06/2022",
+        "changes": [
+            "Optimización de imágenes del fondo y perfil por defecto.",
+            "Rediseño de la pantalla de carga.",
+            "Solución del color de fondo en la pantalla de inicio de sesión.",
+            "Nuevo componente nativo añadido “selector de fecha”.",
+            "Solución de pantalla de carga infinita.",
+            "Rediseño de componentes del cliente.",
+            "Optimización de variables.",
+            "Eliminación de pestañas “en trabajo”.",
+            "Pestaña añadida “Mi cuenta”.",
+            "Ventana “Opciones” movida y editada.",
+            "Nueva ventana “Editar datos”.",
+            "Nuevo visor de imágenes añadido.",
+            "Solución de un error ocasionado al cerrar sesión.",
+            "Rediseño de componentes del administrador.",
+            "Edición del pie del panel de administrador.",
+            "Nuevo diseño de ventanas flotantes.",
+            "Nuevas animaciones de ventanas.",
+            "Experiencia de usuario mejorada.",
+            "Solución al verificar datos al cargar entrenamientos.",
+            "Nueva ventana añadida “Selección de cliente”.",
+            "Opción de búsqueda al cargar entrenamientos añadida.",
+            "Finalización de la prueba beta de “Editar ejercicio”.",
+            "Nueva pestaña añadida “Opciones” en el panel administrador.",
+            "Nuevo sistema de opciones implementado.",
+            "Función de ocultar administradores añadida.",
+            "Funciones adicionales añadidas.",
+            "Solución de errores generales.",
+            "Respuestas al servidor optimizadas.",
+            "Inteligencia del servidor actualizada.",
+            "Sistema de optimización de imágenes finalizada (servidor).",
+            "Filtro de datos de entrenamientos cambiado (por fecha).",
+            "Filtro de datos de comentarios cambiado (por fecha de entrenamiento)."
+        ]
+    }, {
         "version": "1.5.0",
         "date": "29/05/2022",
         "changes": [

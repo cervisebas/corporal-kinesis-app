@@ -3,7 +3,8 @@ import React, { PureComponent } from "react";
 import { Component, ReactNode } from "react";
 import { DeviceEventEmitter, Dimensions, EmitterSubscription, FlatList, ListRenderItemInfo, RefreshControl, StyleProp, StyleSheet, ToastAndroid, View, ViewStyle } from "react-native";
 import { ActivityIndicator, Appbar, Button, Dialog, Divider, List, Paragraph, Portal, Snackbar, Text, TouchableRipple } from "react-native-paper";
-import { Account, Comment, Exercise, Options, Training } from "../../scripts/ApiCorporal";
+import ImageView from "react-native-image-viewing";
+import { Account, Comment, Exercise, HostServer, Options, Training } from "../../scripts/ApiCorporal";
 import { commentsData, dataExercise, dataListUsers, DetailsTrainings, trainings, userData } from "../../scripts/ApiCorporal/types";
 import { Global } from "../../scripts/Global";
 import CombinedTheme from "../../Theme";
@@ -58,6 +59,7 @@ type IState = {
     viewMoreDetailsComment: commentsData | undefined;
     addTrainingUserSelect: { id: string; name: string; } | undefined;
     showUserSelect: boolean;
+    viewImageShow: boolean;
 };
 
 export default class Page1 extends Component<IProps, IState> {
@@ -96,7 +98,8 @@ export default class Page1 extends Component<IProps, IState> {
             viewMoreDetailsTraining: this.reserve1,
             viewMoreDetailsComment: undefined,
             addTrainingUserSelect: undefined,
-            showUserSelect: false
+            showUserSelect: false,
+            viewImageShow: false
         };
         this._renderItem = this._renderItem.bind(this);
     }
@@ -160,8 +163,16 @@ export default class Page1 extends Component<IProps, IState> {
                     this.setState({ userList: data });
                     Options.getAll()
                         .then((opt)=>{
-                            var filter = data.filter((vals)=>vals.permission == '0');
-                            (opt.viewAdmins1)? this.setState({ isLoading: false, userList2: filter }): this.setState({ isLoading: false, userList2: data });
+                            var filter = data.filter((vals)=>{
+                                if (opt.viewDev) {
+                                    if (vals.id == '1') return false;
+                                }
+                                if (opt.viewAdmins1) {
+                                    if (vals.permission !== '0') return false;                                    
+                                }
+                                return true;
+                            });
+                            this.setState({ isLoading: false, userList2: filter });
                             (opt.viewAdmins2)? this.setState({ userList3: filter }): this.setState({ userList3: data });
                         })
                         .catch(()=>this.setState({ isLoading: false, userList2: data }));
@@ -230,7 +241,6 @@ export default class Page1 extends Component<IProps, IState> {
                     renderItem={this._renderItem}
                 />
                 <AddNewAccount show={this.state.showAddNewUser} close={()=>this.setState({ showAddNewUser: false })} />
-                <Snackbar visible={this.state.showSnackBar} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ showSnackBar: false })}><Text>{this.state.textSnackBar}</Text></Snackbar>
                 <AddTraining
                     show={this.state.showAddTraining}
                     listUsers={this.state.userList}
@@ -249,26 +259,37 @@ export default class Page1 extends Component<IProps, IState> {
                     goLoading={(show, text, after)=>this.setState({ loadingView: show, loadingText: text }, ()=>(after)&&after())}
                     openAllComment={(data)=>this.setState({ dataComments: data, viewComments: true })}
                     openAllTrainings={(data)=>this.setState({ dataTrainigsDetails: data, viewTrainigsDetails: true })}
-                    showExternalSnackbar={(text, after)=>this.setState({ showSnackBar: true, textSnackBar: text }, ()=>(after)&&after())} />
-                <ViewComments show={this.state.viewComments} close={()=>this.setState({ viewComments: false })} closeComplete={()=>setTimeout(()=>this.setState({ dataComments: [] }), 600)} data={this.state.dataComments} reloadData={()=>this.reloadDataComment()} goLoading={(show, text, after)=>this.setState({ loadingView: show, loadingText: text }, ()=>(after)&&after())} />
-                <ViewTraining
-                    visible={this.state.viewTrainigsDetails}
-                    trainings={this.state.dataTrainigsDetails}
-                    close={()=>this.setState({ viewTrainigsDetails: false })}
-                    goLoading={(show, message, after)=>this.setState({ loadingView: show, loadingText: message }, ()=>(after)&&after())}
-                    reload={()=>this.reloadDataTraining()}
-                    goMoreDetails={(training, comment)=>this.setState({ viewMoreDetailsVisible: true, viewMoreDetailsTraining: training, viewMoreDetailsComment: comment })}
-                    accountId={this.state.detailsClientData.id} />
-                <ViewMoreDetails
-                    visible={this.state.viewMoreDetailsVisible}
-                    close={()=>this.setState({ viewMoreDetailsVisible: false, viewMoreDetailsTraining: this.reserve1, viewMoreDetailsComment: undefined })}
-                    dataShow={this.state.viewMoreDetailsTraining}
-                    commentData={this.state.viewMoreDetailsComment} />
-                <SelectClient
+                    showExternalSnackbar={(text, after)=>this.setState({ showSnackBar: true, textSnackBar: text }, ()=>(after)&&after())}
+                    viewImage={()=>this.setState({ viewImageShow: true })} />
+                {(this.state.detailsClientView)&&<>
+                    <ViewComments show={this.state.viewComments} close={()=>this.setState({ viewComments: false })} closeComplete={()=>setTimeout(()=>this.setState({ dataComments: [] }), 600)} data={this.state.dataComments} reloadData={()=>this.reloadDataComment()} goLoading={(show, text, after)=>this.setState({ loadingView: show, loadingText: text }, ()=>(after)&&after())} />
+                    <ViewTraining
+                        visible={this.state.viewTrainigsDetails}
+                        trainings={this.state.dataTrainigsDetails}
+                        close={()=>this.setState({ viewTrainigsDetails: false })}
+                        goLoading={(show, message, after)=>this.setState({ loadingView: show, loadingText: message }, ()=>(after)&&after())}
+                        reload={()=>this.reloadDataTraining()}
+                        goMoreDetails={(training, comment)=>this.setState({ viewMoreDetailsVisible: true, viewMoreDetailsTraining: training, viewMoreDetailsComment: comment })}
+                        accountId={this.state.detailsClientData.id} />
+                    <ViewMoreDetails
+                        visible={this.state.viewMoreDetailsVisible}
+                        close={()=>this.setState({ viewMoreDetailsVisible: false, viewMoreDetailsTraining: this.reserve1, viewMoreDetailsComment: undefined })}
+                        dataShow={this.state.viewMoreDetailsTraining}
+                        commentData={this.state.viewMoreDetailsComment} />
+                    <ImageView
+                        images={[{ uri: `${HostServer}/images/accounts/${decode(this.state.detailsClientData.image)}` }]}
+                        imageIndex={0}
+                        visible={this.state.viewImageShow}
+                        onRequestClose={()=>this.setState({ viewImageShow: false })}
+                    />
+                </>}
+                {(this.state.showAddTraining)&&<SelectClient
                     visible={this.state.showUserSelect}
                     close={()=>this.setState({ showUserSelect: false })}
                     dataUser={this.state.userList3}
                     onSelect={(data)=>this.setState({ addTrainingUserSelect: data, showUserSelect: false })} />
+                }
+                <Snackbar visible={this.state.showSnackBar} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ showSnackBar: false })}><Text>{this.state.textSnackBar}</Text></Snackbar>
                 <Portal>
                     <Dialog visible={this.state.showQuestionDeleteUser}>
                         <Dialog.Title>¡¡Advertencia!!</Dialog.Title>

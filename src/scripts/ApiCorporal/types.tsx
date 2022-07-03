@@ -182,6 +182,7 @@ type getInfoAccount = {
 
 type TypeOptions = {
     viewAdmins1: boolean;
+    viewDev: boolean;
     viewAdmins2: boolean;
     activeFilters: boolean;
 };

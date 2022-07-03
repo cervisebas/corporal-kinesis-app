@@ -1,7 +1,7 @@
 import { decode } from "base-64";
 import moment from "moment";
 import React, { Component, PureComponent, ReactNode } from "react";
-import { DeviceEventEmitter, Dimensions, Image, Linking, ScrollView, StyleSheet, ToastAndroid, View } from "react-native";
+import { DeviceEventEmitter, Dimensions, Image, Linking, ScrollView, StyleSheet, ToastAndroid, TouchableOpacity, View } from "react-native";
 import { Appbar, Provider as PaperProvider, Divider, Text, Card, IconButton, Button, Snackbar, Portal, Dialog, Paragraph } from "react-native-paper";
 import { Account, Comment, HostServer, Training } from "../../../scripts/ApiCorporal";
 import { commentsData, trainings, userData } from "../../../scripts/ApiCorporal/types";
@@ -20,6 +20,7 @@ type IProps = {
     openAllComment: (data: commentsData[])=>any;
     openAllTrainings: (data: trainings[])=>any;
     showExternalSnackbar: (text: string, after?: ()=>any)=>any;
+    viewImage: ()=>any;
 };
 type IState = {
     errorView: boolean;
@@ -100,9 +101,9 @@ export default class ViewClietDetails extends Component<IProps, IState> {
                     </Appbar.Header>
                     <ScrollView style={{ flex: 2, overflow: 'hidden', paddingBottom: 16 }}>
                         <View style={{ margin: 20, height: 100, width: (width - 40), flexDirection: 'row' }}>
-                            <View style={styles.imageProfile}>
+                            <TouchableOpacity style={styles.imageProfile} onPress={()=>this.props.viewImage()}>
                                 <Image style={{ width: '100%', height: '100%' }} source={{ uri: `${HostServer}/images/accounts/${decode(this.props.userData.image)}` }} />
-                            </View>
+                            </TouchableOpacity>
                             <View style={styles.textProfile}>
                                 <Text style={{ fontSize: 20 }}>{decode(this.props.userData.name)}</Text>
                                 <Text style={{ marginTop: 8, marginLeft: 12, color: 'rgba(255, 255, 255, 0.7)' }}>

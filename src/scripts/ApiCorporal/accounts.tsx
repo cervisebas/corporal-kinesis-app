@@ -43,8 +43,8 @@ export default class AccountSystem {
                     if (data.ok) {
                         AsyncStorage.setItem('account_session', encode(JSON.stringify(data.datas)), (error)=>{
                             if (error) return reject({ cause: 'Hubo un error al almacenar los datos de sesión.', error });
-                            var datas: any = data.datas;
-                            resolve(datas);
+                            var datas = data.datas;
+                            resolve(datas!);
                         });
                     } else {
                         reject({
@@ -135,12 +135,7 @@ export default class AccountSystem {
                     var postData = { getListUsers: true, email: datas.email, password: datas.password };
                     axios.post(`${this.urlBase}/index.php`, qs.stringify(postData), this.header_access).then((result)=>{
                         var datas: listUsers = result.data;
-                        if (datas.ok) {
-                            var users: any = datas.data;
-                            return resolve(users);
-                        } else {
-                            return reject({ cause: datas.cause, error: datas.ok });
-                        }
+                        if (datas.ok) resolve(datas.data!); else reject({ cause: datas.cause, error: datas.ok });
                     }).catch((error)=>{
                         reject({ cause: 'Error de conexión.', error });
                     });

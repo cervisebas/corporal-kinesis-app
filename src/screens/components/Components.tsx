@@ -278,11 +278,11 @@ class CustomCard3 extends PureComponent<IProps11, IState11> {
     }
     render(): React.ReactNode {
         return(<Card onLayout={({ nativeEvent })=>this.setState({ heightComponent: nativeEvent.layout.height, widthCard: nativeEvent.layout.width })} style={this.props.style} accessible={true} onPress={()=>this.onPressClick()}>
-            <Card.Content>
+            <Card.Content style={{ justifyContent: 'center' }}>
                 <View style={{ width: (this.state.widthCard - this.state.widthViewButton) - 40, overflow: 'hidden' }}>
                     <Title numberOfLines={1}>{this.props.title}</Title>
                 </View>
-                <View onLayout={({ nativeEvent })=>this.setState({ widthViewButton: nativeEvent.layout.width })} style={{ position: 'absolute', right: 16, height: 24, top: (this.state.heightComponent - 24)/2, alignItems: 'center', flexDirection: 'row' }}>
+                <View style={{ position: 'absolute', right: 16, height: 24, alignItems: 'center', flexDirection: 'row' }}>
                     <Text style={{ fontWeight: '700', color: this.state.clickColor }}>Ver más detalles</Text>
                     <Icon name="arrow-right" size={24} color={this.state.clickColor} style={{ marginLeft: 8 }} />
                 </View>

@@ -11,6 +11,7 @@ type IProps = {
 };
 type IState = {
     switch1: boolean;
+    switch1_2: boolean;
     switch2: boolean;
     switch3: boolean;
 
@@ -26,6 +27,7 @@ export default class PageOptions extends Component<IProps, IState> {
         super(props);
         this.state = {
             switch1: false,
+            switch1_2: false,
             switch2: false,
             switch3: false,
 
@@ -55,6 +57,7 @@ export default class PageOptions extends Component<IProps, IState> {
     onSwitchs() {
         var options: TypeOptions = {
             viewAdmins1: this.state.switch1,
+            viewDev: this.state.switch1_2,
             viewAdmins2: this.state.switch2,
             activeFilters: this.state.switch3
         };
@@ -87,6 +90,18 @@ export default class PageOptions extends Component<IProps, IState> {
                                     value={this.state.switch1}
                                     disabled={this.state.isLoading}
                                     onValueChange={()=>this.setState({ switch1: !this.state.switch1 }, ()=>this.onSwitchs())}
+                                />}
+                            />
+                            <List.Item
+                                title={"Ocultar desarrollador"}
+                                description={'Esto ocultara al desarrolador de la lista del inicio y de la lista de cargas, esto no afecta a la búsqueda.'}
+                                descriptionNumberOfLines={4}
+                                disabled={this.state.isLoading}
+                                left={()=><List.Icon icon="eye-remove-outline" />}
+                                right={()=><Switch
+                                    value={this.state.switch1_2}
+                                    disabled={this.state.isLoading}
+                                    onValueChange={()=>this.setState({ switch1_2: !this.state.switch1_2 }, ()=>this.onSwitchs())}
                                 />}
                             />
                             <List.Item

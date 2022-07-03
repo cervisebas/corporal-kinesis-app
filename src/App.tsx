@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SystemNavigationBar from "react-native-system-navigation-bar";
-import { DeviceEventEmitter, EmitterSubscription, Linking, StatusBar, View } from 'react-native';
+import { DeviceEventEmitter, EmitterSubscription, StatusBar, View } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import Client from './screens/client';
 import Profesional from './screens/profesional';
@@ -16,6 +15,7 @@ import DeviceInfo from "react-native-device-info";
 import { decode } from 'base-64';
 import { getNavigationBarHeight } from 'react-native-android-navbar-height';
 import VersionCheck from 'react-native-version-check';
+import 'react-native-gesture-handler';
 
 type IProps = {};
 type IState = {
@@ -62,12 +62,12 @@ export default class App extends Component<IProps, IState> {
         setTimeout(()=>SplashScreen.hide(), 128);
         SystemNavigationBar.setNavigationColor('#0f4577', true);
         this.verifyAccount();
-        setTimeout(async() =>(await DeviceInfo.getApiLevel() < 26) && this.setState({ marginTop: StatusBar.currentHeight || 24, marginBottom: await getNavigationBarHeight() }));
         this.event = DeviceEventEmitter.addListener('nowVerify', ()=>this.verifyAccount());
         this.event2 = DeviceEventEmitter.addListener('openChangeLog', ()=>this.setState({ changeLoadView: true }));
         Notification.init();
-        (!__DEV__) && VersionCheck.needUpdate({ ignoreErrors: true }).then((value)=>(value.isNeeded)&&this.setState({ viewDialogUpdate: true, storeUrl: value.storeUrl }));
+        (!__DEV__)&&VersionCheck.needUpdate({ ignoreErrors: true }).then((value)=>(value.isNeeded)&&this.setState({ viewDialogUpdate: true, storeUrl: value.storeUrl }));
         console.log(`Dev Mode: ${__DEV__}`);
+        setTimeout(async() =>(await DeviceInfo.getApiLevel() < 26) && this.setState({ marginTop: StatusBar.currentHeight || 24, marginBottom: await getNavigationBarHeight() }));
     }
     componentWillUnmount() {
         setLoadNow(false);

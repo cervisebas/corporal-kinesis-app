@@ -13,6 +13,7 @@ export default class SystemOptions {
                 }
                 resolve({
                     viewAdmins1: false,
+                    viewDev: false,
                     viewAdmins2: false,
                     activeFilters: false
                 });

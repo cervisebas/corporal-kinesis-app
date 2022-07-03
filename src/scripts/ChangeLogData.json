@@ -1,5 +1,20 @@
 {
     "data": [{
+        "version": "1.7.0",
+        "date": "03/07/2022",
+        "changes": [
+            "Actualización del sistema de archivos del servidor.",
+            "Nuevo sistema de optimización de imágenes.",
+            "Opción de ocultar desarrollador añadida en el panel de administrador.",
+            "Ver foto de perfil de los clientes en el panel de administrador.",
+            "Actualización de librerías.",
+            "Actualización del núcleo de la plataforma.",
+            "Optimización de la API.",
+            "Optimización de componentes.",
+            "Optimización de la plataforma.",
+            "Optimización de la arquitectura."
+        ]
+    }, {
         "version": "1.6.0",
         "date": "13/06/2022",
         "changes": [

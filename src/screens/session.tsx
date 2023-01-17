@@ -2,9 +2,7 @@ import { decode } from "base-64";
 import moment from "moment";
 import React, { Component } from "react";
 import { DeviceEventEmitter, Dimensions, KeyboardAvoidingView, StyleSheet, View, TextInput as NativeTextInput, TouchableWithoutFeedback, Keyboard } from "react-native";
-import DatePicker from "react-native-date-picker";
 import { Button, Dialog, Paragraph, Portal, Provider as PaperProvider, Text, TextInput } from "react-native-paper";
-import SplashScreen from "react-native-splash-screen";
 import { Logo } from "../assets/icons";
 import { Account } from "../scripts/ApiCorporal";
 import { setLoadNow } from "../scripts/Global";
@@ -265,7 +263,8 @@ export class Session extends Component<IProps, IState> {
                                         render={(props)=><NativeTextInput {...props} ref={(ref)=>this.sessionInputEmail = ref} />}
                                         returnKeyType={'next'}
                                         onSubmitEditing={()=>this.sessionInputPassword?.focus()}
-                                        onChangeText={(text)=>this.setState({ sessionEmail: text.replace(/\ /gi, '') })} />
+                                        onChangeText={(text)=>this.setState({ sessionEmail: text.replace(/\ /gi, '') })}
+                                        blurOnSubmit={false} />
                                     <TextInput
                                         style={styles.textInput}
                                         mode={'outlined'}

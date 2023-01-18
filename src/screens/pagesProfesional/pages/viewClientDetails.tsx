@@ -21,6 +21,7 @@ type IProps = {
     openAllTrainings: (data: trainings[])=>any;
     showExternalSnackbar: (text: string, after?: ()=>any)=>any;
     viewImage: ()=>any;
+    openEditClient: ()=>void;
 };
 type IState = {
     errorView: boolean;
@@ -77,13 +78,6 @@ export default class ViewClietDetails extends Component<IProps, IState> {
                 .catch((error)=>this.setState({ errorView: true, errorTitle: 'Ocurrio un error...', errorMessage: error.cause }))
         );
     }
-    editData() {
-        if (this.props.userData.type == '1') {
-            ToastAndroid.show('Función en desarrollo...', ToastAndroid.SHORT);
-        } else {
-            ToastAndroid.show('Debido a las políticas de usuario no puedes editar este perfil.', ToastAndroid.SHORT);
-        }
-    }
     processTextTraining(num: string): string {
         if (num == '0') return 'Ningún ejercicio evaluado';
         if (num == '1') return '1 ejercicio evaluado';
@@ -96,7 +90,7 @@ export default class ViewClietDetails extends Component<IProps, IState> {
                     <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
                         <Appbar.BackAction onPress={()=>this.props.close()} />
                         <Appbar.Content title={decode(this.props.userData.name)} />
-                        <Appbar.Action icon={'pencil'} onPress={()=>this.editData()} />
+                        <Appbar.Action icon={'pencil'} onPress={this.props.openEditClient} />
                         <Appbar.Action icon={'trash-can-outline'} onPress={()=>this.setState({ showQuestionDeleteUser: true })} />
                     </Appbar.Header>
                     <ScrollView style={{ flex: 2, overflow: 'hidden', paddingBottom: 16 }}>

@@ -1,5 +1,5 @@
 import { decode } from "base-64";
-import React, { PureComponent } from "react";
+import React, { PureComponent, createRef } from "react";
 import { Component, ReactNode } from "react";
 import { DeviceEventEmitter, Dimensions, EmitterSubscription, FlatList, ListRenderItemInfo, RefreshControl, StyleProp, StyleSheet, ToastAndroid, View, ViewStyle } from "react-native";
 import { ActivityIndicator, Appbar, Button, Dialog, Divider, List, Paragraph, Portal, Snackbar, Text, TouchableRipple } from "react-native-paper";
@@ -18,6 +18,7 @@ import SetCommentUser from "./pages/setCommentUser";
 import ViewClietDetails from "./pages/viewClientDetails";
 import ViewComments from "./pages/viewComments";
 import ViewTraining from "./pages/viewTraining";
+import EditClientProfessional, { EditClientProfessionalRef } from "./pages/editClient";
 
 const { width } = Dimensions.get('window');
 
@@ -102,10 +103,13 @@ export default class Page1 extends Component<IProps, IState> {
             viewImageShow: false
         };
         this._renderItem = this._renderItem.bind(this);
+        this._openEditClient = this._openEditClient.bind(this);
     }
     private reserve1 = { id: '-1', date: { value: '-', status: -1, difference: undefined }, session_number: { value: '-', status: -1, difference: undefined }, rds: { value: '-', status: -1, difference: undefined }, rpe: { value: '-', status: -1, difference: undefined }, pulse: { value: '-', status: -1, difference: undefined }, repetitions: { value: '-', status: -1, difference: undefined }, kilage: { value: '-', status: -1, difference: undefined }, tonnage: { value: '-', status: -1, difference: undefined }, exercise: { name: 'No disponible', status: -1, description: '' } };
     private detailsClientDataDefault = { id: '', name: '', email: '', birthday: '', dni: '', phone: '', experience: '', image: '', type: '', num_trainings: '' };
     private event: EmitterSubscription | null = null;
+    private refEditClientProfessional = createRef<EditClientProfessionalRef>();
+
     componentDidMount() {
         this.loadData();
         this.event = DeviceEventEmitter.addListener('adminPage1Reload', ()=>this.loadData());
@@ -205,6 +209,11 @@ export default class Page1 extends Component<IProps, IState> {
             this.setState({ errorView: true, errorTitle: '¡¡¡Atención!!!', errorMessage: 'Debes añadir ejercicios en la lista antes de realizar cargas.' });
     }
 
+    /* ##### New Functions ##### */
+    _openEditClient() {
+        this.refEditClientProfessional.current?.open();
+    }
+
     /*###### FlatList Control ######*/
     _getItemLayout(_i: any, index: number) { return { length: 64, offset: 64 * index, index }; }
     _keyExtractor(item: dataListUsers, _i: number) { return `p1-admin-${item.id}`; }
@@ -260,7 +269,9 @@ export default class Page1 extends Component<IProps, IState> {
                     openAllComment={(data)=>this.setState({ dataComments: data, viewComments: true })}
                     openAllTrainings={(data)=>this.setState({ dataTrainigsDetails: data, viewTrainigsDetails: true })}
                     showExternalSnackbar={(text, after)=>this.setState({ showSnackBar: true, textSnackBar: text }, ()=>(after)&&after())}
-                    viewImage={()=>this.setState({ viewImageShow: true })} />
+                    viewImage={()=>this.setState({ viewImageShow: true })}
+                    openEditClient={this._openEditClient}
+                />
                 {(this.state.detailsClientView)&&<>
                     <ViewComments show={this.state.viewComments} close={()=>this.setState({ viewComments: false })} closeComplete={()=>setTimeout(()=>this.setState({ dataComments: [] }), 600)} data={this.state.dataComments} reloadData={()=>this.reloadDataComment()} goLoading={(show, text, after)=>this.setState({ loadingView: show, loadingText: text }, ()=>(after)&&after())} />
                     <ViewTraining
@@ -287,8 +298,9 @@ export default class Page1 extends Component<IProps, IState> {
                     visible={this.state.showUserSelect}
                     close={()=>this.setState({ showUserSelect: false })}
                     dataUser={this.state.userList3}
-                    onSelect={(data)=>this.setState({ addTrainingUserSelect: data, showUserSelect: false })} />
-                }
+                    onSelect={(data)=>this.setState({ addTrainingUserSelect: data, showUserSelect: false })}
+                />}
+                <EditClientProfessional ref={this.refEditClientProfessional} />
                 <Snackbar visible={this.state.showSnackBar} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ showSnackBar: false })}><Text>{this.state.textSnackBar}</Text></Snackbar>
                 <Portal>
                     <Dialog visible={this.state.showQuestionDeleteUser}>

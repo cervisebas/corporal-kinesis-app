@@ -5,7 +5,7 @@ import { FAB } from "react-native-paper";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CustomDrawerNavegation from "./components/CustomDrawerNavegation";
 
-import Page1 from "./pagesProfesional/Page1";
+import Page1 from "./pagesProfesional/Page1_2";
 import Page2 from "./pagesProfesional/Page2";
 import Page3 from "./pagesProfesional/Page3";
 import PageOptions from "./pagesProfesional/PageOptions";
@@ -14,8 +14,10 @@ type IProps = {
     navigation: any;
 };
 
-const Profesional = (props: IProps) => {
-    const Drawer = createDrawerNavigator();
+const Drawer = createDrawerNavigator();
+
+export default React.memo(function Profesional (props: IProps) {
+    function logout() { return props.navigation.navigate('c'); }
     return(<View style={{ flex: 2 }}>
         <Drawer.Navigator initialRouteName="Inicio" screenOptions={{ headerShown: false }} drawerContent={(props)=><CustomDrawerNavegation {...props} />}>
             <Drawer.Screen
@@ -42,10 +44,10 @@ const Profesional = (props: IProps) => {
         <FAB
             style={styles.fab}
             icon={'logout'}
-            onPress={()=>props.navigation.navigate('c')}
+            onPress={logout}
         />
     </View>);
-};
+});
 
 const styles = StyleSheet.create({
     fab: {
@@ -55,5 +57,3 @@ const styles = StyleSheet.create({
       bottom: 8,
     },
 });
-
-export default Profesional;

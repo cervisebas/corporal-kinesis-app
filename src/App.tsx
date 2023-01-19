@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SystemNavigationBar from "react-native-system-navigation-bar";
@@ -32,7 +32,7 @@ type IState = {
     storeUrl: string;
 };
 const Stack = createNativeStackNavigator();
-export default class App extends Component<IProps, IState> {
+export default class App extends PureComponent<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
@@ -45,6 +45,7 @@ export default class App extends Component<IProps, IState> {
             viewDialogUpdate: false,
             storeUrl: ''
         };
+        this.verifyAccount = this.verifyAccount.bind(this);
     }
     private event: EmitterSubscription | null = null;
     private event2: EmitterSubscription | null = null;
@@ -59,10 +60,10 @@ export default class App extends Component<IProps, IState> {
         });
     }
     componentDidMount() {
-        setTimeout(()=>SplashScreen.hide(), 128);
-        SystemNavigationBar.setNavigationColor('#0f4577', true);
+        setTimeout(SplashScreen.hide, 128);
+        SystemNavigationBar.setNavigationColor('#0f4577', 'light', 'navigation');
         this.verifyAccount();
-        this.event = DeviceEventEmitter.addListener('nowVerify', ()=>this.verifyAccount());
+        this.event = DeviceEventEmitter.addListener('nowVerify', this.verifyAccount);
         this.event2 = DeviceEventEmitter.addListener('openChangeLog', ()=>this.setState({ changeLoadView: true }));
         Notification.init();
         (!__DEV__)&&VersionCheck.needUpdate({ ignoreErrors: true }).then((value)=>(value.isNeeded)&&this.setState({ viewDialogUpdate: true, storeUrl: value.storeUrl }));
@@ -71,16 +72,8 @@ export default class App extends Component<IProps, IState> {
     }
     componentWillUnmount() {
         setLoadNow(false);
-        this.setState({
-            marginTop: 0,
-            marginBottom: 0,
-            openSession: false,
-            showVerify: true,
-            textAnimVerify: undefined
-        });
         this.event?.remove();
         this.event2?.remove();
-        DeviceEventEmitter.removeAllListeners();
     }
     render(): React.ReactNode {
         return(<View style={{ flex: 1, marginTop: this.state.marginTop, marginBottom: this.state.marginBottom }}>

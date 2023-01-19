@@ -1,46 +1,38 @@
-import React, { Component, useState } from "react";
-import { DeviceEventEmitter, StyleSheet, View } from "react-native";
+import React, { PureComponent, createRef, useEffect, useState } from "react";
+import { DeviceEventEmitter, EmitterSubscription, StyleSheet, View } from "react-native";
 import { BottomNavigation, FAB } from "react-native-paper";
 import { Permission } from "../scripts/ApiCorporal";
-import { Global } from "../scripts/Global";
 import Options from "./pages/pages/options";
 import { LoadNow } from "../scripts/Global";
 import { Tab1 } from "./pages/Tab1";
 import { Tab2 } from "./pages/Tab2";
+import LoadingComponent, { LoadingComponentRef } from "./components/LoadingComponent";
 
 type IProps = {
     navigation: any;
     route: any;
-    loading: (show: boolean, title: string)=>any;
 };
 
-const Client = (props: IProps) => {
+export default React.memo(function Client(props: IProps) {
     const [index, setIndex] = React.useState(0);
-    const [viewLoading, setViewLoading] = useState(false);
-    const [viewOptions, setViewOptions] = useState(false);
-    const [textLoading, setTextLoading] = useState('');
-
     const [loadingAdmin, setLoadingAdmin] = useState(true);
     const [showButtonAdmin, setShowButtonAdmin] = useState(true);
+    // Ref's
+    const refLoadingComponent = createRef<LoadingComponentRef>();
+    const refOthersComponents = createRef<OthersComponents>();
+    // Variables
+    var event: EmitterSubscription | undefined = undefined;
     
-    const [routes] = React.useState([
-        { key: 'statistics', title: 'Estadísticas', icon: 'chart-bar' },
-        { key: 'account', title: 'Mi cuenta', icon: 'account-outline' }
-    ]);
+    const routes = [{ key: 'statistics', title: 'Estadísticas', icon: 'chart-bar' }, { key: 'account', title: 'Mi cuenta', icon: 'account-outline' }];
     const renderScene = ({ route }: any) => {
         switch (route.key) {
             case 'statistics':
-                return(<Tab1
-                    showLoading={(show, text)=>{ setViewLoading(show); setTextLoading(text); }}
-                />);
+                return(<Tab1 showLoading={showLoading} />);
             case 'account':
-                return(<Tab2
-                    showLoading={(show, text)=>{ setViewLoading(show); setTextLoading(text); }}
-                    openOptions={()=>setViewOptions(true)}
-                />);
+                return(<Tab2 showLoading={showLoading} openOptions={showViewOptions} />);
         }
     };
-    const verifyAdmin = ()=>{
+    function verifyAdmin() {
         Permission.get().then((value)=>{
             var permission = parseInt(value);
             if (permission >= 2) setShowButtonAdmin(true); else setShowButtonAdmin(false);
@@ -51,24 +43,28 @@ const Client = (props: IProps) => {
         });
     };
     
-    var readyVerifyAdmin = setInterval(()=>{
+    const readyVerifyAdmin = setInterval(()=>{
         if (LoadNow == true) {
             verifyAdmin();
             clearInterval(readyVerifyAdmin);
         }
     }, 512);
 
-    DeviceEventEmitter.addListener('goToHome', ()=>setIndex(0));
+    function showViewOptions() { refOthersComponents.current?.open(); }
+    function showLoading(visible: boolean, message?: string) { refLoadingComponent.current?.controller(visible, message); }
+
+    useEffect(()=>{
+        event = DeviceEventEmitter.addListener('goToHome', ()=>setIndex(0));
+        return ()=>{
+            event?.remove();
+        };
+    }, []);
 
     return(<View style={{ flex: 2 }}>
-        <Global
-            loadingView={viewLoading}
-            loadingText={textLoading}
-        />
+        <LoadingComponent ref={refLoadingComponent} />
         <OthersComponents
-            showOptions={viewOptions}
-            closeOptions={()=>setViewOptions(false)}
-            showLoading={(view, text)=>{ setViewLoading(view); setTextLoading(text); }}
+            ref={refOthersComponents}
+            showLoading={showLoading}
         />
         <BottomNavigation
             navigationState={{ index, routes }}
@@ -85,23 +81,29 @@ const Client = (props: IProps) => {
             onPress={()=>props.navigation.navigate('p')}
         />
     </View>);
-};
+});
 
 type IProps2 = {
-    showOptions: boolean;
-    closeOptions: ()=>any;
     showLoading: (view: boolean, text: string)=>any;
 };
-class OthersComponents extends Component<IProps2> {
+type IState2 = { visible: boolean; };
+class OthersComponents extends PureComponent<IProps2, IState2> {
     constructor(props: IProps2) {
         super(props);
+        this.state = {
+            visible: false
+        };
+        this.open = this.open.bind(this);
+        this.close = this.close.bind(this);
     }
+    open() { this.setState({ visible: true }); }
+    close() { this.setState({ visible: false }); }
     render(): React.ReactNode {
         return(<>
             <Options
-                show={this.props.showOptions}
-                close={()=>this.props.closeOptions()}
-                showLoading={(show, text)=>this.props.showLoading(show, text)}
+                show={this.state.visible}
+                close={this.close}
+                showLoading={this.props.showLoading}
             />
         </>);
     }
@@ -115,5 +117,3 @@ const styles = StyleSheet.create({
       bottom: 56
     },
 });
-
-export default Client;

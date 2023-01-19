@@ -21,7 +21,7 @@ export default class HeaderList extends PureComponent<IProps, IState> {
     render(): React.ReactNode {
         return(<View style={{ flexDirection: 'column' }}>
             <View style={{ marginTop: 12, marginBottom: 8, marginLeft: 8, marginRight: 8 }}>
-                <CustomPicker2 title={'Ejercicio:'} disabled={this.props.isLoading} mode={'dropdown'} value={this.props.exercise} onChange={(value)=>this.props.changeExercise(value)}>
+                <CustomPicker2 title={'Ejercicio:'} disabled={this.props.isLoading} mode={'dropdown'} value={this.props.exercise} onChange={this.props.changeExercise}>
                     {this.props.listExercises.map((value, index)=><Picker.Item key={index.toString()} label={value} value={value} />)}
                 </CustomPicker2>
             </View>

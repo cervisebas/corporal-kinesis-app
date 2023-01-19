@@ -19,26 +19,20 @@ export class VerifyScreen extends Component<IProps, IState> {
         this.state = {
             overflowText: ''
         };
+        this.updateOverflowText = this.updateOverflowText.bind(this);
     }
     private animOverText: any = undefined;
     componentDidMount() {
-        this.animOverText = setInterval(()=>this.setState({ overflowText: (this.state.overflowText.length == 0)? '.': (this.state.overflowText.length == 1)? '..': (this.state.overflowText.length == 2)? '...': '' }), 512);
+        this.animOverText = setInterval(this.updateOverflowText, 512);
     }
     componentWillUnmount() {
         clearInterval(this.animOverText);
-        this.animOverText = null;
-        this.setState({ overflowText: '' });
     }
-    componentDidUpdate() {
+    updateOverflowText() {
         if (this.props.visible) {
-            if (this.animOverText == undefined) {
-                this.animOverText = setInterval(()=>this.setState({ overflowText: (this.state.overflowText.length == 0)? '.': (this.state.overflowText.length == 1)? '..': (this.state.overflowText.length == 2)? '...': '' }), 512);
-            }
-        } else {
-            if (this.animOverText !== undefined) {
-                clearInterval(this.animOverText);
-                this.animOverText = undefined;
-            }
+            let overflowTextState = this.state.overflowText;
+            let overflowText = (overflowTextState.length == 0)? '.': (overflowTextState.length == 1)? '..': (overflowTextState.length == 2)? '...': '';
+            this.setState({ overflowText });
         }
     }
     render(): React.ReactNode {

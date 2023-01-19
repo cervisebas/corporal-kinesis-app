@@ -11,6 +11,7 @@ import { CardButton1 } from "../components/Components";
 import ImageView from "react-native-image-viewing";
 import { ImageSource } from "react-native-vector-icons/Icon";
 import EditAccount from "./pages/editAccount";
+import ImageProfile from "../../assets/profile.webp";
 
 type IProps = {
     showLoading: (show: boolean, text: string)=>any;
@@ -41,7 +42,7 @@ export class Tab2 extends Component<IProps, IState> {
         this.state = {
             viewName: 'Cargando...',
             viewSurname: '-',
-            viewImage: require('../../assets/profile.png'),
+            viewImage: ImageProfile,
             viewImageShow: false,
             viewImageSource: undefined,
             editVisible: false,
@@ -70,19 +71,6 @@ export class Tab2 extends Component<IProps, IState> {
     }
     componentWillUnmount() {
         this.event?.remove();
-        this.event = null;
-        this.setState({
-            viewName: '',
-            viewSurname: '',
-            viewImage: require('../../assets/profile.png'),
-            viewImageShow: false,
-            viewImageSource: undefined,
-            editVisible: false,
-            editData: undefined,
-            snakbarVisible: false,
-            snackbarText: '',
-            isLoading: false
-        });
     }
     openImage() {
         if (this.state.isLoading) {

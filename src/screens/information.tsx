@@ -1,10 +1,11 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import { StyleSheet, View } from "react-native";
-import { Appbar, Paragraph, Provider as PaperProvider, Text } from "react-native-paper";
+import { Appbar, Paragraph, Text } from "react-native-paper";
 import CombinedTheme from "../Theme";
 import CustomModal from "./components/CustomModal";
 import DeviceInfo from "react-native-device-info";
 import FastImage from "react-native-fast-image";
+import ImageIcon from "../assets/icon3.webp";
 
 type IProps = {
     visible: boolean;
@@ -12,7 +13,7 @@ type IProps = {
 };
 type IState = {};
 
-export default class Information extends Component<IProps, IState> {
+export default class Information extends PureComponent<IProps, IState> {
     constructor(props: IProps) {
         super(props);
     }
@@ -20,18 +21,15 @@ export default class Information extends Component<IProps, IState> {
         return(<CustomModal visible={this.props.visible} onRequestClose={()=>this.props.close()}>
             <View style={{ ...styles.content, backgroundColor: CombinedTheme.colors.background }}>
                 <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
-                    <Appbar.BackAction onPress={()=>this.props.close()} />
+                    <Appbar.BackAction onPress={this.props.close} />
                     <Appbar.Content title="Información" />
                 </Appbar.Header>
                 <View style={{ paddingBottom: 16 }}>
                     <View style={{ width: '100%', height: 140, marginTop: 6, flexDirection: 'row', justifyContent: 'center' }}>
                         <View style={{ height: 120, width: 120, marginLeft: 16, marginTop: 10, marginBottom: 10 }}>
                             {(this.props.visible)&&<FastImage
-                                source={require('../assets/icon3.png')}
-                                style={{
-                                    width: '100%',
-                                    height: '100%'
-                                }}
+                                source={ImageIcon}
+                                style={{ width: '100%', height: '100%' }}
                             />}
                         </View>
                         <View style={{ flex: 3, justifyContent: 'center', flexDirection: 'column', paddingLeft: 16 }}>

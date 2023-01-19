@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DrawerContentComponentProps, DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { CommonActions, DrawerActions } from "@react-navigation/native";
 import { decode } from "base-64";
-import React, { Component, ReactNode } from "react";
+import React, { PureComponent, ReactNode } from "react";
 import { DeviceEventEmitter, Linking, View } from "react-native";
 import FastImage from "react-native-fast-image";
 import { Appbar, Avatar, Title } from "react-native-paper";
@@ -16,7 +16,7 @@ type IState = {
     loadingUser: boolean;
     widht: number;
 };
-export default class CustomDrawerNavegation extends Component<DrawerContentComponentProps, IState> {
+export default class CustomDrawerNavegation extends PureComponent<DrawerContentComponentProps, IState> {
     constructor(props: DrawerContentComponentProps) {
         super(props);
         this.state = {
@@ -33,13 +33,6 @@ export default class CustomDrawerNavegation extends Component<DrawerContentCompo
         activeBackgroundColor: 'rgba(237, 112, 53, 0.9)',
         inactiveBackgroundColor: 'rgba(255, 255, 255, 0)'
     };
-    componentWillUnmount() {
-        this.setState({
-            nameUser: 'Cargando...',
-            pictureUser: '',
-            loadingUser: false
-        });
-    }
     componentDidMount() {
         AsyncStorage.getItem('account_session').then((value)=>{
             var datas: storageData = JSON.parse(decode(String(value)));

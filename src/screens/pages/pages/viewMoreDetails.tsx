@@ -1,6 +1,6 @@
 import { decode } from "base-64";
 import moment from "moment";
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { Appbar, Colors, Provider as PaperProvider, Text } from "react-native-paper";
 import utf8 from "utf8";
@@ -26,7 +26,7 @@ const decodeUtf8 = (str: string)=>{
     }
 };
 
-export default class ViewMoreDetails extends Component<IProps, IState> {
+export default class ViewMoreDetails extends PureComponent<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {};
@@ -46,7 +46,7 @@ export default class ViewMoreDetails extends Component<IProps, IState> {
         return String(years);
     }
     render(): React.ReactNode {
-        return(<CustomModal visible={this.props.visible} onRequestClose={()=>this.props.close()}>
+        return(<CustomModal visible={this.props.visible} onRequestClose={this.props.close}>
             <PaperProvider theme={CombinedTheme}>
                 <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background }}>
                     <Appbar.Header style={{ backgroundColor: '#1663AB' }}>

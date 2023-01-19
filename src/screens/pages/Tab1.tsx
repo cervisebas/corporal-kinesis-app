@@ -2,7 +2,7 @@ import { decode, encode } from "base-64";
 import moment from "moment";
 import React, { Component } from "react";
 import { View, FlatList, EmitterSubscription, DeviceEventEmitter, RefreshControl } from "react-native";
-import { Appbar, Divider, Menu, ProgressBar, Snackbar, Text } from "react-native-paper";
+import { Appbar, ProgressBar, Snackbar, Text } from "react-native-paper";
 import utf8 from "utf8";
 import { NoComment } from "../../assets/icons";
 import { Comment, HostServer, Training } from "../../scripts/ApiCorporal";
@@ -63,6 +63,7 @@ export class Tab1 extends Component<IProps, IState> {
             dataComments: [],
             viewMoreDetailsVisible: false
         };
+        this.goLoading = this.goLoading.bind(this);
     }
     private event: EmitterSubscription | null = null;
     private timeLoad: number = 512;
@@ -71,24 +72,11 @@ export class Tab1 extends Component<IProps, IState> {
     private reserve2 = { id: '-1', date: { value: 'n/a', status: -1, difference: undefined }, session_number: { value: 'n/a', status: -1, difference: undefined }, rds: { value: 'n/a', status: -1, difference: undefined }, rpe: { value: 'n/a', status: -1, difference: undefined }, pulse: { value: 'n/a', status: -1, difference: undefined }, repetitions: { value: 'n/a', status: -1, difference: undefined }, kilage: { value: 'n/a', status: -1, difference: undefined }, tonnage: { value: 'n/a', status: -1, difference: undefined }, exercise: { name: 'No disponible', status: -1, description: '' } };
     componentDidMount() {
         this.event = DeviceEventEmitter.addListener('tab1reload', ()=>{
-            this.setState({ showLoading: true, commentsLoading: true, dataComments: [], visiblemenu: false }, ()=>this.goLoading());
+            this.setState({ showLoading: true, commentsLoading: true, dataComments: [], visiblemenu: false }, this.goLoading);
         });
     }
     componentWillUnmount() {
-        this.timeLoad = 512;
-        this.setState({
-            visiblemenu: false,
-            showLoading: true,
-            dataShow: this.reserve1,
-            visibleStatistics: false,
-            titleStatistics: '',
-            dialogShow: false,
-            messageDialog: '',
-            commentsLoading: true,
-            dataComments: []
-        });
         this.event?.remove();
-        this.event = null;
     }
     goStatistics(data: number, titleStatistics: string) {
         this.props.showLoading(true, 'Cargando estadísticas...');
@@ -104,21 +92,21 @@ export class Tab1 extends Component<IProps, IState> {
             this.setState({ dialogShow: true, messageDialog: error.cause });
         });
     }
-    goLoading(refreshing?: boolean) {
+    goLoading() {
+        clearInterval(this.loading);
         Training.getActual().then((value)=>{
             this.setState({
                 dataShow: (value)? { id: value.id, date: value.date, session_number: value.session_number, rds: value.rds, rpe: value.rpe, pulse: value.pulse, repetitions: value.repetitions, kilage: value.kilage, tonnage: value.tonnage, exercise: value.exercise }: this.reserve1,
                 showLoading: false
             });
-            (refreshing)&&this.setState({ refreshing: false });
-            clearInterval(this.loading);
+            (this.state.refreshing)&&this.setState({ refreshing: false });
         }).catch((error)=>{
             this.setState({ dataShow: this.reserve2, showLoading: false, dialogShow: true, messageDialog: error.cause });
-            (refreshing)&&this.setState({ refreshing: false });
+            (this.state.refreshing)&&this.setState({ refreshing: false });
             clearInterval(this.loading);
             var loadNow = LoadNow;
             this.timeLoad *= 2;
-            this.loading = setInterval(()=>{ if (loadNow = true) setTimeout(()=>this.goLoading(), 256) }, this.timeLoad);
+            this.loading = setInterval(()=>{ if (loadNow = true) setTimeout(this.goLoading, 256) }, this.timeLoad);
         });
         Comment.getAll().then((value)=>this.setState({ commentsLoading: false, dataComments: value })).catch((error)=>{
             var commentError: commentsData[] = [{
@@ -154,7 +142,7 @@ export class Tab1 extends Component<IProps, IState> {
                 <FlatList
                     data={this.state.dataComments}
                     keyExtractor={(item)=>`t1-user-${item.id}`}
-                    refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={this.state.refreshing} onRefresh={()=>this.setState({ showLoading: true, commentsLoading: true, dataComments: [], refreshing: true }, ()=>this.goLoading(true))} />}
+                    refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={this.state.refreshing} onRefresh={()=>this.setState({ showLoading: true, commentsLoading: true, dataComments: [], refreshing: true }, this.goLoading)} />}
                     ListHeaderComponent={<HeaderStatistics dataShow={this.state.dataShow} showLoading={this.state.showLoading} goStatistics={(data, title)=>this.goStatistics(data, title)} openDetails={()=>this.setState({ viewMoreDetailsVisible: true })} />}
                     ListEmptyComponent={()=>(!this.state.commentsLoading)? <EmptyListComments message={'No hay comentarios para mostrar'} icon={<NoComment width={96} height={96} />} style={{ marginTop: 32 }} />: <View><ProgressBar indeterminate={true} /></View>}
                     renderItem={({ item })=><CustomCardComments

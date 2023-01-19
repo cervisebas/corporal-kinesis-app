@@ -29,12 +29,6 @@ export default class Options extends Component<IProps, IState> {
             showDialog: false
         };
     }
-    componentWillUnmount() {
-        this.setState({
-            loading: false,
-            showDialog: false
-        });
-    }
     closeSession() {
         this.props.showLoading(true, 'Cerrando sesión, espere por favor...');
         AsyncStorage.removeItem('account_session').then(()=>setTimeout(()=>{

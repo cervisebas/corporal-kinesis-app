@@ -1,5 +1,5 @@
 import { decode } from "base-64";
-import React, { PureComponent, createRef } from "react";
+import React, { PureComponent, createRef, useEffect, useState } from "react";
 import { Component, ReactNode } from "react";
 import { DeviceEventEmitter, Dimensions, EmitterSubscription, FlatList, ListRenderItemInfo, RefreshControl, StyleProp, StyleSheet, ToastAndroid, View, ViewStyle } from "react-native";
 import { ActivityIndicator, Appbar, Button, Dialog, Divider, List, Paragraph, Portal, Snackbar, Text, TouchableRipple } from "react-native-paper";
@@ -64,7 +64,7 @@ type IState = {
     viewImageShow: boolean;
 };
 
-export default class Page1 extends Component<IProps, IState> {
+/*export default class Page1 extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
@@ -210,12 +210,10 @@ export default class Page1 extends Component<IProps, IState> {
             this.setState({ errorView: true, errorTitle: '¡¡¡Atención!!!', errorMessage: 'Debes añadir ejercicios en la lista antes de realizar cargas.' });
     }
 
-    /* ##### New Functions ##### */
     _openEditClient() {
         this.refEditClientProfessional.current?.open();
     }
 
-    /*###### FlatList Control ######*/
     _getItemLayout(_i: any, index: number) { return { length: 64, offset: 64 * index, index }; }
     _keyExtractor(item: dataListUsers, _i: number) { return `p1-admin-${item.id}`; }
     _ItemSeparatorComponent() { return(<Divider />); }
@@ -229,7 +227,6 @@ export default class Page1 extends Component<IProps, IState> {
             actionComment={()=>this.setState({ idActualSendComment: item.id, showSendComment: true })}
         />);
     }
-    /*##############################*/
 
     render(): ReactNode {
         return(<View style={{ flex: 1 }}>
@@ -332,12 +329,110 @@ export default class Page1 extends Component<IProps, IState> {
             </View>
         </View>);
     }
-}
+}*/
+
+export default React.memo(function Page1(props: IProps) {
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+    const [mError, setMerror] = useState('');
+    const [refresh, setRefresh] = useState(false);
+    const [userList, setUserList] = useState<dataListUsers[]>([]);
+    const [excList, setExcList] = useState<dataExercise[]>([]);
+    // Variables
+    var completeList: dataListUsers[] = [];
+    // Ref's
+    const refEditClientProfessional = createRef<EditClientProfessionalRef>();
+
+    /* ##### FlatList ##### */
+    function _getItemLayout(_i: any, index: number) { return {length: 64, offset: 64 * index, index}; }
+    function _keyExtractor(item: dataListUsers, _i: number) { return `p1-admin-${item.id}`; }
+    function _ItemSeparatorComponent() { return(<Divider />); }
+    function _renderItem({ item }: ListRenderItemInfo<dataListUsers>) {
+        return(<CustomItemList2
+            key={`p1-admin-${item.id}`}
+            image={item.image}
+            title={decode(item.name)}
+            onPress={()=>undefined}
+            actionDelete={()=>undefined}
+            actionComment={()=>undefined}
+        />);
+    }
+    /* #################### */
+
+    function setErrAlert(error: any) {
+        setError(true);
+        setMerror(error.cause);
+        setLoading(false);
+        setRefresh(false);
+    }
+    function loadData() {
+        if (!refresh) setLoading(true);
+        setError(false);
+        Account.admin_getListUser()
+            .then((data)=>{
+                completeList = data;
+                Options.getAll()
+                    .then((opt)=>{
+                        var filter = data.filter((vals)=>{
+                            if (opt.viewDev) if (vals.id == '1') return false;
+                            if (opt.viewAdmins1) if (vals.permission !== '0') return false;
+                            return true;
+                        });
+                        Exercise.getAll()
+                            .then((data2)=>{
+                                setExcList(data2);
+                                setUserList(filter);
+                                setLoading(false);
+                                setRefresh(false);
+                            })
+                            .catch(setErrAlert);
+                    })
+                    .catch(()=>{
+                        setUserList(data);
+                        setLoading(false);
+                    });
+            })
+            .catch(setErrAlert);
+    }
+
+    function refreshing() {
+        setRefresh(true);
+        loadData();
+    }
+
+    /* ##### UseEffects ##### */
+    useEffect(()=>{
+        loadData();
+    }, []);
+
+    return(<View style={{ flex: 1 }}>
+        <Appbar style={{ backgroundColor: '#1663AB', height: 56 }}>
+            <Appbar.Action icon="menu" onPress={props.navigation.openDrawer} />
+            <Appbar.Content title={'Inicio'}  />
+        </Appbar>
+        <View style={{ flex: 2, overflow: 'hidden' }}>
+            <FlatList
+                data={userList}
+                extraData={userList}
+                keyExtractor={_keyExtractor}
+                getItemLayout={_getItemLayout}
+                contentContainerStyle={{ flex: (loading || error || userList.length == 0)? 3: undefined }}
+                refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={refresh} onRefresh={refreshing} />}
+                ItemSeparatorComponent={_ItemSeparatorComponent}
+                ListEmptyComponent={(loading)? <ShowLoading />: (error)? <CustomShowError message={mError} />: undefined}
+                ListHeaderComponent={<ButtonsHeaderList load={!loading || error} click1={()=>undefined} click2={()=>undefined}/>}
+                ListFooterComponent={(!loading)? <TouchableRipple onPress={()=>undefined}><List.Item title={'Añadir nuevo usuario'} left={(props)=><List.Icon {...props} icon="account-plus" />} /></TouchableRipple>: undefined}
+                renderItem={_renderItem}
+            />
+            <EditClientProfessional ref={refEditClientProfessional} />
+        </View>
+    </View>);
+});
 
 class ShowLoading extends PureComponent {
     constructor(props: any) { super(props); }
     render(): React.ReactNode {
-        return(<View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}>
+        return(<View style={styles.loadingContent}>
             <ActivityIndicator size={'large'} color={CombinedTheme.colors.accent} />
         </View>);
     }
@@ -345,27 +440,28 @@ class ShowLoading extends PureComponent {
 
 class ButtonsHeaderList extends PureComponent<{ load: boolean; click1: ()=>any; click2: ()=>any; }> {
     constructor(props: any) { super(props); }
-    private styleCard: StyleProp<ViewStyle> = {
-        width: '100%',
-        marginTop: 12,
-        backgroundColor: '#ED7035',
-        height: 56
-    };
+    showMessage() {
+        ToastAndroid.show('No se puede abrir este apartado en este momento...', ToastAndroid.SHORT);
+    }
     render(): React.ReactNode {
         return(<View style={{ ...styles.cardRowContent, width: width }}>
             <View style={{ ...styles.cardContents, paddingLeft: 8, paddingRight: 5 }}>
                 <CustomCard2
-                    style={this.styleCard}
+                    style={styles.styleCard}
                     icon={'plus'}
                     title={'Cargar'}
-                    onPress={()=>(this.props.load)? this.props.click1(): ToastAndroid.show('No se puede abrir este apartado en este momento...', ToastAndroid.SHORT)}/>
+                    disabled={!this.props.load}
+                    onPress={(this.props.load)? this.props.click1: this.showMessage}
+                />
             </View>
             <View style={{ ...styles.cardContents, paddingLeft: 5, paddingRight: 8 }}>
                 <CustomCard2
-                    style={this.styleCard}
+                    style={styles.styleCard}
                     icon={'magnify'}
                     title={'Buscar'}
-                    onPress={()=>(this.props.load)? this.props.click2(): ToastAndroid.show('No se puede abrir este apartado en este momento...', ToastAndroid.SHORT)}/>
+                    disabled={!this.props.load}
+                    onPress={(this.props.load)? this.props.click2: this.showMessage}
+                />
             </View>
         </View>);
     }
@@ -380,5 +476,16 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         alignItems: 'center',
         width: '50%'
+    },
+    styleCard: {
+        width: '100%',
+        marginTop: 12,
+        backgroundColor: '#ED7035',
+        height: 56
+    },
+    loadingContent: {
+        flex: 2,
+        alignItems: 'center',
+        justifyContent: 'center'
     }
 });

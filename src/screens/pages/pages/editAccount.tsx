@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { DeviceEventEmitter, Dimensions, ScrollView, StyleSheet, TouchableHighlight, View } from "react-native";
 import FastImage, { Source } from "react-native-fast-image";
-import { ActivityIndicator, Appbar, Provider as PaperProvider, TextInput } from "react-native-paper";
+import { ActivityIndicator, Appbar, TextInput } from "react-native-paper";
 import { infoAccount } from "../../../scripts/ApiCorporal/types";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import CombinedTheme from "../../../Theme";
@@ -10,6 +10,7 @@ import moment from "moment";
 import { decode, encode } from "base-64";
 import { Account, HostServer } from "../../../scripts/ApiCorporal";
 import { launchImageLibrary } from "react-native-image-picker";
+import ImageProfile from "../../../assets/profile.webp";
 
 type IProps = {
     visible: boolean;
@@ -24,11 +25,8 @@ type IState = {
     formDni: string;
     formPhone: string;
     formImage: { uri: string; type: string; name: string; } | undefined;
-
     viewImage: number | Source | undefined;
     actualDate: Date;
-
-    isUpdate: boolean;
     isLoading: boolean;
 };
 
@@ -43,39 +41,29 @@ export default class EditAccount extends Component<IProps, IState> {
             formDni: '',
             formPhone: '',
             formImage: undefined,
-
-            viewImage: require('../../../assets/profile.png'),
+            viewImage: ImageProfile,
             actualDate: new Date(),
-
-            isUpdate: false,
             isLoading: false
         };
+        this.modifyNow = this.modifyNow.bind(this);
+        this.pickImage = this.pickImage.bind(this);
+        this.viewDatePicker = this.viewDatePicker.bind(this);
     }
+    private isUpdate = false;
     componentDidUpdate() {
         if (this.props.visible) {
-            if (!this.state.isUpdate) {
-                (this.props.datas)&&this.setState({
-                    formName: decode(this.props.datas.name),
-                    formBirthday: decode(this.props.datas.birthday),
-                    formDni: decode(this.props.datas.dni),
-                    formPhone: decode(this.props.datas.phone),
-                    viewImage: { uri: `${HostServer}/images/accounts/${decode(this.props.datas.image)}` },
-                    actualDate: moment(decode(this.props.datas.birthday), 'DD/MM/YYYY').toDate(),
-                    isUpdate: true
+            if (!this.isUpdate) {
+                this.isUpdate = true;
+                this.setState({
+                    formName: decode(this.props.datas!.name),
+                    formBirthday: decode(this.props.datas!.birthday),
+                    formDni: decode(this.props.datas!.dni),
+                    formPhone: decode(this.props.datas!.phone),
+                    viewImage: { uri: `${HostServer}/images/accounts/${decode(this.props.datas!.image)}` },
+                    actualDate: moment(decode(this.props.datas!.birthday), 'DD/MM/YYYY').toDate()
                 });
             }
-        } else {
-            if (this.state.isUpdate) this.setState({
-                formName: '',
-                formBirthday: '',
-                formDni: '',
-                formPhone: '',
-                formImage: undefined,
-                viewImage: require('../../../assets/profile.png'),
-                actualDate: new Date(),
-                isUpdate: false
-            });
-        }
+        } else if (this.isUpdate) this.isUpdate = false;
     }
     pickImage() {
         launchImageLibrary({ mediaType: 'photo', maxWidth: 512, maxHeight: 512, quality: 0.7 }).then((value)=>{
@@ -128,16 +116,16 @@ export default class EditAccount extends Component<IProps, IState> {
         });
     }
     render(): React.ReactNode {
-        return(<CustomModal visible={this.props.visible} onRequestClose={()=>this.props.close()} animationIn={'slideInLeft'} animationOut={'slideOutRight'}>
+        return(<CustomModal visible={this.props.visible} onRequestClose={this.props.close} animationIn={'slideInLeft'} animationOut={'slideOutRight'}>
             <View style={{ ...styles.content, backgroundColor: CombinedTheme.colors.background }}>
                 <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
-                    <Appbar.BackAction onPress={()=>this.props.close()} />
+                    <Appbar.BackAction onPress={this.props.close} />
                     <Appbar.Content title="Editar datos" />
-                    <Appbar.Action icon={'check-outline'} onPress={()=>this.modifyNow()} />
+                    <Appbar.Action icon={'check-outline'} onPress={this.modifyNow} />
                 </Appbar.Header>
                 {(this.props.datas)&&<ScrollView>
                     <View style={{ width: '100%', height: 180, justifyContent: 'center', alignItems: 'center' }}>
-                        <TouchableHighlight underlayColor={'#FFFFFF'} activeOpacity={0.8} onPress={()=>this.pickImage()} style={{ margin: 10, height: 160, width: 160, position: 'relative', borderRadius: 160, overflow: 'hidden' }}>
+                        <TouchableHighlight underlayColor={'#FFFFFF'} activeOpacity={0.8} onPress={this.pickImage} style={{ margin: 10, height: 160, width: 160, position: 'relative', borderRadius: 160, overflow: 'hidden' }}>
                             <View>
                                 {(this.state.viewImage)&&<FastImage
                                     source={this.state.viewImage}
@@ -185,7 +173,7 @@ export default class EditAccount extends Component<IProps, IState> {
                             value={this.state.formBirthday}
                             disabled={this.state.isLoading}
                             editable={false}
-                            right={<TextInput.Icon icon={'calendar-outline'} onPress={()=>this.viewDatePicker()} />} />
+                            right={<TextInput.Icon icon={'calendar-outline'} onPress={this.viewDatePicker} />} />
                     </View>
                 </ScrollView>}
             </View>

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, PureComponent } from "react";
 import { Dimensions, FlatList, StyleSheet, View } from "react-native";
 import { Appbar, Colors, ProgressBar, Provider as PaperProvider, Text } from 'react-native-paper';
 import CombinedTheme from "../../../Theme";
@@ -25,7 +25,7 @@ type IState = {
     listExercises: string[];
     exercise: string;
 };
-export class Statistics2 extends Component<IProps, IState> {
+export class Statistics2 extends PureComponent<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
@@ -42,16 +42,6 @@ export class Statistics2 extends Component<IProps, IState> {
         separate: { labels: [], values: [], },
         singles: []
     };
-    componentWillUnmount() {
-        this.setState({
-            dataView: [],
-            isLoading: true,
-            isLoadingGraphics: true,
-            dataUse: this.dataClean,
-            listExercises: [],
-            exercise: ''
-        });
-    }
     loadData(exercise?: string) {
         var dataUse = this.props.datas.find((value)=>value.exercise == ((exercise)? exercise: this.props.exercise));
         var listExercises = this.props.datas.map((value)=>value.exercise);

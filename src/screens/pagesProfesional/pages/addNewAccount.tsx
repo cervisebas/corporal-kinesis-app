@@ -7,8 +7,9 @@ import { Button, Appbar, Avatar, Portal, TextInput, Provider as PaperProvider, D
 import { Account } from '../../../scripts/ApiCorporal';
 import CombinedTheme from '../../../Theme';
 import CustomModal from '../../components/CustomModal';
+import ImageProfile from "../../../assets/profile.webp";
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 type IProps = {
     show: boolean;
@@ -113,7 +114,7 @@ export default class AddNewAccount extends Component<IProps, IState> {
                     <KeyboardAvoidingView style={{ flex: 2 }} behavior={'height'} keyboardVerticalOffset={0}>
                         <ScrollView style={{ flex: 3 }}>
                             <View style={{ width, alignItems: 'center', paddingTop: 18 }}>
-                                <Avatar.Image size={156} source={require('../../../assets/profile.png')} />
+                                <Avatar.Image size={156} source={ImageProfile} />
                             </View>
                             <View style={{ flex: 4, marginTop: 32 }}>
                                 <TextInput

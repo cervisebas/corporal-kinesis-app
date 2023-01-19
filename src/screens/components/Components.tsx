@@ -1,6 +1,6 @@
 import { decode } from "base-64";
 import moment from "moment";
-import React, { PureComponent } from "react";
+import React, { PureComponent, useState } from "react";
 import { ScrollView, StyleProp, View, ViewStyle } from "react-native";
 import { Avatar, Card, Colors, Text, IconButton, Paragraph, Title, List, Menu, Button } from "react-native-paper";
 import { AvatarImageSource } from "react-native-paper/lib/typescript/components/Avatar/AvatarImage";
@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { HostServer } from "../../scripts/ApiCorporal";
 import { trainings } from "../../scripts/ApiCorporal/types";
 import CombinedTheme from "../../Theme";
+import ImageLazyLoad from "./ImageLazyLoad";
 
 type IProps0 = {
     onPress: ()=>any;
@@ -115,49 +116,49 @@ class CustomItemListLoading extends PureComponent<any, IState4> {
     }
 }
 
-type IProps5 = { onPress: ()=>any; style?: StyleProp<ViewStyle>; title: string; icon: string; };
-class CustomCard2 extends PureComponent<IProps5> {
-    constructor(props: IProps5) { super(props); }
-    render(): React.ReactNode {
-        return(<Card style={this.props.style} accessible={true} onPress={()=>this.props.onPress()}>
-            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%', position: 'relative' }}>
-                <Icon size={28} color={'#FFFFFF'} name={this.props.icon} />
-                <Title style={{ marginLeft: 8, fontSize: 18 }}>{this.props.title}</Title>
-            </View>
-        </Card>);
-    }
-}
-
 type IProps6 = { title: string; image: string; onPress: ()=>any; actionDelete: ()=>any; actionComment: ()=>any; };
-type IState6 = { viewMenu: boolean; };
-class CustomItemList2 extends PureComponent<IProps6, IState6> {
-    constructor(props: IProps6) {
-        super(props);
-        this.state = {
-            viewMenu: false
-        };
+const CustomItemList2 = React.memo(function(props: IProps6) {
+    const [viewMenu, setViewMenu] = useState(false);
+
+    function showMenu() {
+        setViewMenu(true);
     }
-    componentWillUnmount() {
-        this.setState({ viewMenu: false });
+    function hideMenu() {
+        setViewMenu(false);
     }
-    render(): React.ReactNode {
-        return(<List.Item
-            title={this.props.title}
-            onPress={()=>this.props.onPress()}
-            onLongPress={()=>this.setState({ viewMenu: true })}
-            style={{ height: 64 }}
-            left={(props)=><Avatar.Image {...props} size={48} source={(!this.props.image)? require('../../assets/profile.png'): { uri: `${HostServer}/images/accounts/${decode(this.props.image)}` }} />}
-            right={()=><Menu
-                visible={this.state.viewMenu}
-                onDismiss={()=>this.setState({ viewMenu: false })}
-                anchor={<IconButton onPress={()=>this.setState({ viewMenu: true })} icon={'dots-vertical'} />}>
-                <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.onPress())} title={"Ver perfil"} />
-                <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionComment())} title={"Dejar comentario"} />
-                <Menu.Item style={{ backgroundColor: Colors.red500 }} onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionDelete())} title={"Eliminar"} />
-            </Menu>}
+    function menu1() { hideMenu(); props.onPress(); }
+    function menu2() { hideMenu(); props.actionComment(); }
+    function menu3() { hideMenu(); props.actionDelete(); }
+    function rightMenu() {
+        return(<Menu
+            visible={viewMenu}
+            onDismiss={hideMenu}
+            anchor={<IconButton onPress={showMenu} icon={'dots-vertical'} />}>
+            <Menu.Item onPress={menu1} title={"Ver perfil"} />
+            <Menu.Item onPress={menu2} title={"Dejar comentario"} />
+            <Menu.Item style={{ backgroundColor: Colors.red500 }} onPress={menu3} title={"Eliminar"} />
+        </Menu>);
+    }
+    function leftAvatar(lProps: { color: string; style: { marginLeft: number; marginRight: number; marginVertical?: number | undefined; }; }) {
+        let isDefault = decode(props.image).indexOf('default.jpg') !== -1;
+        return(<ImageLazyLoad
+            {...lProps}
+            size={48}
+            circle={true}
+            resizeMode={(isDefault)? 'contain': 'cover'}
+            source={{ uri: `${HostServer}/images/accounts/${decode(props.image)}` }}
         />);
     }
-}
+
+    return(<List.Item
+        title={props.title}
+        onPress={props.onPress}
+        onLongPress={showMenu}
+        style={{ height: 64 }}
+        left={leftAvatar}
+        right={rightMenu}
+    />);
+});
 
 type IProps7 = {
     message: string;
@@ -445,7 +446,6 @@ export {
     CustomCardComments,
     EmptyListComments,
     CustomItemList,
-    CustomCard2,
     CustomItemList2,
     CustomShowError,
     CustomItemList3,

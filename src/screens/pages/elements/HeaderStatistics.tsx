@@ -22,6 +22,7 @@ export default class HeaderStatistics extends PureComponent<IProps, IState> {
         this.state = {
             loadAnimation: 'Cargando'
         };
+        this.animationText = this.animationText.bind(this);
     }
     private animText: any = undefined;
     private styleCard: StyleProp<ViewStyle> = {
@@ -30,13 +31,18 @@ export default class HeaderStatistics extends PureComponent<IProps, IState> {
         backgroundColor: '#ED7035',
         height: 96
     };
+    private dots = '';
+    animationText() {
+        if (this.props.showLoading) {
+            this.dots = (this.dots.length == 0)? '.': (this.dots.length == 1)? '..': (this.dots.length == 2)? '...': '';
+            this.setState({ loadAnimation: `Cargando${this.dots}` });
+        }
+    }
     componentDidMount() {
-        this.animText = setInterval(()=>this.setState({ loadAnimation: (this.state.loadAnimation.length == 8)? 'Cargando.': (this.state.loadAnimation.length == 9)? 'Cargando..': (this.state.loadAnimation.length == 10)? 'Cargando...': 'Cargando' }), 256);
+        this.animText = setInterval(this.animationText, 256);
     }
     componentWillUnmount() {
         clearInterval(this.animText);
-        this.animText = undefined;
-        this.setState({ loadAnimation: '' });
     }
     render(): ReactNode {
         return(<>

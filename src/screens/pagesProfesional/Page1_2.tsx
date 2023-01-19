@@ -20,6 +20,8 @@ import ViewComments from "./pages/viewComments";
 import ViewTraining from "./pages/viewTraining";
 import EditClientProfessional, { EditClientProfessionalRef } from "./pages/editClient";
 import CustomCard2 from "../components/CustomCard2";
+import LoadingComponent, { LoadingComponentRef } from "../components/LoadingComponent";
+import AlertDialog, { AlertDialogRef } from "../components/AlertDialog";
 
 const { width } = Dimensions.get('window');
 
@@ -340,8 +342,12 @@ export default React.memo(function Page1(props: IProps) {
     const [excList, setExcList] = useState<dataExercise[]>([]);
     // Variables
     var completeList: dataListUsers[] = [];
+    var event: EmitterSubscription | undefined = undefined;
     // Ref's
     const refEditClientProfessional = createRef<EditClientProfessionalRef>();
+    const refViewClietDetails = createRef<ViewClietDetails>();
+    const refLoadingComponent = createRef<LoadingComponentRef>();
+    const refAlertDialog = createRef<AlertDialogRef>();
 
     /* ##### FlatList ##### */
     function _getItemLayout(_i: any, index: number) { return {length: 64, offset: 64 * index, index}; }
@@ -352,7 +358,7 @@ export default React.memo(function Page1(props: IProps) {
             key={`p1-admin-${item.id}`}
             image={item.image}
             title={decode(item.name)}
-            onPress={()=>undefined}
+            onPress={()=>openViewDetailsClient(item.id)}
             actionDelete={()=>undefined}
             actionComment={()=>undefined}
         />);
@@ -394,15 +400,37 @@ export default React.memo(function Page1(props: IProps) {
             })
             .catch(setErrAlert);
     }
+    function loadingController(visible: boolean, message?: string): void { return refLoadingComponent.current?.controller(visible, message); }
 
     function refreshing() {
         setRefresh(true);
         loadData();
     }
 
+    // Functions
+    function _openEditClient() {
+        refEditClientProfessional.current?.open();
+    }
+    function openViewDetailsClient(id: string) {
+        loadingController(true, 'Cargando datos del usuario...');
+        Account.admin_getUserData(id)
+            .then((data)=>{
+                loadingController(false);
+                refViewClietDetails.current?.open(data);
+            })
+            .catch((error)=>{
+                refLoadingComponent.current?.controller(false);
+                refAlertDialog.current?.open('Ocurrio un error', error.cause);
+            })
+    }
+
     /* ##### UseEffects ##### */
     useEffect(()=>{
+        event = DeviceEventEmitter.addListener('adminPage1Reload', loadData);
         loadData();
+        return ()=>{
+            event?.remove();
+        };
     }, []);
 
     return(<View style={{ flex: 1 }}>
@@ -425,6 +453,19 @@ export default React.memo(function Page1(props: IProps) {
                 renderItem={_renderItem}
             />
             <EditClientProfessional ref={refEditClientProfessional} />
+            <ViewClietDetails
+                ref={refViewClietDetails}
+                goLoading={loadingController}
+                openAllComment={(data)=>undefined}
+                openAllTrainings={(data)=>undefined}
+                showExternalSnackbar={(text, after)=>undefined}
+                viewImage={()=>undefined}
+                openEditClient={_openEditClient}
+            />
+            <LoadingComponent ref={refLoadingComponent} />
+            <Portal>
+                <AlertDialog ref={refAlertDialog} />
+            </Portal>
         </View>
     </View>);
 });

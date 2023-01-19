@@ -10,6 +10,7 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "clean": "cd android && ./gradlew clean && cd ..",
     "sync": "node sync-git.js",
+    "upsync": "git pull origin main",
     "buildRelease": "cd android && ./gradlew bundleRelease && cd .."
   },
   "dependencies": {

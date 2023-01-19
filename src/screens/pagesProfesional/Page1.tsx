@@ -217,6 +217,7 @@ export default class Page1 extends Component<IProps, IState> {
     /*###### FlatList Control ######*/
     _getItemLayout(_i: any, index: number) { return { length: 64, offset: 64 * index, index }; }
     _keyExtractor(item: dataListUsers, _i: number) { return `p1-admin-${item.id}`; }
+    _ItemSeparatorComponent() { return(<Divider />); }
     _renderItem({ item }: ListRenderItemInfo<dataListUsers>) {
         return(<CustomItemList2
             key={`p1-admin-${item.id}`}
@@ -240,10 +241,9 @@ export default class Page1 extends Component<IProps, IState> {
                     data={this.state.userList2}
                     keyExtractor={this._keyExtractor}
                     getItemLayout={this._getItemLayout}
-                    removeClippedSubviews={true}
                     contentContainerStyle={{ flex: (this.state.isLoading || this.state.isError || this.state.userList.length == 0)? 3: undefined }}
                     refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={this.state.refreshing} onRefresh={()=>this.setState({ refreshing: true }, ()=>this.loadData())} />}
-                    ItemSeparatorComponent={()=><Divider />}
+                    ItemSeparatorComponent={this._ItemSeparatorComponent}
                     ListEmptyComponent={(this.state.isLoading)? <ShowLoading />: (this.state.isError)? <CustomShowError message={this.state.messageError} />: <></>}
                     ListHeaderComponent={<ButtonsHeaderList load={(this.state.isError)? false: !this.state.isLoading} click1={()=>this.openAddTraining()} click2={()=>this.setState({ showSearchClient: true })}/>}
                     ListFooterComponent={(!this.state.isLoading)? <TouchableRipple onPress={()=>this.setState({ showAddNewUser: true })}><List.Item title={'Añadir nuevo usuario'} left={(props)=><List.Icon {...props} icon="account-plus" />} /></TouchableRipple>: <></>}

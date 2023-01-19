@@ -2,7 +2,7 @@ import React, { forwardRef, useImperativeHandle, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import CustomModal from "../../components/CustomModal";
 import CombinedTheme from "../../../Theme";
-import { Appbar, TextInput } from "react-native-paper";
+import { Appbar, Button, TextInput } from "react-native-paper";
 import { ScrollView } from "react-native-gesture-handler";
 
 type IProps = {};
@@ -18,6 +18,7 @@ export default React.memo(forwardRef(function EditClientProfessional(_props: IPr
     const [birthday, setBirthday] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
 
     function close() {
@@ -25,6 +26,26 @@ export default React.memo(forwardRef(function EditClientProfessional(_props: IPr
     }
     function open() {
         setVisible(true);
+    }
+
+    function setStatePassword() {
+        setShowPassword(!showPassword);
+    }
+    function hidenPassword() {
+        setShowPassword(false);
+    }
+    function rightPassword() {
+        return(<TextInput.Icon
+            icon={(showPassword)? 'eye-off-outline': 'eye-outline'}
+            forceTextInputFocus={true}
+            onPress={setStatePassword}
+        />);
+    }
+    function rightBithday() {
+        return(<TextInput.Icon
+            icon={'calendar-outline'}
+            forceTextInputFocus={true}
+        />);
     }
 
     useImperativeHandle(ref, ()=>({ open }));
@@ -40,6 +61,11 @@ export default React.memo(forwardRef(function EditClientProfessional(_props: IPr
                 <TextInput label={'D.N.I'} style={styles.textInput} mode={'outlined'} value={dni} onChangeText={setDNI} keyboardType={'numeric'} blurOnSubmit={false} />
                 <TextInput label={'Teléfono'} style={styles.textInput} mode={'outlined'} value={phone} onChangeText={setPhone} keyboardType={'phone-pad'} textContentType={'telephoneNumber'} blurOnSubmit={false} />
                 <TextInput label={'E-Mail'} style={styles.textInput} mode={'outlined'} value={email} onChangeText={setEmail} autoCapitalize={'none'} keyboardType={'email-address'} textContentType={'emailAddress'} blurOnSubmit={false} />
+                <TextInput label={'Fecha de nacimiento'} style={styles.textInput} mode={'outlined'} value={birthday} editable={false} blurOnSubmit={false} right={rightBithday()} />
+                <TextInput label={'Contraseña'} style={styles.textInput} mode={'outlined'} value={password} onChangeText={setPassword} autoCapitalize={'none'} secureTextEntry={!showPassword} textContentType={'newPassword'} blurOnSubmit={false} onBlur={hidenPassword} right={rightPassword()} />
+                <View style={styles.buttonContent}>
+                    <Button mode={'contained'} style={styles.buttonSend}>Enviar</Button>
+                </View>
             </ScrollView>
         </View>
     </CustomModal>);
@@ -61,5 +87,13 @@ const styles = StyleSheet.create({
     },
     textInput: {
         marginBottom: 8
+    },
+    buttonContent: {
+        marginTop: 12,
+        width: '100%',
+        alignItems: 'center'
+    },
+    buttonSend: {
+        width: 120
     }
 });

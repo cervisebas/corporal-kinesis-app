@@ -16,7 +16,7 @@ type IProps = {
     openAllTrainings: (data: trainings[])=>any;
     showExternalSnackbar: (text: string, after?: ()=>any)=>any;
     viewImage: ()=>any;
-    openEditClient: ()=>void;
+    openEditClient: (data: userData)=>void;
 };
 type IState = {
     visible: boolean;
@@ -47,6 +47,7 @@ export default class ViewClietDetails extends Component<IProps, IState> {
         this.deleteClient = this.deleteClient.bind(this);
         this.getAllTrainings = this.getAllTrainings.bind(this);
         this.goAllComments = this.goAllComments.bind(this);
+        this._openEditClient = this._openEditClient.bind(this);
     }
     private deleteClient() {
         this.props.goLoading(true, 'Borrando información del cliente...');
@@ -88,6 +89,9 @@ export default class ViewClietDetails extends Component<IProps, IState> {
     showQuestionDeleteUser() {
         this.setState({ showQuestionDeleteUser: true });
     }
+    _openEditClient() {
+        this.props.openEditClient(this.state.userData!);
+    }
 
     // Controller
     open(userData: userData) {
@@ -104,7 +108,7 @@ export default class ViewClietDetails extends Component<IProps, IState> {
                     <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
                         <Appbar.BackAction onPress={()=>this.close} />
                         <Appbar.Content title={(this.state.userData)? decode(this.state.userData.name): ''} />
-                        <Appbar.Action icon={'pencil'} onPress={this.props.openEditClient} />
+                        <Appbar.Action icon={'pencil'} onPress={this._openEditClient} />
                         <Appbar.Action icon={'trash-can-outline'} onPress={this.showQuestionDeleteUser} />
                     </Appbar.Header>
                     <ScrollView style={{ flex: 2, overflow: 'hidden', paddingBottom: 16 }}>

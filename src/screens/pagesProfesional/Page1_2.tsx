@@ -408,8 +408,8 @@ export default React.memo(function Page1(props: IProps) {
     }
 
     // Functions
-    function _openEditClient() {
-        refEditClientProfessional.current?.open();
+    function _openEditClient(data: userData) {
+        refEditClientProfessional.current?.open(data);
     }
     function openViewDetailsClient(id: string) {
         loadingController(true, 'Cargando datos del usuario...');

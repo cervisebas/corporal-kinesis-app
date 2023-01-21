@@ -26,6 +26,7 @@ export default React.memo(forwardRef(function EditClientProfessional(_props: IPr
     const [showPassword, setShowPassword] = useState(false);
     const [aDate, setADate] = useState(new Date());
     const [id, setId] = useState('-1');
+    const [datas, setDatas] = useState<userData | undefined>(undefined);
 
     function close() {
         setVisible(false);
@@ -39,6 +40,7 @@ export default React.memo(forwardRef(function EditClientProfessional(_props: IPr
         setADate(moment(birth, 'DD/MM/YYYY').toDate());
         setEmail(decode(data.email));
         setId(data.id);
+        setDatas(data);
         setVisible(true);
     }
 
@@ -78,6 +80,21 @@ export default React.memo(forwardRef(function EditClientProfessional(_props: IPr
         });
     }
 
+    function restoreData() {
+        setName(decode(datas!.name));
+        setDNI(decode(datas!.dni));
+        setPhone(decode(datas!.phone));
+        let birth = decode(datas!.birthday);
+        setBirthday(birth);
+        setADate(moment(birth, 'DD/MM/YYYY').toDate());
+        setEmail(decode(datas!.email));
+    }
+
+    function sendEditing() {
+        setLoading(true);
+        
+    }
+
     useImperativeHandle(ref, ()=>({ open }));
 
     return(<CustomModal visible={visible} onRequestClose={close}>
@@ -85,6 +102,7 @@ export default React.memo(forwardRef(function EditClientProfessional(_props: IPr
             <Appbar.Header style={styles.header}>
                 <Appbar.BackAction onPress={close} />
                 <Appbar.Content title={'Editar usuario'} />
+                <Appbar.Action icon={'restore'} onPress={restoreData} />
             </Appbar.Header>
             <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollView}>
                 <TextInput label={'Nombre y Apellido'} disabled={loading} style={styles.textInput} mode={'outlined'} value={name} onChangeText={setName} autoCapitalize={'words'} keyboardType={'default'} textContentType={'name'} blurOnSubmit={false} />
@@ -99,6 +117,7 @@ export default React.memo(forwardRef(function EditClientProfessional(_props: IPr
                         style={styles.buttonSend}
                         loading={loading}
                         disabled={loading}
+                        onPress={sendEditing}
                     >Enviar</Button>
                 </View>
             </ScrollView>

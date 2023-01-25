@@ -202,4 +202,28 @@ export default class AccountSystem {
             }).catch((error)=>reject({ cause: 'Ocurrió un error al intentar consultar a los datos de sesión.', error }));
         });
     }
+    admin_modify(dataPost: FormData): Promise<void> {
+        return new Promise((resolve, reject)=>{
+            try {
+                AsyncStorage.getItem('account_session').then((value)=>{
+                    if (!value) return reject({ cause: 'No se ha encontrado datos de inicio de sesión.', error: false });
+                    var datas: storageData = JSON.parse(decode(String(value)));
+                    var postDatas = dataPost;
+                    postDatas.append('email', datas.email);
+                    postDatas.append('password', datas.password);
+                    postDatas.append('editUserAdmin', '1');
+                    axios.post(`${this.urlBase}/index.php`, postDatas, this.header_access2).then((result)=>{
+                        var data: tipical = result.data;
+                        if (data.ok) return resolve();
+                        return reject({ cause: (data.cause?.length !== undefined && data.cause?.length !== 0)? data.cause: 'Ocurrió un error inesperadamente.', error: false });
+                    }).catch((error)=>{
+                        console.log(error);
+                        reject({ cause: 'Error de conexión.', error });
+                    });
+                }).catch((error)=>reject({ cause: 'Ocurrió un error al intentar consultar a los datos de sesión.', error }));
+            } catch (error) {
+                reject({ cause: 'Ocurrió un error inesperadamente.', error });
+            }
+        });
+    }
 }

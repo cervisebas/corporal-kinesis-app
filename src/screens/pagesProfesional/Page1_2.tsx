@@ -343,6 +343,7 @@ export default React.memo(function Page1(props: IProps) {
     // Variables
     var completeList: dataListUsers[] = [];
     var event: EmitterSubscription | undefined = undefined;
+    var actualIDAccount: string = '-1';
     // Ref's
     const refEditClientProfessional = createRef<EditClientProfessionalRef>();
     const refViewClietDetails = createRef<ViewClietDetails>();
@@ -416,12 +417,17 @@ export default React.memo(function Page1(props: IProps) {
         Account.admin_getUserData(id)
             .then((data)=>{
                 loadingController(false);
+                actualIDAccount = id;
                 refViewClietDetails.current?.open(data);
             })
             .catch((error)=>{
                 refLoadingComponent.current?.controller(false);
                 refAlertDialog.current?.open('Ocurrio un error', error.cause);
             })
+    }
+    function _reopenViewClient() {
+        refViewClietDetails.current?.close();
+        openViewDetailsClient(actualIDAccount);
     }
 
     /* ##### UseEffects ##### */
@@ -452,7 +458,7 @@ export default React.memo(function Page1(props: IProps) {
                 ListFooterComponent={(!loading)? <TouchableRipple onPress={()=>undefined}><List.Item title={'Añadir nuevo usuario'} left={(props)=><List.Icon {...props} icon="account-plus" />} /></TouchableRipple>: undefined}
                 renderItem={_renderItem}
             />
-            <EditClientProfessional ref={refEditClientProfessional} />
+            <EditClientProfessional ref={refEditClientProfessional} finish={_reopenViewClient} />
             <ViewClietDetails
                 ref={refViewClietDetails}
                 goLoading={loadingController}

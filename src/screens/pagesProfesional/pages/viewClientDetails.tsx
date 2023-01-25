@@ -106,7 +106,7 @@ export default class ViewClietDetails extends Component<IProps, IState> {
             <PaperProvider theme={CombinedTheme}>
                 <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background }}>
                     <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
-                        <Appbar.BackAction onPress={()=>this.close} />
+                        <Appbar.BackAction onPress={this.close} />
                         <Appbar.Content title={(this.state.userData)? decode(this.state.userData.name): ''} />
                         <Appbar.Action icon={'pencil'} onPress={this._openEditClient} />
                         <Appbar.Action icon={'trash-can-outline'} onPress={this.showQuestionDeleteUser} />

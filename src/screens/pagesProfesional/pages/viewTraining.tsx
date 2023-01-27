@@ -56,6 +56,7 @@ export default class ViewTraining extends Component<IProps, IState> {
         this.deleteTraining = this.deleteTraining.bind(this);
         this._deleteItem = this._deleteItem.bind(this);
         this._renderTab = this._renderTab.bind(this);
+        this.goMoreDetails = this.goMoreDetails.bind(this);
     }
     private refCustomSnackbar = createRef<CustomSnackbarRef>();
     

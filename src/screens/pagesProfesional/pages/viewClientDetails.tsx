@@ -13,7 +13,7 @@ import ImageProfile from '../../../assets/profile.webp';
 type IProps = {
     goLoading: (show: boolean, text?: string)=>any;
     openAllComment: (data: commentsData[])=>any;
-    openAllTrainings: (data: trainings[])=>any;
+    openAllTrainings: (data: trainings[], accountId: string)=>any;
     showExternalSnackbar: (text: string, after?: ()=>any)=>any;
     viewImage: ()=>any;
     openEditClient: (data: userData)=>void;
@@ -73,13 +73,16 @@ export default class ViewClietDetails extends Component<IProps, IState> {
             .catch((error)=>this.setState({ errorView: true, errorTitle: 'Ocurrio un error...', errorMessage: error.cause }));
     }
     private getAllTrainings() {
-        this.props.goLoading(true, 'Obteniendo informació...');
+        this.props.goLoading(true, 'Obteniendo información...');
         Training.admin_getAllAccount(this.state.userData!.id)
             .then((value)=>{
                 this.props.goLoading(false);
-                this.props.openAllTrainings(value.reverse());
+                this.props.openAllTrainings(value.reverse(), this.state.userData!.id);
             })
-            .catch((error)=>this.setState({ errorView: true, errorTitle: 'Ocurrio un error...', errorMessage: error.cause }))
+            .catch((error)=>{
+                this.props.goLoading(false);
+                this.setState({ errorView: true, errorTitle: 'Ocurrio un error...', errorMessage: error.cause });
+            });
     }
     private processTextTraining(num: string): string {
         if (num == '0') return 'Ningún ejercicio evaluado';

@@ -9,7 +9,7 @@ import { commentsData, dataExercise, dataListUsers, DetailsTrainings, trainings,
 import { Global } from "../../scripts/Global";
 import CombinedTheme from "../../Theme";
 import { CustomItemList2, CustomShowError } from "../components/Components";
-import ViewMoreDetails from "../pages/pages/viewMoreDetails";
+import ViewMoreDetails from "./pages/viewMoreDetails2";
 import AddNewAccount from "./pages/addNewAccount";
 import AddTraining from "./pages/addTraining";
 import SearchClient from "./pages/searchClient";
@@ -349,6 +349,8 @@ export default React.memo(function Page1(props: IProps) {
     const refViewClietDetails = createRef<ViewClietDetails>();
     const refLoadingComponent = createRef<LoadingComponentRef>();
     const refAlertDialog = createRef<AlertDialogRef>();
+    const refViewTraining = createRef<ViewTraining>();
+    const refViewMoreDetails = createRef<ViewMoreDetails>();
 
     /* ##### FlatList ##### */
     function _getItemLayout(_i: any, index: number) { return {length: 64, offset: 64 * index, index}; }
@@ -430,6 +432,13 @@ export default React.memo(function Page1(props: IProps) {
         openViewDetailsClient(actualIDAccount);
     }
 
+    function _openAllTrainings(trainings: trainings[], accountId: string) {
+        refViewTraining.current?.open(trainings, accountId);
+    }
+    function _goMoreDetails(training: DetailsTrainings, comment?: commentsData) {
+        refViewMoreDetails.current?.open(training, comment);
+    }
+
     /* ##### UseEffects ##### */
     useEffect(()=>{
         event = DeviceEventEmitter.addListener('adminPage1Reload', loadData);
@@ -463,11 +472,17 @@ export default React.memo(function Page1(props: IProps) {
                 ref={refViewClietDetails}
                 goLoading={loadingController}
                 openAllComment={(data)=>undefined}
-                openAllTrainings={(data)=>undefined}
+                openAllTrainings={_openAllTrainings}
                 showExternalSnackbar={(text, after)=>undefined}
                 viewImage={()=>undefined}
                 openEditClient={_openEditClient}
             />
+            <ViewTraining
+                ref={refViewTraining}
+                goLoading={loadingController}
+                goMoreDetails={_goMoreDetails}
+            />
+            <ViewMoreDetails ref={refViewMoreDetails} />
             <LoadingComponent ref={refLoadingComponent} />
             <Portal>
                 <AlertDialog ref={refAlertDialog} />

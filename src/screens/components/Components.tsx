@@ -302,7 +302,7 @@ type IProps12 = {
 class CustomCard4 extends PureComponent<IProps12> {
     constructor(props: IProps12) { super(props); }
     render(): React.ReactNode {
-        return(<Card style={this.props.style} accessible={true} onPress={()=>(this.props.onPress)&&this.props.onPress()}>
+        return(<Card style={this.props.style} accessible={true} onPress={(this.props.onPress)&&this.props.onPress}>
             <Card.Content>
                 <Title>{this.props.value}</Title>
                 <Paragraph>{this.props.title}</Paragraph>
@@ -326,7 +326,7 @@ type IProps13 = {
 class CustomCard5 extends PureComponent<IProps13> {
     constructor(props: IProps13) { super(props); }
     render(): React.ReactNode {
-        return(<Card style={this.props.style} accessible={true} onPress={()=>(this.props.onPress)&&this.props.onPress()}>
+        return(<Card style={this.props.style} accessible={true} onPress={(this.props.onPress)&&this.props.onPress}>
             <Card.Content>
                 <Title>{this.props.title}</Title>
                 <Paragraph>{this.props.paragraph}</Paragraph>
@@ -336,7 +336,7 @@ class CustomCard5 extends PureComponent<IProps13> {
 }
 
 type CustomType1 = { title: string; value: string; marginLeft?: number; };
-class MiniCustomCard extends PureComponent<CustomType1> {
+export class MiniCustomCard extends PureComponent<CustomType1> {
     constructor(props: CustomType1) {
         super(props);
     }
@@ -349,7 +349,7 @@ class MiniCustomCard extends PureComponent<CustomType1> {
     }
 }
 
-type IProps14 = {
+/*type IProps14 = {
     data: trainings;
     editButton?: ()=>any;
     viewButton?: ()=>any;
@@ -393,7 +393,7 @@ class CustomItemList5 extends PureComponent<IProps14, IState14> {
             </Card.Actions>
         </Card>);
     }
-}
+}*/
 
 type IProps15 = {
     style?: StyleProp<ViewStyle>;
@@ -454,7 +454,6 @@ export {
     CustomCard3,
     CustomCard4,
     CustomCard5,
-    CustomItemList5,
     CustomItemList6,
     CardButton1
 };

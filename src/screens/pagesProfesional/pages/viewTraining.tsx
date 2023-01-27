@@ -86,6 +86,9 @@ export default class ViewTraining extends Component<IProps, IState> {
             index
         };
     }
+    _keyExtractor(data: trainings, _index: number) {
+        return `viewT-admin-${data.id}`;
+    }
     _renderItem({ item }: ListRenderItemInfo<trainings>) {
         return(<CustomItemList5
             key={`viewT-admin-${item.id}`}
@@ -117,7 +120,7 @@ export default class ViewTraining extends Component<IProps, IState> {
                         <FlatList
                             data={this.state.trainings}
                             extraData={this.state}
-                            keyExtractor={(item)=>`viewT-admin-${item.id}`}
+                            keyExtractor={this._keyExtractor}
                             contentContainerStyle={(this.state.trainings.length == 0)? { flex: 3, paddingBottom: 12 }: undefined}
                             ListEmptyComponent={<this.listEmptyComponent />}
                             getItemLayout={this._getItemLayout}

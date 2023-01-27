@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { trainings } from "../../scripts/ApiCorporal/types";
 import { Button, Card, IconButton } from "react-native-paper";
 import { ScrollView, StyleSheet } from "react-native";
 import { decode } from "base-64";
 import { MiniCustomCard } from "./Components";
 import moment from "moment";
+import "moment/locale/es";
 
 type IProps14 = {
     data: trainings;
@@ -14,11 +15,7 @@ type IProps14 = {
 };
 
 export default React.memo(function CustomItemList5(props: IProps14) {
-    const date: Date = moment(decode(props.data.date), 'DD/MM/YYYY').toDate();
-    const strDate: string = moment(date).format('dddd D [de] MMMM [del] YYYY');
-    const defDate = strDate.charAt(0).toUpperCase() + strDate.slice(1);
-
-    const [title] = useState(defDate);
+    const [title, setTitle] = useState('Cargando...');
 
     function iconTitle(cProps: any) {
         return(<IconButton
@@ -27,6 +24,13 @@ export default React.memo(function CustomItemList5(props: IProps14) {
             onPress={(props.deleteButton)&&props.deleteButton}
         />);
     }
+
+    useEffect(()=>{
+        const date: Date = moment(decode(props.data.date), 'DD/MM/YYYY').toDate();
+        const strDate: string = moment(date).locale('es').format('dddd D [de] MMMM [del] YYYY');
+        const defDate = strDate.charAt(0).toUpperCase() + strDate.slice(1);
+        setTimeout(()=>setTitle(defDate), 512);
+    }, []);
     
     return(<Card style={styles.card} theme={{ dark: true }}>
         <Card.Title

@@ -22,6 +22,7 @@ import EditClientProfessional, { EditClientProfessionalRef } from "./pages/editC
 import CustomCard2 from "../components/CustomCard2";
 import LoadingComponent, { LoadingComponentRef } from "../components/LoadingComponent";
 import AlertDialog, { AlertDialogRef } from "../components/AlertDialog";
+import CustomSnackbar, { CustomSnackbarRef } from "../components/CustomSnackbar";
 
 const { width } = Dimensions.get('window');
 
@@ -351,6 +352,7 @@ export default React.memo(function Page1(props: IProps) {
     const refAlertDialog = createRef<AlertDialogRef>();
     const refViewTraining = createRef<ViewTraining>();
     const refViewMoreDetails = createRef<ViewMoreDetails>();
+    const refCustomSnackbar = createRef<CustomSnackbarRef>();
 
     /* ##### FlatList ##### */
     function _getItemLayout(_i: any, index: number) { return {length: 64, offset: 64 * index, index}; }
@@ -438,6 +440,9 @@ export default React.memo(function Page1(props: IProps) {
     function _goMoreDetails(training: DetailsTrainings, comment?: commentsData) {
         refViewMoreDetails.current?.open(training, comment);
     }
+    function _controllerSnackbar(text: string) {
+        refCustomSnackbar.current?.open(text);
+    }
 
     /* ##### UseEffects ##### */
     useEffect(()=>{
@@ -473,7 +478,7 @@ export default React.memo(function Page1(props: IProps) {
                 goLoading={loadingController}
                 openAllComment={(data)=>undefined}
                 openAllTrainings={_openAllTrainings}
-                showExternalSnackbar={(text, after)=>undefined}
+                showExternalSnackbar={_controllerSnackbar}
                 viewImage={()=>undefined}
                 openEditClient={_openEditClient}
             />
@@ -484,6 +489,7 @@ export default React.memo(function Page1(props: IProps) {
             />
             <ViewMoreDetails ref={refViewMoreDetails} />
             <LoadingComponent ref={refLoadingComponent} />
+            <CustomSnackbar ref={refCustomSnackbar} />
             <Portal>
                 <AlertDialog ref={refAlertDialog} />
             </Portal>

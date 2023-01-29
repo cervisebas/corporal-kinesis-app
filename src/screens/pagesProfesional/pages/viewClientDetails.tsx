@@ -14,7 +14,7 @@ type IProps = {
     goLoading: (show: boolean, text?: string)=>any;
     openAllComment: (data: commentsData[])=>any;
     openAllTrainings: (data: trainings[], accountId: string)=>any;
-    showExternalSnackbar: (text: string, after?: ()=>any)=>any;
+    showExternalSnackbar: (text: string)=>any;
     viewImage: ()=>any;
     openEditClient: (data: userData)=>void;
 };

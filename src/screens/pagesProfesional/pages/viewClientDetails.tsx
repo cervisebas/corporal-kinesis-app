@@ -12,7 +12,7 @@ import ImageProfile from '../../../assets/profile.webp';
 
 type IProps = {
     goLoading: (show: boolean, text?: string)=>any;
-    openAllComment: (data: commentsData[])=>any;
+    openAllComment: (data: commentsData[], clientId: string)=>any;
     openAllTrainings: (data: trainings[], accountId: string)=>any;
     showExternalSnackbar: (text: string)=>any;
     viewImage: (src: string)=>void;
@@ -69,7 +69,7 @@ export default class ViewClietDetails extends Component<IProps, IState> {
         Comment.admin_getAllAccount(this.state.userData!.id)
             .then((value)=>{
                 this.props.goLoading(false);
-                this.props.openAllComment(value.reverse());
+                this.props.openAllComment(value.reverse(), this.state.userData!.id);
             })
             .catch((error)=>this.setState({ errorView: true, errorTitle: 'Ocurrio un error...', errorMessage: error.cause }));
     }

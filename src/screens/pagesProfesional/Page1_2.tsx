@@ -355,6 +355,7 @@ export default React.memo(function Page1(props: IProps) {
     const refViewMoreDetails = createRef<ViewMoreDetails>();
     const refCustomSnackbar = createRef<CustomSnackbarRef>();
     const refImageViewer = createRef<ImageViewer>();
+    const refViewComments = createRef<ViewComments>();
 
     /* ##### FlatList ##### */
     function _getItemLayout(_i: any, index: number) { return {length: 64, offset: 64 * index, index}; }
@@ -449,6 +450,9 @@ export default React.memo(function Page1(props: IProps) {
         const pSrc = `${HostServer}/images/accounts/${decode(src)}`;
         refImageViewer.current?.open(pSrc);
     }
+    function _openAllComments(data: commentsData[], clientId: string) {
+        refViewComments.current?.open(data, clientId);
+    }
 
     /* ##### UseEffects ##### */
     useEffect(()=>{
@@ -482,7 +486,7 @@ export default React.memo(function Page1(props: IProps) {
             <ViewClietDetails
                 ref={refViewClietDetails}
                 goLoading={loadingController}
-                openAllComment={(data)=>undefined}
+                openAllComment={_openAllComments}
                 openAllTrainings={_openAllTrainings}
                 showExternalSnackbar={_controllerSnackbar}
                 viewImage={_openViewImage}
@@ -493,6 +497,7 @@ export default React.memo(function Page1(props: IProps) {
                 goLoading={loadingController}
                 goMoreDetails={_goMoreDetails}
             />
+            <ViewComments ref={refViewComments} goLoading={loadingController} />
             <ImageViewer ref={refImageViewer} />
             <ViewMoreDetails ref={refViewMoreDetails} />
             <LoadingComponent ref={refLoadingComponent} />

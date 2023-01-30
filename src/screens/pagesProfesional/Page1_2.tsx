@@ -2,7 +2,7 @@ import { decode } from "base-64";
 import React, { PureComponent, createRef, useEffect, useState } from "react";
 import { Component, ReactNode } from "react";
 import { DeviceEventEmitter, Dimensions, EmitterSubscription, FlatList, ListRenderItemInfo, RefreshControl, StyleProp, StyleSheet, ToastAndroid, View, ViewStyle } from "react-native";
-import { ActivityIndicator, Appbar, Button, Dialog, Divider, List, Paragraph, Portal, Snackbar, Text, TouchableRipple } from "react-native-paper";
+import { ActivityIndicator, Appbar, Button, Dialog, Divider, FAB, List, Paragraph, Portal, Snackbar, Text, TouchableRipple } from "react-native-paper";
 import ImageView from "react-native-image-viewing";
 import { Account, Comment, Exercise, HostServer, Options, Training } from "../../scripts/ApiCorporal";
 import { commentsData, dataExercise, dataListUsers, DetailsTrainings, trainings, userData } from "../../scripts/ApiCorporal/types";
@@ -356,6 +356,7 @@ export default React.memo(function Page1(props: IProps) {
     const refCustomSnackbar = createRef<CustomSnackbarRef>();
     const refImageViewer = createRef<ImageViewer>();
     const refViewComments = createRef<ViewComments>();
+    const refSetCommentUser = createRef<SetCommentUser>();
 
     /* ##### FlatList ##### */
     function _getItemLayout(_i: any, index: number) { return {length: 64, offset: 64 * index, index}; }
@@ -368,7 +369,7 @@ export default React.memo(function Page1(props: IProps) {
             title={decode(item.name)}
             onPress={()=>openViewDetailsClient(item.id)}
             actionDelete={()=>undefined}
-            actionComment={()=>undefined}
+            actionComment={()=>_openSetComment(item.id)}
         />);
     }
     /* #################### */
@@ -453,6 +454,9 @@ export default React.memo(function Page1(props: IProps) {
     function _openAllComments(data: commentsData[], clientId: string) {
         refViewComments.current?.open(data, clientId);
     }
+    function _openSetComment(idClient: string) {
+        refSetCommentUser.current?.open(idClient);
+    }
 
     /* ##### UseEffects ##### */
     useEffect(()=>{
@@ -474,12 +478,11 @@ export default React.memo(function Page1(props: IProps) {
                 extraData={userList}
                 keyExtractor={_keyExtractor}
                 getItemLayout={_getItemLayout}
-                contentContainerStyle={{ flex: (loading || error || userList.length == 0)? 3: undefined }}
+                contentContainerStyle={{ flex: (loading || error || userList.length == 0)? 3: undefined, paddingBottom: 160 }}
                 refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={refresh} onRefresh={refreshing} />}
                 ItemSeparatorComponent={_ItemSeparatorComponent}
                 ListEmptyComponent={(loading)? <ShowLoading />: (error)? <CustomShowError message={mError} />: undefined}
                 ListHeaderComponent={<ButtonsHeaderList load={!loading || error} click1={()=>undefined} click2={()=>undefined}/>}
-                ListFooterComponent={(!loading)? <TouchableRipple onPress={()=>undefined}><List.Item title={'Añadir nuevo usuario'} left={(props)=><List.Icon {...props} icon="account-plus" />} /></TouchableRipple>: undefined}
                 renderItem={_renderItem}
             />
             <EditClientProfessional ref={refEditClientProfessional} finish={_reopenViewClient} />
@@ -504,7 +507,14 @@ export default React.memo(function Page1(props: IProps) {
             <CustomSnackbar ref={refCustomSnackbar} />
             <Portal>
                 <AlertDialog ref={refAlertDialog} />
+                <SetCommentUser ref={refSetCommentUser} goLoading={loadingController} />
             </Portal>
+            <FAB
+                visible={!loading}
+                icon={'account-plus'}
+                style={styles.fab}
+                onPress={()=>undefined}
+            />
         </View>
     </View>);
 });
@@ -567,5 +577,14 @@ const styles = StyleSheet.create({
         flex: 2,
         alignItems: 'center',
         justifyContent: 'center'
+    },
+    fab: {
+        position: 'absolute',
+        right: 0,
+        bottom: 8,
+        marginRight: 16,
+        marginLeft: 16,
+        marginTop: 16,
+        marginBottom: 88
     }
 });

@@ -23,6 +23,7 @@ import CustomCard2 from "../components/CustomCard2";
 import LoadingComponent, { LoadingComponentRef } from "../components/LoadingComponent";
 import AlertDialog, { AlertDialogRef } from "../components/AlertDialog";
 import CustomSnackbar, { CustomSnackbarRef } from "../components/CustomSnackbar";
+import ImageViewer from "./pages/ImageViewer";
 
 const { width } = Dimensions.get('window');
 
@@ -353,6 +354,7 @@ export default React.memo(function Page1(props: IProps) {
     const refViewTraining = createRef<ViewTraining>();
     const refViewMoreDetails = createRef<ViewMoreDetails>();
     const refCustomSnackbar = createRef<CustomSnackbarRef>();
+    const refImageViewer = createRef<ImageViewer>();
 
     /* ##### FlatList ##### */
     function _getItemLayout(_i: any, index: number) { return {length: 64, offset: 64 * index, index}; }
@@ -443,6 +445,10 @@ export default React.memo(function Page1(props: IProps) {
     function _controllerSnackbar(text: string) {
         refCustomSnackbar.current?.open(text);
     }
+    function _openViewImage(src: string) {
+        const pSrc = `${HostServer}/images/accounts/${decode(src)}`;
+        refImageViewer.current?.open(pSrc);
+    }
 
     /* ##### UseEffects ##### */
     useEffect(()=>{
@@ -479,7 +485,7 @@ export default React.memo(function Page1(props: IProps) {
                 openAllComment={(data)=>undefined}
                 openAllTrainings={_openAllTrainings}
                 showExternalSnackbar={_controllerSnackbar}
-                viewImage={()=>undefined}
+                viewImage={_openViewImage}
                 openEditClient={_openEditClient}
             />
             <ViewTraining
@@ -487,6 +493,7 @@ export default React.memo(function Page1(props: IProps) {
                 goLoading={loadingController}
                 goMoreDetails={_goMoreDetails}
             />
+            <ImageViewer ref={refImageViewer} />
             <ViewMoreDetails ref={refViewMoreDetails} />
             <LoadingComponent ref={refLoadingComponent} />
             <CustomSnackbar ref={refCustomSnackbar} />

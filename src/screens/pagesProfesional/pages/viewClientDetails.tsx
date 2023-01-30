@@ -15,7 +15,7 @@ type IProps = {
     openAllComment: (data: commentsData[])=>any;
     openAllTrainings: (data: trainings[], accountId: string)=>any;
     showExternalSnackbar: (text: string)=>any;
-    viewImage: ()=>any;
+    viewImage: (src: string)=>void;
     openEditClient: (data: userData)=>void;
 };
 type IState = {
@@ -48,6 +48,7 @@ export default class ViewClietDetails extends Component<IProps, IState> {
         this.getAllTrainings = this.getAllTrainings.bind(this);
         this.goAllComments = this.goAllComments.bind(this);
         this._openEditClient = this._openEditClient.bind(this);
+        this._openViewImage = this._openViewImage.bind(this);
     }
     private deleteClient() {
         this.props.goLoading(true, 'Borrando información del cliente...');
@@ -95,6 +96,9 @@ export default class ViewClietDetails extends Component<IProps, IState> {
     _openEditClient() {
         this.props.openEditClient(this.state.userData!);
     }
+    _openViewImage() {
+        this.props.viewImage(this.state.userData!.image);
+    }
 
     // Controller
     open(userData: userData) {
@@ -116,7 +120,7 @@ export default class ViewClietDetails extends Component<IProps, IState> {
                     </Appbar.Header>
                     <ScrollView style={{ flex: 2, overflow: 'hidden', paddingBottom: 16 }}>
                         <View style={{ padding: 20, height: 140, width: '100%', flexDirection: 'row' }}>
-                            <TouchableOpacity style={styles.imageProfile} onPress={()=>this.props.viewImage()}>
+                            <TouchableOpacity style={styles.imageProfile} onPress={this._openViewImage}>
                                 <Image style={{ width: '100%', height: '100%' }} source={{ uri: (this.state.userData)? `${HostServer}/images/accounts/${decode(this.state.userData.image)}`: ImageProfile }} />
                             </TouchableOpacity>
                             <View style={styles.textProfile}>

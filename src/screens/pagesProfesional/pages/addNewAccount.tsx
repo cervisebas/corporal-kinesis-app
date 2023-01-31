@@ -11,11 +11,10 @@ import ImageProfile from "../../../assets/profile.webp";
 
 const { width } = Dimensions.get('window');
 
-type IProps = {
-    show: boolean;
-    close: ()=>any;
-};
+type IProps = {};
 type IState = {
+    visible: boolean;
+
     name: string;
     dni: string;
     date: string;
@@ -40,6 +39,7 @@ export default class AddNewAccount extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
+            visible: false,
             name: '',
             dni: '',
             date: moment(new Date()).format('DD/MM/YYYY'),
@@ -54,11 +54,12 @@ export default class AddNewAccount extends Component<IProps, IState> {
             dialogErrorView: false,
             dialogErrorMessage: ''
         };
+        this.close = this.close.bind(this);
     }
-    closeModal() {
+    close() {
         if (this.state.isLoading) return ToastAndroid.show('Espere...', ToastAndroid.SHORT);
-        this.props.close();
         this.setState({
+            visible: false,
             name: '',
             dni: '',
             date: moment(new Date()).format('DD/MM/YYYY'),
@@ -103,12 +104,16 @@ export default class AddNewAccount extends Component<IProps, IState> {
                 .catch((error)=>this.setState({ dialogErrorView: true, dialogErrorMessage: error.cause, isLoading: false }));
         });
     }
+
+    // Controller
+    open() { this.setState({ visible: true }); }
+
     render(): React.ReactNode {
-        return(<CustomModal visible={this.props.show} onRequestClose={()=>this.closeModal()} animationIn={'slideInLeft'} animationOut={'slideOutRight'}>
+        return(<CustomModal visible={this.state.visible} onRequestClose={this.close} animationIn={'slideInLeft'} animationOut={'slideOutRight'}>
             <PaperProvider theme={CombinedTheme}>
                 <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background }}>
                     <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
-                        <Appbar.BackAction onPress={()=>this.closeModal()}/>
+                        <Appbar.BackAction onPress={this.close}/>
                         <Appbar.Content title={'Añadir nuevo usuario'} />
                     </Appbar.Header>
                     <KeyboardAvoidingView style={{ flex: 2 }} behavior={'height'} keyboardVerticalOffset={0}>

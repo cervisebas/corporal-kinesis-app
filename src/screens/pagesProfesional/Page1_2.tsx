@@ -24,6 +24,7 @@ import LoadingComponent, { LoadingComponentRef } from "../components/LoadingComp
 import AlertDialog, { AlertDialogRef } from "../components/AlertDialog";
 import CustomSnackbar, { CustomSnackbarRef } from "../components/CustomSnackbar";
 import ImageViewer from "./pages/ImageViewer";
+import DeleteUser, { DeleteUserRef } from "./pages/deleteUser";
 
 const { width } = Dimensions.get('window');
 
@@ -357,6 +358,8 @@ export default React.memo(function Page1(props: IProps) {
     const refImageViewer = createRef<ImageViewer>();
     const refViewComments = createRef<ViewComments>();
     const refSetCommentUser = createRef<SetCommentUser>();
+    const refAddNewAccount = createRef<AddNewAccount>();
+    const refDeleteUser = createRef<DeleteUserRef>();
 
     /* ##### FlatList ##### */
     function _getItemLayout(_i: any, index: number) { return {length: 64, offset: 64 * index, index}; }
@@ -368,7 +371,7 @@ export default React.memo(function Page1(props: IProps) {
             image={item.image}
             title={decode(item.name)}
             onPress={()=>openViewDetailsClient(item.id)}
-            actionDelete={()=>undefined}
+            actionDelete={()=>_deleteUser(item.id)}
             actionComment={()=>_openSetComment(item.id)}
         />);
     }
@@ -457,6 +460,12 @@ export default React.memo(function Page1(props: IProps) {
     function _openSetComment(idClient: string) {
         refSetCommentUser.current?.open(idClient);
     }
+    function _openAddNewAccount() {
+        refAddNewAccount.current?.open();
+    }
+    function _deleteUser(idClient: string) {
+        refDeleteUser.current?.open(idClient);
+    }
 
     /* ##### UseEffects ##### */
     useEffect(()=>{
@@ -503,17 +512,19 @@ export default React.memo(function Page1(props: IProps) {
             <ViewComments ref={refViewComments} goLoading={loadingController} />
             <ImageViewer ref={refImageViewer} />
             <ViewMoreDetails ref={refViewMoreDetails} />
+            <AddNewAccount ref={refAddNewAccount} />
             <LoadingComponent ref={refLoadingComponent} />
             <CustomSnackbar ref={refCustomSnackbar} />
             <Portal>
                 <AlertDialog ref={refAlertDialog} />
                 <SetCommentUser ref={refSetCommentUser} goLoading={loadingController} />
+                <DeleteUser ref={refDeleteUser} goLoading={loadingController} externalSnackbar={_controllerSnackbar} reload={refreshing} />
             </Portal>
             <FAB
                 visible={!loading}
                 icon={'account-plus'}
                 style={styles.fab}
-                onPress={()=>undefined}
+                onPress={_openAddNewAccount}
             />
         </View>
     </View>);

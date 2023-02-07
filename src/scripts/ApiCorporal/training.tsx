@@ -211,14 +211,14 @@ export default class TrainingSystem {
     admin_getEspecificTraining(idTraining: string, idAccount: string): Promise<{ t: DetailsTrainings, c: commentsData | undefined }> {
         return new Promise(async(resolve, reject)=>{
             AsyncStorage.getItem('account_session').then((value)=>{
-                var datas: storageData = JSON.parse(decode(String(value)));
-                axios.post(`${this.urlBase}/index.php`, qs.stringify({ adminGetAllTrainigs: true, email: datas.email, password: datas.password, idAccount }), this.header_access).then((value)=>{
+                const storage: storageData = JSON.parse(decode(String(value)));
+                axios.post(`${this.urlBase}/index.php`, qs.stringify({ adminGetAllTrainigs: true, email: storage.email, password: storage.password, idAccount }), this.header_access).then((value)=>{
                     try {
                         const Comment = new CommentSystem(this.urlBase, this.header_access.headers.Authorization);
-                        var resultTraining: any = undefined;
-                        var datas: trainingsData = value.data;
+                        let resultTraining: any = undefined;
+                        const datas: trainingsData = value.data;
                         if (datas.ok) {
-                            var trainings: any = datas.trainings;
+                            const trainings = datas.trainings!;
                             if (trainings.length == 1) {
                                 resultTraining = {
                                     id: trainings[trainings.length - 1].id,
@@ -233,7 +233,7 @@ export default class TrainingSystem {
                                     exercise: { name: decode(trainings[trainings.length - 1].exercise.name), status: 0, description: decode(trainings[trainings.length - 1].exercise.description) },
                                 };
                             } else {
-                                var searchLocation: any = (datas.trainings)&&datas.trainings.findIndex((value)=>value.id == idTraining);
+                                const searchLocation = datas.trainings!.findIndex((value)=>value.id == idTraining);
                                 resultTraining = {
                                     id: trainings[trainings.length -1].id,
                                     date: { value: decode(trainings[searchLocation].date), status: -1, difference: undefined },
@@ -263,6 +263,8 @@ export default class TrainingSystem {
             }).catch((error)=>reject({ cause: 'Ocurrió un error al intentar consultar a los datos de sesión.', error }));
         });
     }
+
+
     admin_getAllAccount(idAccount: string): Promise<trainings[]> {
         return new Promise((resolve, reject)=>{
             AsyncStorage.getItem('account_session').then((value)=>{

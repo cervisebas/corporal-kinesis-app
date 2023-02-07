@@ -343,8 +343,8 @@ export default React.memo(function Page1(props: IProps) {
     const [refresh, setRefresh] = useState(false);
     const [userList, setUserList] = useState<dataListUsers[]>([]);
     const [excList, setExcList] = useState<dataExercise[]>([]);
+    const [completeList, setCompleteList] = useState<dataListUsers[]>([]);
     // Variables
-    var completeList: dataListUsers[] = [];
     var event: EmitterSubscription | undefined = undefined;
     var actualIDAccount: string = '-1';
     // Ref's
@@ -360,6 +360,7 @@ export default React.memo(function Page1(props: IProps) {
     const refSetCommentUser = createRef<SetCommentUser>();
     const refAddNewAccount = createRef<AddNewAccount>();
     const refDeleteUser = createRef<DeleteUserRef>();
+    const refSearchClient = createRef<SearchClient>();
 
     /* ##### FlatList ##### */
     function _getItemLayout(_i: any, index: number) { return {length: 64, offset: 64 * index, index}; }
@@ -388,7 +389,7 @@ export default React.memo(function Page1(props: IProps) {
         setError(false);
         Account.admin_getListUser()
             .then((data)=>{
-                completeList = data;
+                setCompleteList(data);
                 Options.getAll()
                     .then((opt)=>{
                         var filter = data.filter((vals)=>{
@@ -466,6 +467,9 @@ export default React.memo(function Page1(props: IProps) {
     function _deleteUser(idClient: string) {
         refDeleteUser.current?.open(idClient);
     }
+    function _openSearchView() {
+        refSearchClient.current?.open(completeList);
+    }
 
     /* ##### UseEffects ##### */
     useEffect(()=>{
@@ -491,7 +495,7 @@ export default React.memo(function Page1(props: IProps) {
                 refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={refresh} onRefresh={refreshing} />}
                 ItemSeparatorComponent={_ItemSeparatorComponent}
                 ListEmptyComponent={(loading)? <ShowLoading />: (error)? <CustomShowError message={mError} />: undefined}
-                ListHeaderComponent={<ButtonsHeaderList load={!loading || error} click1={()=>undefined} click2={()=>undefined}/>}
+                ListHeaderComponent={<ButtonsHeaderList load={!loading || error} click1={()=>undefined} click2={_openSearchView} />}
                 renderItem={_renderItem}
             />
             <EditClientProfessional ref={refEditClientProfessional} finish={_reopenViewClient} />
@@ -513,6 +517,16 @@ export default React.memo(function Page1(props: IProps) {
             <ImageViewer ref={refImageViewer} />
             <ViewMoreDetails ref={refViewMoreDetails} />
             <AddNewAccount ref={refAddNewAccount} />
+
+            <SearchClient
+                ref={refSearchClient}
+                goDetailsClient={openViewDetailsClient}
+                showLoading={loadingController}
+                showSnackOut={_controllerSnackbar}
+                deleteAccount={_deleteUser}
+                sendComment={_openSetComment}
+            />
+
             <LoadingComponent ref={refLoadingComponent} />
             <CustomSnackbar ref={refCustomSnackbar} />
             <Portal>
@@ -545,8 +559,8 @@ class ButtonsHeaderList extends PureComponent<{ load: boolean; click1: ()=>any; 
         ToastAndroid.show('No se puede abrir este apartado en este momento...', ToastAndroid.SHORT);
     }
     render(): React.ReactNode {
-        return(<View style={{ ...styles.cardRowContent, width: width }}>
-            <View style={{ ...styles.cardContents, paddingLeft: 8, paddingRight: 5 }}>
+        return(<View style={[styles.cardRowContent, { width: width }]}>
+            <View style={[styles.cardContents, { paddingLeft: 8, paddingRight: 5 }]}>
                 <CustomCard2
                     style={styles.styleCard}
                     icon={'plus'}
@@ -555,7 +569,7 @@ class ButtonsHeaderList extends PureComponent<{ load: boolean; click1: ()=>any; 
                     onPress={(this.props.load)? this.props.click1: this.showMessage}
                 />
             </View>
-            <View style={{ ...styles.cardContents, paddingLeft: 5, paddingRight: 8 }}>
+            <View style={[styles.cardContents, { paddingLeft: 5, paddingRight: 8 }]}>
                 <CustomCard2
                     style={styles.styleCard}
                     icon={'magnify'}

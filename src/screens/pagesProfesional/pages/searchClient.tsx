@@ -80,9 +80,9 @@ export default class SearchClient extends PureComponent<IProps, IState> {
         this.setState({
             visible: true,
             listUsers,
-            listSearch: listUsers
+            listSearch: listUsers,
+            searchQuery: ''
         });
-        console.log(listUsers.length);
     }
     close() {
         this.setState({ visible: false });

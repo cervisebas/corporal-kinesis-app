@@ -49,7 +49,7 @@ export default class CustomDrawerNavegation extends PureComponent<DrawerContentC
                 <View style={{ width: '100%', height: 150, backgroundColor: CombinedTheme.colors.background, position: 'relative', marginBottom: 8, marginTop: -4, overflow: 'hidden' }}>
                     <FastImage source={require('../../assets/background-picture-admin.gif')} style={{ width: '100%', height: '100%', opacity: 0.7 }} resizeMode={'cover'} />
                     <View style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', position: 'absolute', bottom: 18, width: '100%' }}>
-                        <Avatar.Image size={46} source={(this.state.loadingUser)? { uri: this.state.pictureUser }: require('../../assets/profile.png')} style={{ marginLeft: 12 }} />
+                        <Avatar.Image size={46} source={(this.state.loadingUser)? { uri: this.state.pictureUser }: require('../../assets/profile.webp')} style={{ marginLeft: 12 }} />
                         <Title numberOfLines={1} style={{ marginLeft: 12, width: this.state.widht - 78 }}>{this.state.nameUser}</Title>
                     </View>
                 </View>

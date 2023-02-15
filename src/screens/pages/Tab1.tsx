@@ -147,7 +147,7 @@ export class Tab1 extends Component<IProps, IState> {
                     ListEmptyComponent={()=>(!this.state.commentsLoading)? <EmptyListComments message={'No hay comentarios para mostrar'} icon={<NoComment width={96} height={96} />} style={{ marginTop: 32 }} />: <View><ProgressBar indeterminate={true} /></View>}
                     renderItem={({ item })=><CustomCardComments
                         key={`t1-user-${item.id}`}
-                        source={(item.id !== '-1')? { uri: `${HostServer}/images/accounts/${decode(item.accountData.image)}` }: require('../../assets/profile.png')}
+                        source={(item.id !== '-1')? { uri: `${HostServer}/images/accounts/${decode(item.accountData.image)}` }: require('../../assets/profile.webp')}
                         accountName={(item.id !== '-1')? `${decode(item.accountData.name)} (${this.calcYears(decode(item.accountData.birthday))} años)`: decode(item.accountData.name)}
                         edit={item.edit}
                         date={decode(item.date)}

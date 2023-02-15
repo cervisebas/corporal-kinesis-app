@@ -185,7 +185,7 @@ class CustomItemList3 extends PureComponent<IProps8> {
             description={this.props.subtitle}
             onPress={()=>this.props.onPress()}
             style={{ height: 72 }}
-            left={(props)=><Avatar.Image {...props} size={56} source={(!this.props.image)? require('../../assets/profile.png'): { uri: `${HostServer}/images/accounts/${decode(this.props.image)}` }} />}
+            left={(props)=><Avatar.Image {...props} size={56} source={(!this.props.image)? require('../../assets/profile.webp'): { uri: `${HostServer}/images/accounts/${decode(this.props.image)}` }} />}
             right={(props)=><List.Icon {...props} icon={(this.props.type == '0')? 'account-outline': 'shield-crown-outline'} />}
         />);
     }

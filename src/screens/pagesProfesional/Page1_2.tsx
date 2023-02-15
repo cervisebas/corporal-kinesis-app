@@ -361,6 +361,7 @@ export default React.memo(function Page1(props: IProps) {
     const refAddNewAccount = createRef<AddNewAccount>();
     const refDeleteUser = createRef<DeleteUserRef>();
     const refSearchClient = createRef<SearchClient>();
+    const refAddTraining = createRef<AddTraining>();
 
     /* ##### FlatList ##### */
     function _getItemLayout(_i: any, index: number) { return {length: 64, offset: 64 * index, index}; }
@@ -470,6 +471,9 @@ export default React.memo(function Page1(props: IProps) {
     function _openSearchView() {
         refSearchClient.current?.open(completeList);
     }
+    function _openAddTraining() {
+        refAddTraining.current?.open();
+    }
 
     /* ##### UseEffects ##### */
     useEffect(()=>{
@@ -495,7 +499,7 @@ export default React.memo(function Page1(props: IProps) {
                 refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={refresh} onRefresh={refreshing} />}
                 ItemSeparatorComponent={_ItemSeparatorComponent}
                 ListEmptyComponent={(loading)? <ShowLoading />: (error)? <CustomShowError message={mError} />: undefined}
-                ListHeaderComponent={<ButtonsHeaderList load={!loading || error} click1={()=>undefined} click2={_openSearchView} />}
+                ListHeaderComponent={<ButtonsHeaderList load={!loading || error} click1={_openAddTraining} click2={_openSearchView} />}
                 renderItem={_renderItem}
             />
             <EditClientProfessional ref={refEditClientProfessional} finish={_reopenViewClient} />
@@ -525,6 +529,12 @@ export default React.memo(function Page1(props: IProps) {
                 showSnackOut={_controllerSnackbar}
                 deleteAccount={_deleteUser}
                 sendComment={_openSetComment}
+            />
+            <AddTraining
+                ref={refAddTraining}
+                listUsers={completeList}
+                listExercise={excList}
+                openUserSelect={()=>undefined}
             />
 
             <LoadingComponent ref={refLoadingComponent} />

@@ -18,15 +18,13 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 const { width } = Dimensions.get('window');
 
 type IProps = {
-    show: boolean;
-    close: ()=>any;
     listUsers: dataListUsers[];
     listExercise: dataExercise[];
-    userSelect: { id: string; name: string; } | undefined;
-    openUserSelect: ()=>any;
-    clearUserSelect: ()=>any;
+    openUserSelect: ()=>void;
 };
 type IState = {
+    visible: boolean;
+
     rds: string;
     rpe: string;
     pulse: string;
@@ -51,11 +49,14 @@ type IState = {
     snackBarText: string;
 
     comment: string;
+
+    userSelect: { id: string; name: string; } | undefined;
 };
 export default class AddTraining extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
+            visible: false,
             rds: '-',
             rpe: '-',
             pulse: '0',
@@ -76,9 +77,11 @@ export default class AddTraining extends Component<IProps, IState> {
             successShow: false,
             snackBarView: false,
             snackBarText: '',
-            comment: ''
+            comment: '',
+            userSelect: undefined
         };
         moment.locale('es');
+        this.close = this.close.bind(this);
     }
     startCalculate() {
         if (this.state.repetitions.length !== 0 && this.state.kilage.length !== 0) {
@@ -95,33 +98,8 @@ export default class AddTraining extends Component<IProps, IState> {
             }
         }
     }
-    closeModal() {
-        if (this.state.isSendResults) return ToastAndroid.show('Espere...', ToastAndroid.SHORT);
-        this.props.clearUserSelect();
-        this.setState({
-            rds: '-',
-            rpe: '-',
-            pulse: '0',
-            repetitions: '0',
-            kilage: '0',
-            tonnage: '0',
-            exerciseId: '-1',
-            rir: '-',
-            shoelaces: '-',
-            date: new Date(),
-            dateActual: moment(new Date()).format('DD/MM/YYYY'),
-            technique: '-',
-            viewDialogDate: false,
-            isSendResults: false,
-            showError: false,
-            messageError: '',
-            successShow: false,
-            comment: ''
-        });
-        return this.props.close();
-    }
     verifyInputs() {
-        if (this.props.userSelect == undefined) {
+        if (this.state.userSelect == undefined) {
             this.setState({ snackBarView: true, snackBarText: 'Selecciona un cliente.' });
             return false;
         }
@@ -170,11 +148,11 @@ export default class AddTraining extends Component<IProps, IState> {
     sendResults() {
         if (!this.verifyInputs()) return;
         this.setState({ isSendResults: true, buttonSendText: 'Enviando...' }, ()=>
-            Training.create((this.props.userSelect)? this.props.userSelect.id: '-1', this.state.exerciseId, this.state.dateActual, this.state.rds, this.state.rpe, this.state.pulse, this.state.repetitions, this.state.kilage, this.state.tonnage).then((idTrainingGet)=>{
+            Training.create(this.state.userSelect!.id, this.state.exerciseId, this.state.dateActual, this.state.rds, this.state.rpe, this.state.pulse, this.state.repetitions, this.state.kilage, this.state.tonnage).then((idTrainingGet)=>{
                 var comment: string = `
                     Observaciones: ${moment(this.state.date).format('dddd D [de] MMMM [del] YYYY')}\n   • Ejercicio realizado: ${decode(String(this.props.listExercise.find((e)=>e.id == this.state.exerciseId)?.name))}\n   • RIR: ${this.state.rir}\n   • Agujetas: ${this.state.shoelaces}\n   • Técnica realizada: ${this.state.technique}\n\nObservaciones del entrenador:\n${this.state.comment}
                 `.trimStart().trimEnd();
-                Comment.admin_create((this.props.userSelect)? this.props.userSelect.id: '-1', encode(utf8.encode(comment)), idTrainingGet).then(()=>this.setState({
+                Comment.admin_create(this.state.userSelect!.id, encode(utf8.encode(comment)), idTrainingGet).then(()=>this.setState({
                     isSendResults: false,
                     buttonSendText: 'Enviar',
                     successShow: true,
@@ -191,7 +169,7 @@ export default class AddTraining extends Component<IProps, IState> {
                     dateActual: moment(new Date()).format('DD/MM/YYYY'),
                     technique: '-',
                     comment: ''
-                }, ()=>this.props.clearUserSelect())).catch((error)=>this.setState({
+                })).catch((error)=>this.setState({
                     isSendResults: false,
                     buttonSendText: 'Enviar',
                     showError: true,
@@ -205,19 +183,42 @@ export default class AddTraining extends Component<IProps, IState> {
             }))
         );
     }
-    loadStart() {
-        this.props.clearUserSelect();
-        this.setState({ exerciseId: '-1' });
-    }
     processTextInput(str: string) {
         return (str.length == 0)? '0': (str.charAt(0) == '0')? (str.slice(1) == ' ')? '0': str.slice(1).replace(/\ /gi, ''): str.replace(/\ /gi, '');
     }
+
+    // Controller
+    open() {
+        this.setState({
+            visible: true,
+            isSendResults: false,
+            buttonSendText: 'Enviar',
+            successShow: true,
+            rds: '-',
+            rpe: '-',
+            pulse: '0',
+            repetitions: '0',
+            kilage: '0',
+            tonnage: '0',
+            exerciseId: '-1',
+            rir: '-',
+            shoelaces: '-',
+            date: new Date(),
+            dateActual: moment(new Date()).format('DD/MM/YYYY'),
+            technique: '-',
+            comment: ''
+        });
+    }
+    close() {
+        this.setState({ visible: false });
+    }
+
     render(): React.ReactNode {
-        return(<CustomModal visible={this.props.show} onShow={()=>this.loadStart()} onRequestClose={()=>this.closeModal()}>
+        return(<CustomModal visible={this.state.visible} onRequestClose={this.close}>
             <PaperProvider theme={CombinedTheme}>
                 <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background }}>
                     <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
-                        <Appbar.BackAction onPress={()=>this.closeModal()} />
+                        <Appbar.BackAction onPress={this.close} />
                         <Appbar.Content title={'Cargar entrenamiento'}/>
                     </Appbar.Header>
                     <ScrollView>
@@ -232,8 +233,8 @@ export default class AddTraining extends Component<IProps, IState> {
                                 value={this.state.dateActual}/>
                             <SelectUser
                                 styles={styles.textInput}
-                                data={this.props.userSelect}
-                                onPress={()=>this.props.openUserSelect()}
+                                data={this.state.userSelect}
+                                onPress={this.props.openUserSelect}
                             />
                             <CustomPicker4 disabled={this.state.isSendResults} style={{ width: Math.floor(width - 24), margin: 8 }} title={"Ejercicio:"} value={this.state.exerciseId} onChange={(value)=>this.setState({ exerciseId: value })}>
                                 <Picker.Item label={'- Seleccionar -'} value={'-1'} />

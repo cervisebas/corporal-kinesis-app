@@ -362,6 +362,7 @@ export default React.memo(function Page1(props: IProps) {
     const refDeleteUser = createRef<DeleteUserRef>();
     const refSearchClient = createRef<SearchClient>();
     const refAddTraining = createRef<AddTraining>();
+    const refSelectClient = createRef<SelectClient>();
 
     /* ##### FlatList ##### */
     function _getItemLayout(_i: any, index: number) { return {length: 64, offset: 64 * index, index}; }
@@ -474,6 +475,12 @@ export default React.memo(function Page1(props: IProps) {
     function _openAddTraining() {
         refAddTraining.current?.open();
     }
+    function _updateUserSelect(data: { id: string; name: string; }) {
+        refAddTraining.current?.update(data);
+    }
+    function _openSelectClient() {
+        refSelectClient.current?.open();
+    }
 
     /* ##### UseEffects ##### */
     useEffect(()=>{
@@ -534,7 +541,12 @@ export default React.memo(function Page1(props: IProps) {
                 ref={refAddTraining}
                 listUsers={completeList}
                 listExercise={excList}
-                openUserSelect={()=>undefined}
+                openUserSelect={_openSelectClient}
+            />
+            <SelectClient
+                ref={refSelectClient}
+                dataUser={completeList}
+                onSelect={_updateUserSelect}
             />
 
             <LoadingComponent ref={refLoadingComponent} />

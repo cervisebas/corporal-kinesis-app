@@ -168,7 +168,8 @@ export default class AddTraining extends Component<IProps, IState> {
                     date: new Date(),
                     dateActual: moment(new Date()).format('DD/MM/YYYY'),
                     technique: '-',
-                    comment: ''
+                    comment: '',
+                    userSelect: undefined
                 })).catch((error)=>this.setState({
                     isSendResults: false,
                     buttonSendText: 'Enviar',
@@ -193,7 +194,7 @@ export default class AddTraining extends Component<IProps, IState> {
             visible: true,
             isSendResults: false,
             buttonSendText: 'Enviar',
-            successShow: true,
+            successShow: false,
             rds: '-',
             rpe: '-',
             pulse: '0',
@@ -206,8 +207,12 @@ export default class AddTraining extends Component<IProps, IState> {
             date: new Date(),
             dateActual: moment(new Date()).format('DD/MM/YYYY'),
             technique: '-',
-            comment: ''
+            comment: '',
+            userSelect: undefined
         });
+    }
+    update(userSelect: { id: string; name: string; }) {
+        this.setState({ userSelect });
     }
     close() {
         this.setState({ visible: false });

@@ -9,12 +9,11 @@ import { CustomShowError } from "../../components/Components";
 import CustomModal from "../../components/CustomModal";
 
 type IProps = {
-    visible: boolean;
-    close: ()=>any;
     dataUser: dataListUsers[];
-    onSelect: (data: { id: string, name: string })=>any;
+    onSelect: (data: { id: string, name: string })=>void;
 };
 type IState = {
+    visible: boolean;
     searchQuery: string;
     listUsers: dataListUsers[];
 };
@@ -24,11 +23,13 @@ export default class SelectClient extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
+            visible: false,
             listUsers: [],
             searchQuery: ''
         };
         this._renderItem = this._renderItem.bind(this);
         this.loadData = this.loadData.bind(this);
+        this.close = this.close.bind(this);
     }
 
     /*###### Search Control ######*/
@@ -55,10 +56,14 @@ export default class SelectClient extends Component<IProps, IState> {
         return(<List.Item
             title={decode(item.name)}
             left={(props)=><List.Icon {...props} icon={'account-outline'} />}
-            onPress={()=>this.props.onSelect({ id: item.id, name: decode(item.name) })}
+            onPress={()=>this.select(item)}
         />);
     }
     /*##############################*/
+    select(item: dataListUsers) {
+        this.props.onSelect({ id: item.id, name: decode(item.name) });
+        this.close();
+    }
 
     loadData() {
         this.setState({
@@ -68,20 +73,24 @@ export default class SelectClient extends Component<IProps, IState> {
     }
 
     componentDidUpdate() {
-        if (!this.props.visible && this.state.listUsers.length !== 0) {
+        if (!this.state.visible && this.state.listUsers.length !== 0) {
             this.setState({ listUsers: [] });
         }
     }
 
+    // Controller
+    open() { this.setState({ visible: true }); }
+    close() { this.setState({ visible: false }); }
+
     render(): React.ReactNode {
-        return(<CustomModal visible={this.props.visible} onShow={this.loadData} onRequestClose={()=>this.props.close()} animationIn={'slideInLeft'} animationOut={'slideOutRight'}>
+        return(<CustomModal visible={this.state.visible} onShow={this.loadData} onRequestClose={this.close} animationIn={'slideInLeft'} animationOut={'slideOutRight'}>
             <View style={{ ...styles.content, backgroundColor: CombinedTheme.colors.background }}>
                 <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
-                    <Appbar.BackAction onPress={()=>this.props.close()} />
+                    <Appbar.BackAction onPress={this.close} />
                     <Appbar.Content title={'Seleccionar cliente'} />
                 </Appbar.Header>
                 <View>
-                    {(this.props.visible)&&<FlatList
+                    {(this.state.visible)&&<FlatList
                         data={this.state.listUsers}
                         keyExtractor={this._keyExtractor}
                         getItemLayout={this._getItemLayout}

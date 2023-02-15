@@ -43,9 +43,10 @@ export class VerifyScreen extends Component<IProps, IState> {
             <PaperProvider theme={CombinedTheme}>
                 <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background, position: 'relative' }}>
                     <LinearGradient colors={['#100E20', '#15122A', '#1663AB']}>
-                        <View style={{ ...styles.contain, width: '100%', height: '100%' }}>
+                        <View style={[styles.contain, { width: '100%', height: '100%' }]}>
                             <FastImage
                                 source={LogoImage}
+                                resizeMode={'contain'}
                                 style={getForPercentScale(Dimensions.get('window').width, 925, 1160, 70)}
                             />
                         </View>

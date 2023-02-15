@@ -76,6 +76,6 @@ const styles = StyleSheet.create({
     textIndicator: {
         color: '#FFFFFF',
         fontSize: 16,
-        marginTop: 12
+        marginTop: 24
     }
 });

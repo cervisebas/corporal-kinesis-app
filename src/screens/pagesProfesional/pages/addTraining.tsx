@@ -82,6 +82,7 @@ export default class AddTraining extends Component<IProps, IState> {
         };
         moment.locale('es');
         this.close = this.close.bind(this);
+        this.startCalculate = this.startCalculate.bind(this);
     }
     startCalculate() {
         if (this.state.repetitions.length !== 0 && this.state.kilage.length !== 0) {
@@ -266,7 +267,7 @@ export default class AddTraining extends Component<IProps, IState> {
                                 keyboardType={'decimal-pad'}
                                 value={this.state.repetitions}
                                 disabled={this.state.isSendResults}
-                                onChangeText={(text)=>this.setState({ repetitions: this.processTextInput(text) }, ()=>this.startCalculate())} />
+                                onChangeText={(text)=>this.setState({ repetitions: this.processTextInput(text) }, this.startCalculate)} />
                             <TextInput
                                 style={styles.textInput}
                                 mode={'outlined'}
@@ -274,7 +275,7 @@ export default class AddTraining extends Component<IProps, IState> {
                                 keyboardType={'decimal-pad'}
                                 value={this.state.kilage}
                                 disabled={this.state.isSendResults}
-                                onChangeText={(text)=>this.setState({ kilage: this.processTextInput(text) }, ()=>this.startCalculate())} />
+                                onChangeText={(text)=>this.setState({ kilage: this.processTextInput(text) }, this.startCalculate)} />
                             <Pressable onPress={()=>ToastAndroid.show('Este campo es automático, no hace falta editarlo.', ToastAndroid.SHORT)}>
                                 <TextInput
                                     style={styles.textInput}
@@ -400,7 +401,7 @@ class SelectUser extends PureComponent<IProps2> {
         padding: 8
     };
     render(): React.ReactNode {
-        return(<TouchableRipple onPress={()=>(this.props.onPress)&&this.props.onPress()} style={[this.styles, this.props.styles]}>
+        return(<TouchableRipple onPress={this.props.onPress} style={[this.styles, this.props.styles]}>
             <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
                 <Text>Cliente:</Text>
                 <Text style={{ flex: 2, marginLeft: 32, fontSize: 16 }}>{(this.props.data)? this.props.data.name: '- Seleccionar -'}</Text>

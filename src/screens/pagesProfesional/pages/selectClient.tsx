@@ -72,12 +72,6 @@ export default class SelectClient extends Component<IProps, IState> {
         });
     }
 
-    componentDidUpdate() {
-        if (!this.state.visible && this.state.listUsers.length !== 0) {
-            this.setState({ listUsers: [] });
-        }
-    }
-
     // Controller
     open() { this.setState({ visible: true }); }
     close() { this.setState({ visible: false }); }
@@ -90,7 +84,7 @@ export default class SelectClient extends Component<IProps, IState> {
                     <Appbar.Content title={'Seleccionar cliente'} />
                 </Appbar.Header>
                 <View>
-                    {(this.state.visible)&&<FlatList
+                    <FlatList
                         data={this.state.listUsers}
                         keyExtractor={this._keyExtractor}
                         getItemLayout={this._getItemLayout}
@@ -106,7 +100,7 @@ export default class SelectClient extends Component<IProps, IState> {
                         ItemSeparatorComponent={()=><Divider />}
                         ListEmptyComponent={<CustomShowError message={'Lista vacia'} />}
                         renderItem={this._renderItem}
-                    />}
+                    />
                 </View>
             </View>
         </CustomModal>);

@@ -121,7 +121,7 @@ export default class EditAccount extends Component<IProps, IState> {
                 <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
                     <Appbar.BackAction onPress={this.props.close} />
                     <Appbar.Content title="Editar datos" />
-                    <Appbar.Action icon={'check-outline'} onPress={this.modifyNow} />
+                    <Appbar.Action icon={'check'} onPress={this.modifyNow} />
                 </Appbar.Header>
                 {(this.props.datas)&&<ScrollView>
                     <View style={{ width: '100%', height: 180, justifyContent: 'center', alignItems: 'center' }}>

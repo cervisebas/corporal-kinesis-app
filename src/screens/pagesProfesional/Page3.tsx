@@ -112,7 +112,10 @@ export default class Page3 extends Component<IProps, IState> {
                         index,
                     })}
                     removeClippedSubviews={true}
-                    contentContainerStyle={{ flex: (this.state.isLoading || this.state.isError)? 3: undefined }}
+                    contentContainerStyle={{
+                        flex: (this.state.isLoading || this.state.isError)? 3: undefined,
+                        paddingBottom: 90
+                    }}
                     refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={this.state.refreshing} onRefresh={()=>this.setState({ refreshing: true }, ()=>this.loadData())} />}
                     ItemSeparatorComponent={(props)=><Divider {...props} />}
                     ListEmptyComponent={(this.state.isLoading)? <ShowLoading />: (this.state.isError)? <CustomShowError message={this.state.messageError} />: <></>}

@@ -70,6 +70,7 @@ export default React.memo(function Client(props: IProps) {
             navigationState={{ index, routes }}
             onIndexChange={setIndex}
             renderScene={renderScene}
+            sceneAnimationEnabled={true}
             barStyle={{ backgroundColor: '#1663AB' }}
         />
         <FAB

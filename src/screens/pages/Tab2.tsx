@@ -51,6 +51,7 @@ export class Tab2 extends Component<IProps, IState> {
             snackbarText: '',
             isLoading: false
         };
+        this.openEditAccount = this.openEditAccount.bind(this);
     }
     private event: EmitterSubscription | null = null;
     loadData() {
@@ -99,7 +100,7 @@ export class Tab2 extends Component<IProps, IState> {
         return(<View style={{ flex: 1 }}>
             <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
                 <Appbar.Content title={"Mi cuenta"} />
-                <Appbar.Action icon={'cog'} onPress={()=>this.props.openOptions()} />
+                <Appbar.Action icon={'cog'} onPress={this.props.openOptions} />
             </Appbar.Header>
             <View style={{ flex: 2 }}>
                 <View style={{ width: '100%', height: 120, marginTop: 8, flexDirection: 'row' }}>
@@ -145,7 +146,7 @@ export class Tab2 extends Component<IProps, IState> {
                     visible={this.state.editVisible}
                     close={()=>this.setState({ editVisible: false, editData: undefined })}
                     datas={this.state.editData}
-                    showLoading={(s, t)=>this.props.showLoading(s, t)}
+                    showLoading={this.props.showLoading}
                     showSnackBar={(s, t)=>this.setState({ snakbarVisible: s, snackbarText: t })}
                 />
             </View>

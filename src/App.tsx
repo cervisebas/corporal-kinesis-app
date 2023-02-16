@@ -9,13 +9,14 @@ import Profesional from './screens/profesional';
 import CombinedTheme from './Theme';
 import { Account, ChangeLogSystem, Notification } from './scripts/ApiCorporal';
 import { ExtraContents } from './ExtraContents';
-import SplashScreen from 'react-native-splash-screen';
+import RNSplashScreen from 'react-native-splash-screen';
 import { setLoadNow } from './scripts/Global';
 import DeviceInfo from "react-native-device-info";
 import { decode } from 'base-64';
 import { getNavigationBarHeight } from 'react-native-android-navbar-height';
 import VersionCheck from 'react-native-version-check';
 import 'react-native-gesture-handler';
+import SplashScreen from './screens/SplashScreen';
 
 type IProps = {};
 type IState = {
@@ -39,7 +40,7 @@ export default class App extends PureComponent<IProps, IState> {
             marginTop: 0,
             marginBottom: 0,
             openSession: false,
-            showVerify: true,
+            showVerify: false,
             textAnimVerify: undefined,
             changeLoadView: false,
             viewDialogUpdate: false,
@@ -50,6 +51,7 @@ export default class App extends PureComponent<IProps, IState> {
     private event: EmitterSubscription | null = null;
     private event2: EmitterSubscription | null = null;
     verifyAccount() {
+        this.setState({ showVerify: true });
         Account.verify().then((value)=>{
             if (value) this.setState({ textAnimVerify: `Accediendo como "${decode(value.email).slice(0, 5)}...${decode(value.email).slice(decode(value.email).indexOf('@'), decode(value.email).length)}"` });
             setTimeout(()=>this.setState({ openSession: !value, showVerify: false }, ()=>(value) && setLoadNow(true)), 2500);
@@ -60,13 +62,13 @@ export default class App extends PureComponent<IProps, IState> {
         });
     }
     componentDidMount() {
-        setTimeout(SplashScreen.hide, 128);
+        //setTimeout(RNSplashScreen.hide, 128);
         SystemNavigationBar.setNavigationColor('#0f4577', 'light', 'navigation');
-        this.verifyAccount();
+        //this.verifyAccount();
         this.event = DeviceEventEmitter.addListener('nowVerify', this.verifyAccount);
         this.event2 = DeviceEventEmitter.addListener('openChangeLog', ()=>this.setState({ changeLoadView: true }));
         Notification.init();
-        (!__DEV__)&&VersionCheck.needUpdate({ ignoreErrors: true }).then((value)=>(value.isNeeded)&&this.setState({ viewDialogUpdate: true, storeUrl: value.storeUrl }));
+        VersionCheck.needUpdate({ ignoreErrors: true }).then((value)=>(value.isNeeded)&&this.setState({ viewDialogUpdate: true, storeUrl: value.storeUrl }));
         console.log(`Dev Mode: ${__DEV__}`);
         setTimeout(async() =>(await DeviceInfo.getApiLevel() < 26) && this.setState({ marginTop: StatusBar.currentHeight || 24, marginBottom: await getNavigationBarHeight() }));
     }
@@ -92,6 +94,7 @@ export default class App extends PureComponent<IProps, IState> {
                         closeDialogUpdate={()=>this.setState({ viewDialogUpdate: false })}
                         storeUrl={this.state.storeUrl}
                     />
+                    <SplashScreen init={this.verifyAccount} />
                     <Stack.Navigator initialRouteName="c" screenOptions={{ headerShown: false, animation: 'fade_from_bottom', gestureEnabled: false }} >
                         <Stack.Screen name="c" component={Client} />
                         <Stack.Screen name="p" component={Profesional} />

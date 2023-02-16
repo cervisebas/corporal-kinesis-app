@@ -8,11 +8,16 @@ type IProps = {
     visible: boolean;
     onShow?: ()=>any;
     onClose?: ()=>any;
+    onRequestClose?: ()=>any;
     animationIn?: ExtractProps<Modal>['animationIn'];
     animationOut?: ExtractProps<Modal>['animationOut'];
-    onRequestClose?: ()=>any;
+    removeAnimationIn?: boolean;
+    removeAnimationOut?: boolean;
+    animationInTiming?: number;
+    animationOutTiming?: number;
     style?: StyleProp<ViewStyle>;
     transparent?: boolean;
+    coverScreen?: boolean;
 };
 type IState = {};
 
@@ -23,26 +28,27 @@ export default class CustomModal extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
     }
-    onShow() { if (this.props.onShow) this.props.onShow(); }
-    onRequestClose() { if (this.props.onRequestClose) this.props.onRequestClose(); }
-    onClose() { if (this.props.onClose) this.props.onClose(); }
     render(): React.ReactNode {
         return(<Modal
             isVisible={this.props.visible}
-            animationIn={(this.props.animationIn)? this.props.animationIn: 'fadeInUp'}
-            animationInTiming={250}
-            animationOut={(this.props.animationOut)? this.props.animationOut: 'fadeOutDown'}
-            animationOutTiming={250}
-            onBackButtonPress={()=>this.onRequestClose()}
-            onBackdropPress={()=>this.onRequestClose()}
-            onModalWillShow={()=>this.onShow()}
-            onModalHide={()=>this.onClose()}
+            // Animation In
+            animationIn={(this.props.removeAnimationIn)? { from: { opacity: 1 }, to: { opacity: 1 } }: (this.props.animationIn)? this.props.animationIn: 'fadeInUp'}
+            animationInTiming={(this.props.removeAnimationIn)? 0: (!this.props.animationInTiming)? 250: this.props.animationInTiming}
+            // Animation Out
+            animationOut={(this.props.removeAnimationOut)? { from: { opacity: 0 }, to: { opacity: 0 } }: (this.props.animationOut)? this.props.animationOut: 'fadeOutDown'}
+            animationOutTiming={(this.props.removeAnimationOut)? 0: (!this.props.animationOutTiming)? 250: this.props.animationOutTiming}
+            // Others
+            onBackButtonPress={this.props.onRequestClose}
+            onBackdropPress={this.props.onRequestClose}
+            onModalWillShow={this.props.onShow}
+            onModalHide={this.props.onClose}
             useNativeDriver={true}
             useNativeDriverForBackdrop={true}
             backdropOpacity={(this.props.transparent)? 0: undefined}
             backdropColor={'#121212'}
             deviceWidth={width}
             deviceHeight={height}
+            coverScreen={this.props.coverScreen}
             style={[this.props.style, { margin: 0 }]}>
             {this.props.children}
         </Modal>);

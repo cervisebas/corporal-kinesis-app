@@ -1,5 +1,8 @@
 import moment from "moment";
 
+export function waitTo(time: number): Promise<void> {
+    return new Promise((resolve)=>setTimeout(resolve, time));
+}
 export function calcYears(date: string): string {
     let dateNow = new Date();
     let processDate = moment(date, 'DD-MM-YYYY').toDate();

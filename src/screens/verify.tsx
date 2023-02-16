@@ -39,7 +39,7 @@ export class VerifyScreen extends Component<IProps, IState> {
         }
     }
     render(): React.ReactNode {
-        return(<CustomModal visible={true} animationIn={'fadeIn'} animationOut={'fadeOut'}>
+        return(<CustomModal visible={this.props.visible} animationIn={'fadeIn'} animationOut={'fadeOut'}>
             <PaperProvider theme={CombinedTheme}>
                 <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background, position: 'relative' }}>
                     <LinearGradient colors={['#100E20', '#15122A', '#1663AB']}>

@@ -71,7 +71,7 @@ export default class ViewMoreDetails extends PureComponent<IProps, IState> {
                             <View style={{ marginLeft: 8, marginBottom: 16 }}><Text style={{ fontSize: 18 }}>Comentario:</Text></View>
                             <CustomCardComments
                                 source={{ uri: `${HostServer}/images/accounts/${decode(this.props.commentData?.accountData.image)}` }}
-                                accountName={`${decode(this.props.commentData?.accountData.name)} (${this.calcYears(decode(this.props.commentData?.accountData.birthday))} años)`}
+                                accountName={`${decode(this.props.commentData?.accountData.name)}`}
                                 edit={this.props.commentData?.edit}
                                 date={decode(this.props.commentData?.date)}
                                 comment={decodeUtf8(decode(this.props.commentData?.comment))}

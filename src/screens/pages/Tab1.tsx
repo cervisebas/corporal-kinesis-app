@@ -148,7 +148,7 @@ export class Tab1 extends Component<IProps, IState> {
                     renderItem={({ item })=><CustomCardComments
                         key={`t1-user-${item.id}`}
                         source={(item.id !== '-1')? { uri: `${HostServer}/images/accounts/${decode(item.accountData.image)}` }: require('../../assets/profile.webp')}
-                        accountName={(item.id !== '-1')? `${decode(item.accountData.name)} (${this.calcYears(decode(item.accountData.birthday))} años)`: decode(item.accountData.name)}
+                        accountName={(item.id !== '-1')? `${decode(item.accountData.name)}`: decode(item.accountData.name)}
                         edit={item.edit}
                         date={decode(item.date)}
                         comment={decodeUtf8(decode(item.comment))}

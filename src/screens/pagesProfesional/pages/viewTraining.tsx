@@ -116,8 +116,12 @@ export default class ViewTraining extends Component<IProps, IState> {
     _renderTab(value: dataTabTraining) {
         return(<Tab.Screen
             key={`tab-training-${value.id}`}
-            name={value.title}
-            children={()=><ViewTrainingPage data={value.data} goMoreDetails={this.goMoreDetails} deleteItem={this._deleteItem} />}
+            name={`${value.title} (${value.data.length})`}
+            children={()=><ViewTrainingPage
+                data={value.data}
+                goMoreDetails={this.goMoreDetails}
+                deleteItem={this._deleteItem}
+            />}
         />);
     }
 

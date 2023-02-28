@@ -233,19 +233,39 @@ export default class TrainingSystem {
                                     exercise: { name: decode(trainings[trainings.length - 1].exercise.name), status: 0, description: decode(trainings[trainings.length - 1].exercise.description) },
                                 };
                             } else {
-                                const searchLocation = datas.trainings!.findIndex((value)=>value.id == idTraining);
-                                resultTraining = {
-                                    id: trainings[trainings.length -1].id,
-                                    date: { value: decode(trainings[searchLocation].date), status: -1, difference: undefined },
-                                    session_number: { value: decode(trainings[searchLocation].session_number), status: -1, difference: undefined },
-                                    rds: { value: decode(trainings[searchLocation].rds), status: this.calculate('RDS', parseOrUndefinded((trainings[searchLocation - 1])&&trainings[searchLocation - 1].rds), parseFloat(decode(trainings[searchLocation].rds))), difference: this.calculate2('RDS', parseOrUndefinded((trainings[searchLocation - 1])&&trainings[searchLocation - 1].rds), parseFloat(decode(trainings[searchLocation].rds))) },
-                                    rpe: { value: decode(trainings[searchLocation].rpe), status: this.calculate('RPE', parseOrUndefinded((trainings[searchLocation - 1])&&trainings[searchLocation - 1].rpe), parseFloat(decode(trainings[searchLocation].rpe))), difference: this.calculate2('RPE', parseOrUndefinded((trainings[searchLocation - 1])&&trainings[searchLocation - 1].rpe), parseFloat(decode(trainings[searchLocation].rpe))) },
-                                    pulse: { value: decode(trainings[searchLocation].pulse), status: this.calculate('Pulso', parseOrUndefinded((trainings[searchLocation - 1])&&trainings[searchLocation - 1].pulse), parseFloat(decode(trainings[searchLocation].pulse))), difference: this.calculate2('Pulso', parseOrUndefinded((trainings[searchLocation - 1])&&trainings[searchLocation - 1].pulse), parseFloat(decode(trainings[searchLocation].pulse))) },
-                                    repetitions: { value: decode(trainings[searchLocation].repetitions), status: this.calculate('RDS', parseOrUndefinded((trainings[searchLocation - 1])&&trainings[searchLocation - 1].repetitions), parseFloat(decode(trainings[searchLocation].repetitions))), difference: this.calculate2('RDS', parseOrUndefinded((trainings[searchLocation - 1])&&trainings[searchLocation - 1].repetitions), parseFloat(decode(trainings[searchLocation].repetitions))) },
-                                    kilage: { value: decode(trainings[searchLocation].kilage), status: this.calculate('Kilaje', parseOrUndefinded((trainings[searchLocation - 1])&&trainings[searchLocation - 1].kilage), parseFloat(decode(trainings[searchLocation].kilage))), difference: this.calculate2('Kilaje', parseOrUndefinded((trainings[searchLocation - 1])&&trainings[searchLocation - 1].kilage), parseFloat(decode(trainings[searchLocation].kilage))) },
-                                    tonnage: { value: decode(trainings[searchLocation].tonnage), status: this.calculate('Tonelaje', parseOrUndefinded((trainings[searchLocation - 1])&&trainings[searchLocation - 1].tonnage), parseFloat(decode(trainings[searchLocation].tonnage))), difference: this.calculate2('Tonelaje', parseOrUndefinded((trainings[searchLocation - 1])&&trainings[searchLocation - 1].tonnage), parseFloat(decode(trainings[searchLocation].tonnage))) },
-                                    exercise: { name: decode(trainings[searchLocation].exercise.name), status: 0, description: decode(trainings[searchLocation].exercise.description) },
+                                const that = trainings!.find((value)=>value.id == idTraining);
+                                const filterFormExercise = trainings!.filter((v)=>v.exercise.id == that?.exercise.id);
+                                const _default = {
+                                    id: that!.id,
+                                    date: { value: decode(that!.date), status: -1, difference: -9999999999 },
+                                    session_number: { value: decode(that!.session_number), status: -1, difference: -9999999999 },
+                                    rds: { value: decode(that!.rds), status: 0, difference: -9999999999 },
+                                    rpe: { value: decode(that!.rpe), status: 0, difference: -9999999999 },
+                                    pulse: { value: decode(that!.pulse), status: 0, difference: -9999999999 },
+                                    repetitions: { value: decode(that!.repetitions), status: 0, difference: -9999999999 },
+                                    kilage: { value: decode(that!.kilage), status: 0, difference: -9999999999 },
+                                    tonnage: { value: decode(that!.tonnage), status: 0, difference: -9999999999 },
+                                    exercise: { name: decode(that!.exercise.name), status: 0, description: decode(trainings[trainings.length - 1].exercise.description) }
                                 };
+                                if (filterFormExercise.length == 1) resultTraining = _default; else {
+                                    const findIndexTraining = filterFormExercise.findIndex((v)=>v.id == idTraining);
+                                    if (filterFormExercise[findIndexTraining - 1]?.id == undefined) resultTraining = _default; else {
+                                        const nextTraining = filterFormExercise[findIndexTraining - 1];
+                                        const backTraining = filterFormExercise[findIndexTraining];
+                                        resultTraining = {
+                                            id: nextTraining.id,
+                                            date: { value: decode(nextTraining.date), status: -1, difference: undefined },
+                                            session_number: { value: decode(nextTraining.session_number), status: -1, difference: undefined },
+                                            rds: { value: decode(nextTraining.rds), status: this.calculate('RDS', parseOrUndefinded(nextTraining.rds), parseFloat(decode(backTraining.rds))), difference: this.calculate2('RDS', parseOrUndefinded(nextTraining.rds), parseFloat(decode(backTraining.rds))) },
+                                            rpe: { value: decode(nextTraining.rpe), status: this.calculate('RPE', parseOrUndefinded(nextTraining.rpe), parseFloat(decode(backTraining.rpe))), difference: this.calculate2('RPE', parseOrUndefinded(nextTraining.rpe), parseFloat(decode(backTraining.rpe))) },
+                                            pulse: { value: decode(nextTraining.pulse), status: this.calculate('Pulso', parseOrUndefinded(nextTraining.pulse), parseFloat(decode(backTraining.pulse))), difference: this.calculate2('Pulso', parseOrUndefinded(nextTraining.pulse), parseFloat(decode(backTraining.pulse))) },
+                                            repetitions: { value: decode(nextTraining.repetitions), status: this.calculate('RDS', parseOrUndefinded(nextTraining.repetitions), parseFloat(decode(backTraining.repetitions))), difference: this.calculate2('RDS', parseOrUndefinded(nextTraining.repetitions), parseFloat(decode(backTraining.repetitions))) },
+                                            kilage: { value: decode(nextTraining.kilage), status: this.calculate('Kilaje', parseOrUndefinded(nextTraining.kilage), parseFloat(decode(backTraining.kilage))), difference: this.calculate2('Kilaje', parseOrUndefinded(nextTraining.kilage), parseFloat(decode(backTraining.kilage))) },
+                                            tonnage: { value: decode(nextTraining.tonnage), status: this.calculate('Tonelaje', parseOrUndefinded(nextTraining.tonnage), parseFloat(decode(backTraining.tonnage))), difference: this.calculate2('Tonelaje', parseOrUndefinded(nextTraining.tonnage), parseFloat(decode(backTraining.tonnage))) },
+                                            exercise: { name: decode(nextTraining.exercise.name), status: 0, description: decode(nextTraining.exercise.description) },
+                                        };
+                                    }
+                                }
                             }
                             Comment.admin_getAllAccount(idAccount)
                                 .then((comments)=>{
@@ -257,6 +277,7 @@ export default class TrainingSystem {
                             return reject({ cause: datas.cause, error: datas.ok });
                         }
                     } catch (error) {
+                        console.log(error);
                         reject({ cause: 'Ocurrió un error inesperadamente.', error });
                     }
                 }).catch((error)=>reject({ cause: 'Error de conexión.', error }));
@@ -269,17 +290,15 @@ export default class TrainingSystem {
         return new Promise((resolve, reject)=>{
             AsyncStorage.getItem('account_session').then((value)=>{
                 if (!value) return reject({ cause: 'No se ha encontrado datos de inicio de sesión.', action: 1, error: false });
-                var datas: storageData = JSON.parse(decode(String(value)));
-                var dataPost = { adminGetAllTrainigs: true, email: datas.email, password: datas.password, idAccount };
+                const datas: storageData = JSON.parse(decode(String(value)));
+                const dataPost = { adminGetAllTrainigs: true, email: datas.email, password: datas.password, idAccount };
                 axios.post(`${this.urlBase}/index.php`, qs.stringify(dataPost), this.header_access).then((html)=>{
                     try {
-                        var result: trainingData = html.data;
+                        const result: { ok: boolean; cause: string; trainings: trainings[]; } = html.data;
                         if (result.ok) {
-                            var res: any = result.trainings;
+                            var res = result.trainings;
                             resolve(res);
-                        } else {
-                            reject({ cause: (result.cause?.length !== undefined && result.cause?.length !== 0)? result.cause: 'Ocurrió un error inesperadamente.', error: false });
-                        }
+                        } else reject({ cause: (result.cause?.length !== undefined && result.cause?.length !== 0)? result.cause: 'Ocurrió un error inesperadamente.', error: false });
                     } catch (error) {
                         reject({ cause: 'Ocurrió un error inesperadamente.', error });
                     }

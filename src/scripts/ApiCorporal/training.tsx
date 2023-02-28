@@ -207,7 +207,6 @@ export default class TrainingSystem {
         }
         
     }
-    // Modificar para que calcule con un ejercicio similar.
     admin_getEspecificTraining(idTraining: string, idAccount: string): Promise<{ t: DetailsTrainings, c: commentsData | undefined }> {
         return new Promise(async(resolve, reject)=>{
             AsyncStorage.getItem('account_session').then((value)=>{

@@ -1,5 +1,15 @@
 {
     "data": [{
+        "version": "2.0.1",
+        "data": "28/02/2023",
+        "changes": [
+            "Se soluciono un problema de cálculo al mostrar los detalles de una actividad (Entrenador).",
+            "Se añadió el número de ejercicios a los títulos de las pestañas de ejercicios (Entrenador).",
+            "Se quito la edad de los entrenadores de las tarjetas de los comentarios.",
+            "Se soluciono un problema al cargar la imagen de los usuarios al abrir la vista de más detalles (Entrenador).",
+            "Se quitaron partes innecesarias del código fuente de la aplicación para aligerar el consumo de rendimiento."
+        ]
+    }, {
         "version": "2.0.0",
         "date": "17/02/2023",
         "changes": [

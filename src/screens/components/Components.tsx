@@ -1,13 +1,11 @@
 import { decode } from "base-64";
-import moment from "moment";
 import React, { PureComponent, useState } from "react";
-import { ScrollView, StyleProp, View, ViewStyle } from "react-native";
+import { StyleProp, View, ViewStyle } from "react-native";
 import { Avatar, Card, Colors, Text, IconButton, Paragraph, Title, List, Menu, Button } from "react-native-paper";
 import { AvatarImageSource } from "react-native-paper/lib/typescript/components/Avatar/AvatarImage";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { HostServer } from "../../scripts/ApiCorporal";
-import { trainings } from "../../scripts/ApiCorporal/types";
 import CombinedTheme from "../../Theme";
 import ImageLazyLoad from "./ImageLazyLoad";
 
@@ -140,12 +138,11 @@ const CustomItemList2 = React.memo(function(props: IProps6) {
         </Menu>);
     }
     function leftAvatar(lProps: { color: string; style: { marginLeft: number; marginRight: number; marginVertical?: number | undefined; }; }) {
-        let isDefault = decode(props.image).indexOf('default.jpg') !== -1;
         return(<ImageLazyLoad
             {...lProps}
             size={48}
             circle={true}
-            resizeMode={(isDefault)? 'contain': 'cover'}
+            resizeMode={'cover'}
             source={{ uri: `${HostServer}/images/accounts/${decode(props.image)}` }}
         />);
     }

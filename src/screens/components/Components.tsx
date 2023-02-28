@@ -346,52 +346,6 @@ export class MiniCustomCard extends PureComponent<CustomType1> {
     }
 }
 
-/*type IProps14 = {
-    data: trainings;
-    editButton?: ()=>any;
-    viewButton?: ()=>any;
-    deleteButton?: ()=>any;
-};
-type IState14 = { title: string; };
-
-class CustomItemList5 extends PureComponent<IProps14, IState14> {
-    constructor(props: IProps14) {
-        super(props);
-        this.state = {
-            title: 'Cargando...'
-        };
-    }
-    componentDidMount() {
-        var date: Date = moment(decode(this.props.data.date), 'DD/MM/YYYY').toDate();
-        var strDate: string = moment(date).format('dddd D [de] MMMM [del] YYYY');
-        this.setState({ title: strDate.charAt(0).toUpperCase() + strDate.slice(1) });
-    }
-    render(): React.ReactNode {
-        return(<Card style={{ marginLeft: 8, marginRight: 8, marginTop: 12, height: 182 }} theme={{ dark: true }}>
-            <Card.Title
-                title={this.state.title}
-                subtitle={decode(this.props.data.exercise.name)}
-                subtitleStyle={{ marginLeft: 4 }}
-                right={(props)=><IconButton {...props} icon={'trash-can-outline'} onPress={()=>(this.props.deleteButton)&&this.props.deleteButton()} />}
-            />
-            <Card.Content>
-                <ScrollView horizontal={true}>
-                    <MiniCustomCard title={'RDS:'} value={decode(this.props.data.rds)} marginLeft={8} />
-                    <MiniCustomCard title={'RPE:'} value={decode(this.props.data.rpe)} />
-                    <MiniCustomCard title={'PULSO:'} value={decode(this.props.data.pulse)} />
-                    <MiniCustomCard title={'REPS:'} value={decode(this.props.data.repetitions)} />
-                    <MiniCustomCard title={'KLG:'} value={decode(this.props.data.kilage)} />
-                    <MiniCustomCard title={'TLG:'} value={decode(this.props.data.tonnage)} />
-                </ScrollView>
-            </Card.Content>
-            <Card.Actions>
-                <Button style={{ display: 'none' }} onPress={()=>(this.props.editButton)&&this.props.editButton()}>Editar</Button>
-                <Button onPress={()=>(this.props.viewButton)&&this.props.viewButton()}>Ver detalles</Button>
-            </Card.Actions>
-        </Card>);
-    }
-}*/
-
 type IProps15 = {
     style?: StyleProp<ViewStyle>;
     title: string;

@@ -4,7 +4,6 @@ import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import FastImage, { FastImageProps, ResizeMode } from "react-native-fast-image";
 import RNFS from "react-native-fs";
 // Images
-//import ProfilePicture from "../../Assets/profile.webp";
 import ProfilePicture from "../../assets/profile.webp";
 
 type IProps = {

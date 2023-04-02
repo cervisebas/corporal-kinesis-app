@@ -27,10 +27,10 @@ export default React.memo(function Client(props: IProps) {
     // Variables
     var event: EmitterSubscription | undefined = undefined;
     
-    const routes = [
+    const [routes] = useState([
         { key: 'statistics', title: 'Estadísticas', focusedIcon: 'chart-timeline-variant-shimmer', unfocusedIcon: 'chart-timeline-variant' },
         { key: 'account', title: 'Mi cuenta', focusedIcon: 'account', unfocusedIcon: 'account-outline' }
-    ];
+    ]);
     const renderScene = ({ route }: any) => {
         switch (route.key) {
             case 'statistics':
@@ -66,8 +66,9 @@ export default React.memo(function Client(props: IProps) {
             event?.remove();
         };
     }, []);
+    console.log(`Client primary: ${theme.colors.primary}`);
 
-    return(<View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+    return(<View style={{ flex: 1 }}>
         <LoadingComponent ref={refLoadingComponent} />
         <OthersComponents
             ref={refOthersComponents}

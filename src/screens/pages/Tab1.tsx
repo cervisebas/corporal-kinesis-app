@@ -13,6 +13,7 @@ import { CustomCardComments, EmptyListComments } from "../components/Components"
 import HeaderStatistics from "./elements/HeaderStatistics";
 import ViewMoreDetails from "./pages/viewMoreDetails";
 import { Statistics2 } from "./statistics/statistic2";
+import { ThemeContext } from "../../providers/ThemeProvider";
 
 type IProps = {
     showLoading: (show: boolean, text: string)=>any;
@@ -70,6 +71,7 @@ export class Tab1 extends Component<IProps, IState> {
     private loading = setInterval(()=>{ if (LoadNow == true) setTimeout(()=>this.goLoading(), 256) }, this.timeLoad);
     private reserve1 = { id: '-1', date: { value: '-', status: -1, difference: undefined }, session_number: { value: '-', status: -1, difference: undefined }, rds: { value: '-', status: -1, difference: undefined }, rpe: { value: '-', status: -1, difference: undefined }, pulse: { value: '-', status: -1, difference: undefined }, repetitions: { value: '-', status: -1, difference: undefined }, kilage: { value: '-', status: -1, difference: undefined }, tonnage: { value: '-', status: -1, difference: undefined }, exercise: { name: 'No disponible', status: -1, description: '' } };
     private reserve2 = { id: '-1', date: { value: 'n/a', status: -1, difference: undefined }, session_number: { value: 'n/a', status: -1, difference: undefined }, rds: { value: 'n/a', status: -1, difference: undefined }, rpe: { value: 'n/a', status: -1, difference: undefined }, pulse: { value: 'n/a', status: -1, difference: undefined }, repetitions: { value: 'n/a', status: -1, difference: undefined }, kilage: { value: 'n/a', status: -1, difference: undefined }, tonnage: { value: 'n/a', status: -1, difference: undefined }, exercise: { name: 'No disponible', status: -1, description: '' } };
+    static contextType = ThemeContext;
     componentDidMount() {
         this.event = DeviceEventEmitter.addListener('tab1reload', ()=>{
             this.setState({ showLoading: true, commentsLoading: true, dataComments: [], visiblemenu: false }, this.goLoading);
@@ -125,16 +127,9 @@ export class Tab1 extends Component<IProps, IState> {
             this.setState({ dialogShow: true, messageDialog: error.cause, dataComments: commentError, commentsLoading: false });
         });
     }
-    calcYears(date: string): string {
-        var dateNow = new Date();
-        var processDate = moment(date, 'DD-MM-YYYY').toDate();
-        var years = dateNow.getFullYear() - processDate.getFullYear();
-        var months = dateNow.getMonth() - processDate.getMonth();
-        if (months < 0 || (months === 0 && dateNow.getDate() < processDate.getDate())) years--;
-        return years.toString();
-    }
     render(): React.ReactNode {
-        return(<View style={{ flex: 1 }}>
+        const { theme } = this.context;
+        return(<View style={{ flex: 1, backgroundColor: theme.colors.background }}>
             <Appbar.Header>
                 <Appbar.Content title="Estadísticas" />
             </Appbar.Header>

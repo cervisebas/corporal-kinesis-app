@@ -6,13 +6,10 @@ import { DeviceEventEmitter, EmitterSubscription, StatusBar, View } from 'react-
 import { Provider as PaperProvider } from 'react-native-paper';
 import Client from './screens/client';
 import Profesional from './screens/profesional';
-import CombinedTheme from './Theme';
 import { Account, ChangeLogSystem, Notification } from './scripts/ApiCorporal';
 import { ExtraContents } from './ExtraContents';
 import { setLoadNow } from './scripts/Global';
-import DeviceInfo from "react-native-device-info";
 import { decode } from 'base-64';
-import { getNavigationBarHeight } from 'react-native-android-navbar-height';
 import VersionCheck from 'react-native-version-check';
 import 'react-native-gesture-handler';
 import SplashScreen from './screens/SplashScreen';
@@ -72,6 +69,7 @@ export default class App extends PureComponent<IProps, IState> {
     }
     render(): React.ReactNode {
         const { theme, navTheme } = this.context;
+        console.log(`App primary: ${theme.colors.primary}`);
         return(<View style={{ flex: 1, position: 'relative', backgroundColor: theme.colors.background }}>
             <StatusBar barStyle={'light-content'} backgroundColor={'#0f4577'} />
             <PaperProvider theme={theme}>
@@ -90,8 +88,8 @@ export default class App extends PureComponent<IProps, IState> {
                     />
                     <SplashScreen init={this.verifyAccount} />
                     <Stack.Navigator initialRouteName="c" screenOptions={{ headerShown: false, animation: 'fade_from_bottom', gestureEnabled: false }} >
-                        <Stack.Screen name="c" component={Client} />
-                        <Stack.Screen name="p" component={Profesional} />
+                        <Stack.Screen name="c" children={(cProps)=><Client {...cProps} />} />
+                        <Stack.Screen name="p" children={(cProps)=><Profesional {...cProps} />} />
                     </Stack.Navigator>
                 </NavigationContainer>
             </PaperProvider>

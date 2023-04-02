@@ -17,6 +17,8 @@ export default React.memo(function ThemeProvider(props: { children: React.ReactN
     const [theme, setTheme] = useState(Theme);
     const [navTheme, setNavTheme] = useState(ThemeNavigation);
 
+    console.log(`Provider primary: ${theme.colors.primary}`);
+
     return(<ThemeContext.Provider value={{ theme, navTheme }}>
         {props.children}
     </ThemeContext.Provider>);

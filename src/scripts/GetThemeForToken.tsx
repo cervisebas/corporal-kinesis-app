@@ -7,14 +7,14 @@ import Color from "color";
 export default function (json: ThemeToken, theme: 'light' | 'dark'): MD3Theme {
     const useToken = (theme == 'dark')? json.schemes.dark: json.schemes.light;
 
+    const DTheme = (theme == 'dark')? MD3DarkTheme: MD3LightTheme;
     const Background = Color(useToken.background).rgb().string();
     const primaryRGB = Color(useToken.primary).rgb();
 
     return {
-        ...((theme == 'dark')? MD3DarkTheme: MD3LightTheme),
-        ...((theme == 'dark')? { mode: 'adaptive' }: {}),
+        ...DTheme,
         colors: {
-            ...((theme == 'dark')? MD3DarkTheme: MD3LightTheme).colors,
+            ...DTheme.colors,
             primary: useToken.primary,
             primaryContainer: useToken.primaryContainer,
             secondary: useToken.secondary,
@@ -52,7 +52,6 @@ export default function (json: ThemeToken, theme: 'light' | 'dark'): MD3Theme {
             inversePrimary: useToken.inversePrimary,
             shadow: useToken.shadow,
             scrim: useToken.scrim,
-            //...({ secret: getValue('md.ref.palette.primary60') } as any),
             elevation: {
                 level0: 'transparent',
                 // Note: Color values with transparency cause RN to transfer shadows to children nodes

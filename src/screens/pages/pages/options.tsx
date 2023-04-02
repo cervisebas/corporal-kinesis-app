@@ -1,14 +1,10 @@
 import React, { Component } from "react";
-import { BackHandler, DeviceEventEmitter, ToastAndroid, View } from "react-native";
-import { Appbar, Text, Provider as PaperProvider, List, Avatar, Card, Button, Portal, Dialog } from "react-native-paper";
+import { DeviceEventEmitter, ToastAndroid, View } from "react-native";
+import { Appbar, Text, Provider as PaperProvider, Button, Portal, Dialog } from "react-native-paper";
 import CombinedTheme from "../../../Theme";
 import CustomModal from "../../components/CustomModal";
 import DeviceInfo from "react-native-device-info";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { decode } from "base-64";
-import { HostServer } from "../../../scripts/ApiCorporal";
-import { storageData } from "../../../scripts/ApiCorporal/types";
-import SplashScreen from "react-native-splash-screen";
 import { CardButton1 } from "../../components/Components";
 
 type IProps = {

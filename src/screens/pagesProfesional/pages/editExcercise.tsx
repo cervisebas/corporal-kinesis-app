@@ -43,6 +43,7 @@ export default class EditExcercise extends Component<IProps, IState> {
             messageAlert: '',
             textButton: 'Enviar'
         };
+        this.closeModal = this.closeModal.bind(this);
     }
     closeModal() {
         if (this.state.isLoading) return ToastAndroid.show('Espere...', ToastAndroid.SHORT);
@@ -100,7 +101,7 @@ export default class EditExcercise extends Component<IProps, IState> {
         return(<CustomModal visible={this.props.visible} onShow={()=>this.setState({ name: decode(this.props.data.title), description: (decode(this.props.data.message) == 'none')? '': decode(this.props.data.message) })} onRequestClose={()=>this.closeModal()} animationIn={'slideInLeft'} animationOut={'slideOutRight'}>
             <View style={{ ...styles.content, backgroundColor: CombinedTheme.colors.background }}>
                 <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
-                    <Appbar.BackAction onPress={()=>this.closeModal()}/>
+                    <Appbar.BackAction onPress={this.closeModal}/>
                     <Appbar.Content title={'Editar ejercicio'} />
                 </Appbar.Header>
                 <View style={{ paddingBottom: 8 }}>

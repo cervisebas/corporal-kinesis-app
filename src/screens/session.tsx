@@ -2,7 +2,7 @@ import { decode } from "base-64";
 import moment from "moment";
 import React, { Component } from "react";
 import { DeviceEventEmitter, Dimensions, KeyboardAvoidingView, StyleSheet, View, TextInput as NativeTextInput, TouchableWithoutFeedback, Keyboard } from "react-native";
-import { Button, Dialog, Paragraph, Portal, Provider as PaperProvider, Text, TextInput } from "react-native-paper";
+import { Button, Dialog, Paragraph, Portal, Text, TextInput } from "react-native-paper";
 import { Logo } from "../assets/icons";
 import { Account } from "../scripts/ApiCorporal";
 import { setLoadNow } from "../scripts/Global";
@@ -244,8 +244,8 @@ export class Session extends Component<IProps, IState> {
         });
     }
     render(): React.ReactNode {
-        return(<CustomModal visible={this.props.visible} style={{ backgroundColor: '#0B0C0E' }} animationIn={'fadeIn'} animationOut={'fadeOut'}>
-            <PaperProvider theme={CombinedTheme}>
+        return(<CustomModal visible={this.props.visible} animationIn={'fadeIn'} animationOut={'fadeOut'}>
+            <View style={{ flex: 1, backgroundColor: '#0B0C0E', position: 'relative' }}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                     <KeyboardAvoidingView style={{ flex: 1 }} behavior={'height'} keyboardVerticalOffset={0}>
                         <View style={styles.contain}>
@@ -355,7 +355,7 @@ export class Session extends Component<IProps, IState> {
                                         error={this.state.registerAlertDate}
                                         value={this.state.registerDate}
                                         editable={false}
-                                        right={<TextInput.Icon name="calendar-range" onPress={()=>this.openDatePicker()} />} />
+                                        right={<TextInput.Icon icon="calendar-range" onPress={()=>this.openDatePicker()} />} />
                                     <TextInput
                                         style={styles.textInput}
                                         mode={'outlined'}
@@ -404,7 +404,7 @@ export class Session extends Component<IProps, IState> {
                         </Dialog.Actions>
                     </Dialog>
                 </Portal>
-            </PaperProvider>
+            </View>
         </CustomModal>);
     }
 }

@@ -332,13 +332,13 @@ export default class AddTraining extends Component<IProps, IState> {
                     <Dialog visible={this.state.viewDialogDate} dismissable={true} onDismiss={()=>this.setState({ viewDialogDate: false })}>
                         <Dialog.Title>Fecha de nacimiento</Dialog.Title>
                         <Dialog.Content style={{ overflow: 'hidden' }}>
-                            <DatePicker
+                            {<DatePicker
                                 date={this.state.date}
                                 mode={'date'}
                                 fadeToColor={'#323335'}
                                 textColor={'#FFFFFF'}
                                 onDateChange={(date)=>this.setState({ date: date })}
-                            />
+                            />}
                         </Dialog.Content>
                         <Dialog.Actions>
                             <Button onPress={()=>this.setState({ viewDialogDate: false })}>Cancelar</Button>

@@ -1,4 +1,4 @@
-import React, { PureComponent, createRef, useEffect, useState } from "react";
+import React, { PureComponent, createRef, useContext, useEffect, useState } from "react";
 import { DeviceEventEmitter, EmitterSubscription, StyleSheet, View } from "react-native";
 import { BottomNavigation, FAB } from "react-native-paper";
 import { Permission } from "../scripts/ApiCorporal";
@@ -7,6 +7,7 @@ import { LoadNow } from "../scripts/Global";
 import { Tab1 } from "./pages/Tab1";
 import { Tab2 } from "./pages/Tab2";
 import LoadingComponent, { LoadingComponentRef } from "./components/LoadingComponent";
+import { ThemeContext } from "../providers/ThemeProvider";
 
 type IProps = {
     navigation: any;
@@ -14,6 +15,9 @@ type IProps = {
 };
 
 export default React.memo(function Client(props: IProps) {
+    // Context's
+    const { theme } = useContext(ThemeContext);
+    // States
     const [index, setIndex] = React.useState(0);
     const [loadingAdmin, setLoadingAdmin] = useState(true);
     const [showButtonAdmin, setShowButtonAdmin] = useState(true);
@@ -23,7 +27,10 @@ export default React.memo(function Client(props: IProps) {
     // Variables
     var event: EmitterSubscription | undefined = undefined;
     
-    const routes = [{ key: 'statistics', title: 'Estadísticas', icon: 'chart-bar' }, { key: 'account', title: 'Mi cuenta', icon: 'account-outline' }];
+    const routes = [
+        { key: 'statistics', title: 'Estadísticas', focusedIcon: 'chart-timeline-variant-shimmer', unfocusedIcon: 'chart-timeline-variant' },
+        { key: 'account', title: 'Mi cuenta', focusedIcon: 'account', unfocusedIcon: 'account-outline' }
+    ];
     const renderScene = ({ route }: any) => {
         switch (route.key) {
             case 'statistics':
@@ -60,7 +67,7 @@ export default React.memo(function Client(props: IProps) {
         };
     }, []);
 
-    return(<View style={{ flex: 2 }}>
+    return(<View style={{ flex: 1, backgroundColor: theme.colors.background }}>
         <LoadingComponent ref={refLoadingComponent} />
         <OthersComponents
             ref={refOthersComponents}
@@ -71,7 +78,6 @@ export default React.memo(function Client(props: IProps) {
             onIndexChange={setIndex}
             renderScene={renderScene}
             sceneAnimationEnabled={true}
-            barStyle={{ backgroundColor: '#1663AB' }}
         />
         <FAB
             style={styles.fab}
@@ -115,6 +121,6 @@ const styles = StyleSheet.create({
       position: 'absolute',
       margin: 16,
       right: 0,
-      bottom: 56
+      bottom: 80
     },
 });

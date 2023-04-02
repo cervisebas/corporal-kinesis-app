@@ -53,7 +53,7 @@ export default React.memo(function SplashScreen(props: { init: ()=>void; }) {
         setVisible(false);
     }
 
-    return(<CustomModal visible={visible} coverScreen={false} removeAnimationIn={true} animationOut={'fadeOut'}>
+    return(<CustomModal visible={visible} removeAnimationIn={true} animationOut={'fadeOut'}>
         <View style={styles.background}>
             <Animated.View style={[styles.viewText, viewTitleStyles]}>
                 <Text style={[styles.text, { color: '#1D68AD' }]}>Corporal</Text>

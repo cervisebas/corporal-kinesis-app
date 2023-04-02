@@ -37,6 +37,7 @@ export default class AddNewExercise extends Component<IProps, IState> {
             messageAlert: '',
             textButton: 'Enviar'
         };
+        this.closeModal = this.closeModal.bind(this);
     }
     closeModal() {
         if (this.state.isLoading) return ToastAndroid.show('Espere...', ToastAndroid.SHORT);
@@ -90,7 +91,7 @@ export default class AddNewExercise extends Component<IProps, IState> {
         });
     }
     render(): ReactNode {
-        return(<CustomModal visible={this.props.show} onRequestClose={()=>this.closeModal()} animationIn={'slideInLeft'} animationOut={'slideOutRight'}>
+        return(<CustomModal visible={this.props.show} onRequestClose={this.closeModal} animationIn={'slideInLeft'} animationOut={'slideOutRight'}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                 <View style={{ ...styles.content, backgroundColor: CombinedTheme.colors.background }}>
                     <Appbar.Header style={{ backgroundColor: '#1663AB' }}>

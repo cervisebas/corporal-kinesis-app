@@ -135,10 +135,10 @@ export class Tab1 extends Component<IProps, IState> {
     }
     render(): React.ReactNode {
         return(<View style={{ flex: 1 }}>
-            <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
+            <Appbar.Header>
                 <Appbar.Content title="Estadísticas" />
             </Appbar.Header>
-            <View style={{ flex: 2, overflow: 'hidden' }}>
+            <View style={{ flex: 1, overflow: 'hidden' }}>
                 <FlatList
                     data={this.state.dataComments}
                     keyExtractor={(item)=>`t1-user-${item.id}`}

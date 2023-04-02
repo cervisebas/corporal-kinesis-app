@@ -5,7 +5,7 @@ import { FAB } from "react-native-paper";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CustomDrawerNavegation from "./components/CustomDrawerNavegation";
 
-import Page1 from "./pagesProfesional/Page1_2";
+import Page1 from "./pagesProfesional/Page1";
 import Page2 from "./pagesProfesional/Page2";
 import Page3 from "./pagesProfesional/Page3";
 import PageOptions from "./pagesProfesional/PageOptions";

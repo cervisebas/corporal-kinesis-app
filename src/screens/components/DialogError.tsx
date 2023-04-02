@@ -16,13 +16,13 @@ export default class DialogError extends Component<IProps, IState> {
     render(): ReactNode {
         return(<PaperProvider theme={CombinedTheme}>
             <Portal>
-                <Dialog visible={this.props.show} onDismiss={()=>this.props.close()}>
+                <Dialog visible={this.props.show} onDismiss={this.props.close}>
                     <Dialog.Title>{this.props.title}</Dialog.Title>
                     <Dialog.Content>
                         <Paragraph>{this.props.message}</Paragraph>
                     </Dialog.Content>
                     <Dialog.Actions>
-                        <Button onPress={()=>this.props.close()}>Aceptar</Button>
+                        <Button onPress={this.props.close}>Aceptar</Button>
                     </Dialog.Actions>
                 </Dialog>
             </Portal>

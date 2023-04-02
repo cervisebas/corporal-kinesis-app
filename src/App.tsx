@@ -9,7 +9,6 @@ import Profesional from './screens/profesional';
 import CombinedTheme from './Theme';
 import { Account, ChangeLogSystem, Notification } from './scripts/ApiCorporal';
 import { ExtraContents } from './ExtraContents';
-import RNSplashScreen from 'react-native-splash-screen';
 import { setLoadNow } from './scripts/Global';
 import DeviceInfo from "react-native-device-info";
 import { decode } from 'base-64';
@@ -17,12 +16,10 @@ import { getNavigationBarHeight } from 'react-native-android-navbar-height';
 import VersionCheck from 'react-native-version-check';
 import 'react-native-gesture-handler';
 import SplashScreen from './screens/SplashScreen';
+import { ThemeContext, ThemeContextType } from './providers/ThemeProvider';
 
 type IProps = {};
 type IState = {
-    marginTop: number;
-    marginBottom: number;
-
     openSession: boolean;
     showVerify: boolean;
     textAnimVerify: string | undefined;
@@ -37,8 +34,6 @@ export default class App extends PureComponent<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
-            marginTop: 0,
-            marginBottom: 0,
             openSession: false,
             showVerify: false,
             textAnimVerify: undefined,
@@ -50,6 +45,7 @@ export default class App extends PureComponent<IProps, IState> {
     }
     private event: EmitterSubscription | null = null;
     private event2: EmitterSubscription | null = null;
+    static contextType: React.Context<ThemeContextType> = ThemeContext;
     verifyAccount() {
         this.setState({ showVerify: true });
         Account.verify().then((value)=>{
@@ -62,15 +58,12 @@ export default class App extends PureComponent<IProps, IState> {
         });
     }
     componentDidMount() {
-        //setTimeout(RNSplashScreen.hide, 128);
         SystemNavigationBar.setNavigationColor('#0f4577', 'light', 'navigation');
-        //this.verifyAccount();
         this.event = DeviceEventEmitter.addListener('nowVerify', this.verifyAccount);
         this.event2 = DeviceEventEmitter.addListener('openChangeLog', ()=>this.setState({ changeLoadView: true }));
         Notification.init();
         VersionCheck.needUpdate({ ignoreErrors: true }).then((value)=>(value.isNeeded)&&this.setState({ viewDialogUpdate: true, storeUrl: value.storeUrl }));
         console.log(`Dev Mode: ${__DEV__}`);
-        setTimeout(async() =>(await DeviceInfo.getApiLevel() < 26) && this.setState({ marginTop: StatusBar.currentHeight || 24, marginBottom: await getNavigationBarHeight() }));
     }
     componentWillUnmount() {
         setLoadNow(false);
@@ -78,14 +71,15 @@ export default class App extends PureComponent<IProps, IState> {
         this.event2?.remove();
     }
     render(): React.ReactNode {
-        return(<View style={{ flex: 1, marginTop: this.state.marginTop, marginBottom: this.state.marginBottom }}>
+        const { theme, navTheme } = this.context;
+        return(<View style={{ flex: 1, position: 'relative', backgroundColor: theme.colors.background }}>
             <StatusBar barStyle={'light-content'} backgroundColor={'#0f4577'} />
-            <PaperProvider theme={CombinedTheme}>
-                <NavigationContainer theme={CombinedTheme}>
+            <PaperProvider theme={theme}>
+                <NavigationContainer theme={navTheme}>
                     <ExtraContents
                         openSession={this.state.openSession}
                         closeSession={()=>this.setState({ openSession: false })}
-                        setLoadData={(data)=>setLoadNow(data)}
+                        setLoadData={setLoadNow}
                         showVerify={this.state.showVerify}
                         textVerify={this.state.textAnimVerify}
                         visibleChangeLoad={this.state.changeLoadView}

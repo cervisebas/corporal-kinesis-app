@@ -149,7 +149,7 @@ export default class AddNewAccount extends Component<IProps, IState> {
                                     value={this.state.date}
                                     disabled={this.state.isLoading}
                                     editable={false}
-                                    right={<TextInput.Icon name="calendar-range" disabled={this.state.isLoading} onPress={()=>this.setState({ viewModalDate: true })} />} />
+                                    right={<TextInput.Icon icon="calendar-range" disabled={this.state.isLoading} onPress={()=>this.setState({ viewModalDate: true })} />} />
                                 <Button mode={'contained'} loading={this.state.isLoading} onPress={()=>(!this.state.isLoading)? this.createNow(): ToastAndroid.show('Espere...', ToastAndroid.SHORT)} style={{ marginTop: 8, marginLeft: 16, marginRight: 16 }}>
                                     {this.state.textButton}
                                 </Button>
@@ -160,13 +160,13 @@ export default class AddNewAccount extends Component<IProps, IState> {
                         <Dialog visible={this.state.viewModalDate} dismissable={true} onDismiss={()=>this.setState({ viewModalDate: false })}>
                             <Dialog.Title>Fecha de nacimiento</Dialog.Title>
                             <Dialog.Content>
-                                <DatePicker
+                                {<DatePicker
                                     date={this.state.actualDate}
                                     mode={'date'}
                                     fadeToColor={'#323335'}
                                     textColor={'#FFFFFF'}
                                     onDateChange={(date)=>this.setState({ actualDate: date })}
-                                />
+                                />}
                             </Dialog.Content>
                             <Dialog.Actions>
                                 <Button onPress={()=>this.setState({ viewModalDate: false })}>Cancelar</Button>

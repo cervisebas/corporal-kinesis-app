@@ -1,8 +1,7 @@
 import { decode } from "base-64";
 import React, { PureComponent, useState } from "react";
 import { StyleProp, View, ViewStyle } from "react-native";
-import { Avatar, Card, Colors, Text, IconButton, Paragraph, Title, List, Menu, Button } from "react-native-paper";
-import { AvatarImageSource } from "react-native-paper/lib/typescript/components/Avatar/AvatarImage";
+import { Avatar, Card, MD2Colors, Text, IconButton, Paragraph, Title, List, Menu, Button } from "react-native-paper";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { HostServer } from "../../scripts/ApiCorporal";
@@ -25,7 +24,7 @@ class CustomCard1 extends PureComponent<IProps0> {
                 <Paragraph>{this.props.title}</Paragraph>
                 <IconButton
                     icon={(this.props.status == -5)? 'timer-sand': (this.props.status == -1)? 'chart-bubble': (this.props.status == 0)? 'chart-timeline-variant': (this.props.status == 1)? 'arrow-up': (this.props.status == 2)? 'arrow-down': 'chart-timeline-variant-shimmer'}
-                    color={(this.props.status == -5)? CombinedTheme.colors.accent: (this.props.status == -1)? Colors.red500: (this.props.status == 0)? Colors.yellow500: (this.props.status == 1)? Colors.green500: (this.props.status == 2)? Colors.red500: Colors.blue500}
+                    iconColor={(this.props.status == -5)? CombinedTheme.colors.accent: (this.props.status == -1)? MD2Colors.red500: (this.props.status == 0)? MD2Colors.yellow500: (this.props.status == 1)? MD2Colors.green500: (this.props.status == 2)? MD2Colors.red500: MD2Colors.blue500}
                     size={32}
                     style={{ position: 'absolute', right: 6, top: 18, backgroundColor: CombinedTheme.colors.background }}
                 />
@@ -39,7 +38,7 @@ type IProps1 = {
     date: string;
     edit: boolean;
     comment: string;
-    source: AvatarImageSource;
+    source: any;
 };
 class CustomCardComments extends PureComponent<IProps1> {
     constructor(props: IProps1) {
@@ -108,7 +107,7 @@ class CustomItemListLoading extends PureComponent<any, IState4> {
                 title={()=><SkeletonPlaceholder backgroundColor={'#1F1F1F'} highlightColor={'#727272'}><SkeletonPlaceholder.Item width={90} height={12} borderRadius={2} /></SkeletonPlaceholder>}
                 titleStyle={{ color: '#727272' }}
                 left={()=><View style={{ height: 48, alignItems: 'center', justifyContent: 'center' }}><SkeletonPlaceholder backgroundColor={'#111111'} highlightColor={'#F2F2F2'}><SkeletonPlaceholder.Item width={this.state.value} height={36} borderRadius={4} /></SkeletonPlaceholder></View>}
-                right={()=><List.Icon color={Colors.yellow500} icon={'chart-timeline-variant'} />}
+                right={()=><List.Icon color={MD2Colors.yellow500} icon={'chart-timeline-variant'} />}
             />: <></>}
         </View>);
     }
@@ -134,10 +133,10 @@ const CustomItemList2 = React.memo(function(props: IProps6) {
             anchor={<IconButton onPress={showMenu} icon={'dots-vertical'} />}>
             <Menu.Item onPress={menu1} title={"Ver perfil"} />
             <Menu.Item onPress={menu2} title={"Dejar comentario"} />
-            <Menu.Item style={{ backgroundColor: Colors.red500 }} onPress={menu3} title={"Eliminar"} />
+            <Menu.Item style={{ backgroundColor: MD2Colors.red500 }} onPress={menu3} title={"Eliminar"} />
         </Menu>);
     }
-    function leftAvatar(lProps: { color: string; style: { marginLeft: number; marginRight: number; marginVertical?: number | undefined; }; }) {
+    function leftAvatar(lProps: any) {
         return(<ImageLazyLoad
             {...lProps}
             size={48}
@@ -193,7 +192,7 @@ type IProps9 = {
     date: string;
     edit: boolean;
     comment: string;
-    source: AvatarImageSource;
+    source: any;
     buttonEdit?: ()=>any;
     buttonDelete?: ()=>any;
 };
@@ -241,7 +240,7 @@ class CustomItemList4 extends PureComponent<IProps10, IState10> {
                 anchor={<IconButton onPress={()=>this.setState({ viewMenu: true })} icon={'dots-vertical'} />}>
                 <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionViewDescription())} title={"Ver descripción"} />
                 <Menu.Item onPress={()=>this.setState({ viewMenu: false }, ()=>(this.props.actionEdit)&&this.props.actionEdit())} title={"Editar"} />
-                <Menu.Item style={{ backgroundColor: Colors.red500 }} onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionDelete())} title={"Borrar"} />
+                <Menu.Item style={{ backgroundColor: MD2Colors.red500 }} onPress={()=>this.setState({ viewMenu: false }, ()=>this.props.actionDelete())} title={"Borrar"} />
             </Menu>}
         />);
     }
@@ -305,7 +304,7 @@ class CustomCard4 extends PureComponent<IProps12> {
                 <Paragraph>{this.props.title}</Paragraph>
                 <IconButton
                     icon={this.props.iconName}
-                    color={Colors.blue500}
+                    iconColor={MD2Colors.blue500}
                     size={26}
                     style={{ position: 'absolute', right: 6, top: 18, backgroundColor: CombinedTheme.colors.background }}
                 />

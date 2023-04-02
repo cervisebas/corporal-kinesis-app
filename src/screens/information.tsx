@@ -18,7 +18,7 @@ export default class Information extends PureComponent<IProps, IState> {
         super(props);
     }
     render(): React.ReactNode {
-        return(<CustomModal visible={this.props.visible} onRequestClose={()=>this.props.close()}>
+        return(<CustomModal visible={this.props.visible} onRequestClose={this.props.close}>
             <View style={{ ...styles.content, backgroundColor: CombinedTheme.colors.background }}>
                 <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
                     <Appbar.BackAction onPress={this.props.close} />

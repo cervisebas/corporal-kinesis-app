@@ -37,6 +37,7 @@ export default class PageOptions extends Component<IProps, IState> {
             options: undefined,
             isLoading: true
         };
+        this.onSwitchs = this.onSwitchs.bind(this);
     }
     loadData() {
         Options.getAll().then((value)=>this.setState({
@@ -73,7 +74,7 @@ export default class PageOptions extends Component<IProps, IState> {
         return(<PaperProvider theme={CombinedTheme}>
             <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background }}>
                 <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
-                    <Appbar.Action icon="menu" onPress={()=>this.props.navigation.openDrawer()} />
+                    <Appbar.Action icon="menu" onPress={this.props.navigation.openDrawer} />
                     <Appbar.Content title="Opciones" />
                 </Appbar.Header>
                 <View style={{ flex: 2, overflow: 'hidden' }}>
@@ -89,7 +90,7 @@ export default class PageOptions extends Component<IProps, IState> {
                                 right={()=><Switch
                                     value={this.state.switch1}
                                     disabled={this.state.isLoading}
-                                    onValueChange={()=>this.setState({ switch1: !this.state.switch1 }, ()=>this.onSwitchs())}
+                                    onValueChange={()=>this.setState({ switch1: !this.state.switch1 }, this.onSwitchs)}
                                 />}
                             />
                             <List.Item
@@ -101,7 +102,7 @@ export default class PageOptions extends Component<IProps, IState> {
                                 right={()=><Switch
                                     value={this.state.switch1_2}
                                     disabled={this.state.isLoading}
-                                    onValueChange={()=>this.setState({ switch1_2: !this.state.switch1_2 }, ()=>this.onSwitchs())}
+                                    onValueChange={()=>this.setState({ switch1_2: !this.state.switch1_2 }, this.onSwitchs)}
                                 />}
                             />
                             <List.Item
@@ -113,7 +114,7 @@ export default class PageOptions extends Component<IProps, IState> {
                                 right={()=><Switch
                                     value={this.state.switch2}
                                     disabled={this.state.isLoading}
-                                    onValueChange={()=>this.setState({ switch2: !this.state.switch2 }, ()=>this.onSwitchs())}
+                                    onValueChange={()=>this.setState({ switch2: !this.state.switch2 }, this.onSwitchs)}
                                 />}
                             />
                             <List.Item
@@ -125,7 +126,7 @@ export default class PageOptions extends Component<IProps, IState> {
                                 right={()=><Switch
                                     value={this.state.switch3}
                                     disabled={this.state.isLoading}
-                                    onValueChange={()=>this.setState({ switch3: !this.state.switch3 }, ()=>this.onSwitchs())}
+                                    onValueChange={()=>this.setState({ switch3: !this.state.switch3 }, this.onSwitchs)}
                                 />}
                             />
                         </List.Section>

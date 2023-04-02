@@ -65,11 +65,12 @@ export default class Page3 extends Component<IProps, IState> {
                 message: ''
             }
         };
+        this.loadData = this.loadData.bind(this);
     }
     private event: EmitterSubscription | null = null;
     componentDidMount() {
         this.loadData();
-        this.event = DeviceEventEmitter.addListener('adminPage3Reload', ()=>this.loadData());
+        this.event = DeviceEventEmitter.addListener('adminPage3Reload', this.loadData);
     }
     componentWillUnmount() {
         this.event?.remove();

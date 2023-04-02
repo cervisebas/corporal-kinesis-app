@@ -1,5 +1,5 @@
 import { DarkTheme as NavigationDarkTheme } from '@react-navigation/native';
-import { DarkTheme as PaperDarkTheme } from 'react-native-paper';
+import { MD2DarkTheme as PaperDarkTheme } from 'react-native-paper';
 
 const CombinedTheme = {
     ...PaperDarkTheme,

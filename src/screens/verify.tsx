@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
-import { Text, Provider as PaperProvider, ActivityIndicator } from "react-native-paper";
-import CombinedTheme from "../Theme";
+import { Text, ActivityIndicator } from "react-native-paper";
 import CustomModal from "./components/CustomModal";
 import FastImage from "react-native-fast-image";
 import LogoImage from "../assets/logo.webp";
@@ -40,28 +39,27 @@ export class VerifyScreen extends Component<IProps, IState> {
     }
     render(): React.ReactNode {
         return(<CustomModal visible={this.props.visible} animationIn={'fadeIn'} animationOut={'fadeOut'}>
-            <PaperProvider theme={CombinedTheme}>
-                <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background, position: 'relative' }}>
-                    <LinearGradient colors={['#100E20', '#15122A', '#1663AB']}>
-                        <View style={[styles.contain, { width: '100%', height: '100%' }]}>
-                            <FastImage
-                                source={LogoImage}
-                                resizeMode={'contain'}
-                                style={getForPercentScale(Dimensions.get('window').width, 925, 1160, 70)}
-                            />
-                        </View>
-                        <View style={{ ...styles.contentIndicator, width: '100%', marginBottom: 100 }}>
-                            <ActivityIndicator animating size={'large'} />
-                            {(this.props.textShow)&&<Text style={styles.textIndicator}>{this.props.textShow}</Text>}
-                        </View>
-                    </LinearGradient>
-                </View>
-            </PaperProvider>
+            <View style={{ flex: 1, backgroundColor: '#000000', position: 'relative' }}>
+                <LinearGradient style={{ flex: 1 }} colors={['#100E20', '#15122A', '#1663AB']}>
+                    <View style={[styles.contain, { width: '100%', height: '100%' }]}>
+                        <FastImage
+                            source={LogoImage}
+                            resizeMode={'contain'}
+                            style={getForPercentScale(Dimensions.get('window').width, 925, 1160, 70)}
+                        />
+                    </View>
+                    <View style={[styles.contentIndicator, { width: '100%', marginBottom: 100 }]}>
+                        <ActivityIndicator animating size={'large'} />
+                        {(this.props.textShow)&&<Text style={styles.textIndicator}>{this.props.textShow}</Text>}
+                    </View>
+                </LinearGradient>
+            </View>
         </CustomModal>);
     }
 }
 const styles = StyleSheet.create({
     contain: {
+        flex: 1,
         alignItems: 'center',
         justifyContent: 'center'
     },

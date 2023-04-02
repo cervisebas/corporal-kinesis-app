@@ -2,7 +2,7 @@ import { decode } from "base-64";
 import moment from "moment";
 import React, { PureComponent } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { Appbar, Colors, Provider as PaperProvider, Text } from "react-native-paper";
+import { Appbar, MD2Colors, Provider as PaperProvider, Text } from "react-native-paper";
 import utf8 from "utf8";
 import { HostServer } from "../../../scripts/ApiCorporal";
 import { commentsData, details, DetailsTrainings } from "../../../scripts/ApiCorporal/types";
@@ -32,8 +32,8 @@ export default class ViewMoreDetails extends PureComponent<IProps, IState> {
         this.state = {};
     }
     processShow(data: details, isRPE?: boolean): any {
-        if (isRPE) return(<Text>{data.value} <Text style={{ color: (data.difference)&&(data.difference > 0)? (data.difference == -9999999999)? Colors.yellow500: Colors.red500: Colors.green500 }}>{`(${(data.difference == -9999999999)? '~': data.difference})`}</Text></Text>);
-        return(<Text>{data.value} <Text style={{ color: (data.difference)&&(data.difference < 0)? (data.difference == -9999999999)? Colors.yellow500: Colors.red500: Colors.green500 }}>{`(${(data.difference == -9999999999)? '~': data.difference})`}</Text></Text>);
+        if (isRPE) return(<Text>{data.value} <Text style={{ color: (data.difference)&&(data.difference > 0)? (data.difference == -9999999999)? MD2Colors.yellow500: MD2Colors.red500: MD2Colors.green500 }}>{`(${(data.difference == -9999999999)? '~': data.difference})`}</Text></Text>);
+        return(<Text>{data.value} <Text style={{ color: (data.difference)&&(data.difference < 0)? (data.difference == -9999999999)? MD2Colors.yellow500: MD2Colors.red500: MD2Colors.green500 }}>{`(${(data.difference == -9999999999)? '~': data.difference})`}</Text></Text>);
     }
     processTitle(exercise: string): any { return(<Text>Ejercicio realizado: <Text style={{ fontWeight: '700' }}>{exercise}</Text></Text>); }
     processParagraph(paragraph: string) { return (paragraph == 'none')? 'No hay descripción disponible.': paragraph; }

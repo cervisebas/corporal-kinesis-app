@@ -12,6 +12,7 @@ import ImageView from "react-native-image-viewing";
 import { ImageSource } from "react-native-vector-icons/Icon";
 import EditAccount from "./pages/editAccount";
 import ImageProfile from "../../assets/profile.webp";
+import { ThemeContext } from "../../providers/ThemeProvider";
 
 type IProps = {
     showLoading: (show: boolean, text: string)=>any;
@@ -54,6 +55,7 @@ export class Tab2 extends Component<IProps, IState> {
         this.openEditAccount = this.openEditAccount.bind(this);
     }
     private event: EmitterSubscription | null = null;
+    static contextType = ThemeContext;
     loadData() {
         AsyncStorage.getItem('account_session').then((value)=>{
             if (!value) return this.setState({ viewName: 'Error!!!' });
@@ -97,8 +99,9 @@ export class Tab2 extends Component<IProps, IState> {
         }, ()=>this.props.showLoading(false, '')));
     }
     render(): React.ReactNode {
+        const { theme } = this.context;
         return(<View style={{ flex: 1 }}>
-            <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
+            <Appbar.Header style={{ backgroundColor: theme.colors.background }}>
                 <Appbar.Content title={"Mi cuenta"} />
                 <Appbar.Action icon={'cog'} onPress={this.props.openOptions} />
             </Appbar.Header>

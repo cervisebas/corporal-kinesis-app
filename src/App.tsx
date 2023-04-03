@@ -11,7 +11,6 @@ import { ExtraContents } from './ExtraContents';
 import { setLoadNow } from './scripts/Global';
 import { decode } from 'base-64';
 import VersionCheck from 'react-native-version-check';
-import 'react-native-gesture-handler';
 import SplashScreen from './screens/SplashScreen';
 import { ThemeContext, ThemeContextType } from './providers/ThemeProvider';
 
@@ -69,7 +68,6 @@ export default class App extends PureComponent<IProps, IState> {
     }
     render(): React.ReactNode {
         const { theme, navTheme } = this.context;
-        console.log(`App primary: ${theme.colors.primary}`);
         return(<View style={{ flex: 1, position: 'relative', backgroundColor: theme.colors.background }}>
             <StatusBar barStyle={'light-content'} backgroundColor={'#0f4577'} />
             <PaperProvider theme={theme}>

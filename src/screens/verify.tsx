@@ -11,41 +11,20 @@ type IProps = {
     visible: boolean;
     textShow: string | undefined;
 };
-type IState = {
-    overflowText: string;
-};
 
-export class VerifyScreen extends Component<IProps, IState> {
+export class VerifyScreen extends Component<IProps> {
     constructor(props: IProps) {
         super(props);
-        this.state = {
-            overflowText: ''
-        };
-        this.updateOverflowText = this.updateOverflowText.bind(this);
-    }
-    private animOverText: any = undefined;
-    componentDidMount() {
-        this.animOverText = setInterval(this.updateOverflowText, 512);
-    }
-    componentWillUnmount() {
-        clearInterval(this.animOverText);
-    }
-    updateOverflowText() {
-        if (this.props.visible) {
-            let overflowTextState = this.state.overflowText;
-            let overflowText = (overflowTextState.length == 0)? '.': (overflowTextState.length == 1)? '..': (overflowTextState.length == 2)? '...': '';
-            this.setState({ overflowText });
-        }
     }
     render(): React.ReactNode {
-        return(<CustomModal visible={this.props.visible} animationIn={'fadeIn'} animationOut={'fadeOut'}>
+        return(<CustomModal visible={true} animationIn={'fadeIn'} animationOut={'fadeOut'}>
             <View style={{ flex: 1, backgroundColor: '#000000', position: 'relative' }}>
                 <LinearGradient style={{ flex: 1 }} colors={['#100E20', '#15122A', '#1663AB']}>
                     <View style={[styles.contain, { width: '100%', height: '100%' }]}>
                         <FastImage
                             source={LogoImage}
                             resizeMode={'contain'}
-                            style={getForPercentScale(Dimensions.get('window').width, 925, 1160, 70)}
+                            style={getForPercentScale(Dimensions.get('window').width, 925, 1160, 65)}
                         />
                     </View>
                     <View style={[styles.contentIndicator, { width: '100%', marginBottom: 100 }]}>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import CustomModal from "./components/CustomModal";
 import LogoImage from "../assets/logo.webp";
@@ -7,8 +7,10 @@ import Animated, { Easing, useAnimatedStyle, useSharedValue, withSpring, withTim
 import { waitTo } from "../scripts/Utils";
 import TextAnimationShake from "../components/TextAnimationShake";
 import RNSplashScreen from "react-native-splash-screen";
+import { ThemeContext } from "../providers/ThemeProvider";
 
 export default React.memo(function SplashScreen(props: { init: ()=>void; }) {
+    const { setThemeStatus } = useContext(ThemeContext);
     const [visible, setVisible] = useState(true);
     const [startText, setStartText] = useState(false);
 
@@ -51,6 +53,7 @@ export default React.memo(function SplashScreen(props: { init: ()=>void; }) {
         await waitTo(3000);
         props.init();
         setVisible(false);
+        setThemeStatus([{ color: '#1663AB', style: 'light' }, { color: '#100E20', style: 'light' }]);
     }
 
     return(<CustomModal visible={visible} removeAnimationIn={true} animationOut={'fadeOut'}>

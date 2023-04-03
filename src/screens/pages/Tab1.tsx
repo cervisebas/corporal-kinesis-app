@@ -130,7 +130,7 @@ export class Tab1 extends Component<IProps, IState> {
     render(): React.ReactNode {
         const { theme } = this.context;
         return(<View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-            <Appbar.Header>
+            <Appbar.Header style={{ backgroundColor: theme.colors.background }}>
                 <Appbar.Content title="Estadísticas" />
             </Appbar.Header>
             <View style={{ flex: 1, overflow: 'hidden' }}>

@@ -66,7 +66,6 @@ export default React.memo(function Client(props: IProps) {
             event?.remove();
         };
     }, []);
-    console.log(`Client primary: ${theme.colors.primary}`);
 
     return(<View style={{ flex: 1 }}>
         <LoadingComponent ref={refLoadingComponent} />

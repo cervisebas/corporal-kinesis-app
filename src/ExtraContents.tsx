@@ -5,7 +5,7 @@ import { MaterialDialog } from "./components/material-dialog";
 import { ChangeLog } from "./screens/ChangeLog";
 import Information from "./screens/information";
 import { Session } from "./screens/session";
-import { VerifyScreen } from "./screens/verify";
+import VerifyScreen from "./screens/verify";
 import { Global } from "./scripts/Global";
 import CombinedTheme from "./Theme";
 
@@ -50,11 +50,6 @@ export class ExtraContents extends Component<IProps, IState> {
     }
     componentWillUnmount() {
         this.event?.remove();
-        this.setState({
-            viewLoading: false,
-            textLoading: '',
-            showInfoApp: false
-        });
     }
     render(): React.ReactNode {
         return(<>

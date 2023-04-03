@@ -1,8 +1,8 @@
-import React, { PureComponent } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SystemNavigationBar from "react-native-system-navigation-bar";
-import { DeviceEventEmitter, EmitterSubscription, StatusBar, View } from 'react-native';
+import { DeviceEventEmitter, EmitterSubscription, StatusBar, StatusBarStyle, View } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import Client from './screens/client';
 import Profesional from './screens/profesional';
@@ -12,85 +12,112 @@ import { setLoadNow } from './scripts/Global';
 import { decode } from 'base-64';
 import VersionCheck from 'react-native-version-check';
 import SplashScreen from './screens/SplashScreen';
-import { ThemeContext, ThemeContextType } from './providers/ThemeProvider';
+import { ThemeContext } from './providers/ThemeProvider';
 
-type IProps = {};
-type IState = {
-    openSession: boolean;
-    showVerify: boolean;
-    textAnimVerify: string | undefined;
-
-    changeLoadView: boolean;
-
-    viewDialogUpdate: boolean;
-    storeUrl: string;
-};
 const Stack = createNativeStackNavigator();
-export default class App extends PureComponent<IProps, IState> {
-    constructor(props: IProps) {
-        super(props);
-        this.state = {
-            openSession: false,
-            showVerify: false,
-            textAnimVerify: undefined,
-            changeLoadView: false,
-            viewDialogUpdate: false,
-            storeUrl: ''
-        };
-        this.verifyAccount = this.verifyAccount.bind(this);
-    }
-    private event: EmitterSubscription | null = null;
-    private event2: EmitterSubscription | null = null;
-    static contextType: React.Context<ThemeContextType> = ThemeContext;
-    verifyAccount() {
-        this.setState({ showVerify: true });
+
+var event: EmitterSubscription | undefined = undefined;
+var event2: EmitterSubscription | undefined = undefined;
+
+export default React.memo(function App() {
+    // Context's
+    const { theme, navTheme, themeStatus } = useContext(ThemeContext);
+    // State's
+    const [openSession, setOpenSession] = useState<boolean>(false);
+    const [showVerify, setShowVerify] = useState<boolean>(false);
+    const [textAnimVerify, setTextAnimVerify] = useState<string|undefined>(undefined);
+    const [changeLoadView, setChangeLoadView] = useState<boolean>(false);
+    const [viewDialogUpdate, setViewDialogUpdate] = useState<boolean>(false);
+    const [storeUrl, setStoreUrl] = useState<string>('');
+    // State's StatusBar and NavBar
+    const [statusColor, setStatusColor] = useState(themeStatus[0].color);
+    const [statusStyle, setStatusStyle] = useState<StatusBarStyle>((themeStatus[0].style == 'light')? 'light-content': 'dark-content');
+    const [navColor, setNavColor] = useState(themeStatus[1].color);
+    const [navStyle, setNavStyle] = useState(themeStatus[1].style);
+
+    // Functions Extra Contentents
+    function _closeSession() { setOpenSession(false); }
+    function _closeChangeLoad() { setChangeLoadView(false); }
+    function _closeDialogUpdate() { setViewDialogUpdate(false); }
+
+    // Funtions
+    function verifyAccount() {
+        setShowVerify(true);
         Account.verify().then((value)=>{
-            if (value) this.setState({ textAnimVerify: `Accediendo como "${decode(value.email).slice(0, 5)}...${decode(value.email).slice(decode(value.email).indexOf('@'), decode(value.email).length)}"` });
-            setTimeout(()=>this.setState({ openSession: !value, showVerify: false }, ()=>(value) && setLoadNow(true)), 2500);
-            setTimeout(()=>(value)&&ChangeLogSystem.getVerify().then((value)=>(value) && this.setState({ changeLoadView: true }, ()=>ChangeLogSystem.setNewVersion())), 200);
+            setTextAnimVerify(`Accediendo como "${decode(value.email).slice(0, 5)}...${decode(value.email).slice(decode(value.email).indexOf('@'), decode(value.email).length)}"`);
+            setTimeout(()=>{
+                setOpenSession(!value);
+                setShowVerify(false);
+                if (value) {
+                    setLoadNow(true);
+                    ChangeLogSystem.getVerify().then((value)=>{
+                        if (value) {
+                            setChangeLoadView(true);
+                            ChangeLogSystem.setNewVersion();
+                        }
+                    });
+                }
+            }, 2500);
         }).catch((error)=>{
-            if (error.action == 1) return this.setState({ openSession: true });
-            this.setState({ textAnimVerify: error.cause }, ()=>setTimeout(()=>this.setState({ openSession: true }), 1500));
+            if (error.action == 1) return setOpenSession(true);
+            setTextAnimVerify(error.cause);
+            setTimeout(_closeSession, 1500);
         });
     }
-    componentDidMount() {
-        SystemNavigationBar.setNavigationColor('#0f4577', 'light', 'navigation');
-        this.event = DeviceEventEmitter.addListener('nowVerify', this.verifyAccount);
-        this.event2 = DeviceEventEmitter.addListener('openChangeLog', ()=>this.setState({ changeLoadView: true }));
+
+    useEffect(()=>{
+        event = DeviceEventEmitter.addListener('nowVerify', verifyAccount);
+        event2 = DeviceEventEmitter.addListener('openChangeLog', ()=>setChangeLoadView(true));
         Notification.init();
-        VersionCheck.needUpdate({ ignoreErrors: true }).then((value)=>(value.isNeeded)&&this.setState({ viewDialogUpdate: true, storeUrl: value.storeUrl }));
-        console.log(`Dev Mode: ${__DEV__}`);
-    }
-    componentWillUnmount() {
-        setLoadNow(false);
-        this.event?.remove();
-        this.event2?.remove();
-    }
-    render(): React.ReactNode {
-        const { theme, navTheme } = this.context;
-        return(<View style={{ flex: 1, position: 'relative', backgroundColor: theme.colors.background }}>
-            <StatusBar barStyle={'light-content'} backgroundColor={'#0f4577'} />
-            <PaperProvider theme={theme}>
-                <NavigationContainer theme={navTheme}>
-                    <ExtraContents
-                        openSession={this.state.openSession}
-                        closeSession={()=>this.setState({ openSession: false })}
-                        setLoadData={setLoadNow}
-                        showVerify={this.state.showVerify}
-                        textVerify={this.state.textAnimVerify}
-                        visibleChangeLoad={this.state.changeLoadView}
-                        closeChangeLoad={()=>this.setState({ changeLoadView: false })}
-                        viewDialogUpdate={this.state.viewDialogUpdate}
-                        closeDialogUpdate={()=>this.setState({ viewDialogUpdate: false })}
-                        storeUrl={this.state.storeUrl}
-                    />
-                    <SplashScreen init={this.verifyAccount} />
-                    <Stack.Navigator initialRouteName="c" screenOptions={{ headerShown: false, animation: 'fade_from_bottom', gestureEnabled: false }} >
-                        <Stack.Screen name="c" children={(cProps)=><Client {...cProps} />} />
-                        <Stack.Screen name="p" children={(cProps)=><Profesional {...cProps} />} />
-                    </Stack.Navigator>
-                </NavigationContainer>
-            </PaperProvider>
-        </View>);
-    }
-}
+        VersionCheck.needUpdate({ ignoreErrors: true }).then((value)=>{
+            if (value.isNeeded) {
+                setViewDialogUpdate(true);
+                setStoreUrl(value.storeUrl);
+            }
+        });
+        return ()=>{
+            setLoadNow(false);
+            event?.remove();
+            event2?.remove();
+        };
+    }, []);
+    
+    useEffect(()=>{
+        console.log(themeStatus);
+        const stStyle = (themeStatus[0].style == 'light')? 'light-content': 'dark-content';
+        if (statusColor !== themeStatus[0].color) setStatusColor(themeStatus[0].color);
+        if (statusStyle !== stStyle) setStatusStyle(stStyle);
+        if (navColor !== themeStatus[1].color) setNavColor(themeStatus[1].color);
+        if (navStyle !== themeStatus[1].style) setNavStyle(themeStatus[1].style);
+    }, [themeStatus]);
+    /* ########## Color StatusBar/StatusNavigationBar ########## */
+    SystemNavigationBar.setNavigationColor(navColor, navStyle);
+    StatusBar.setBackgroundColor(statusColor, false);
+    StatusBar.setBarStyle(statusStyle, false);
+    //console.log(navColor, navStyle, statusColor, statusStyle);
+    /* ######################################################### */
+
+    return(<View style={{ flex: 1, position: 'relative', backgroundColor: theme.colors.background }}>
+        <PaperProvider theme={theme}>
+            <NavigationContainer theme={navTheme}>
+                <ExtraContents
+                    openSession={openSession}
+                    closeSession={_closeSession}
+                    setLoadData={setLoadNow}
+                    showVerify={showVerify}
+                    textVerify={textAnimVerify}
+                    visibleChangeLoad={changeLoadView}
+                    closeChangeLoad={_closeChangeLoad}
+                    viewDialogUpdate={viewDialogUpdate}
+                    closeDialogUpdate={_closeDialogUpdate}
+                    storeUrl={storeUrl}
+                />
+                <SplashScreen init={verifyAccount} />
+                <Stack.Navigator initialRouteName="c" screenOptions={{ headerShown: false, animation: 'fade_from_bottom', gestureEnabled: false }} >
+                    <Stack.Screen name="c" children={(cProps)=><Client {...cProps} />} />
+                    <Stack.Screen name="p" children={(cProps)=><Profesional {...cProps} />} />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </PaperProvider>
+    </View>);
+});

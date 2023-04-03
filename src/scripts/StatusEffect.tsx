@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react";
-import { DataContext, ThemeStatus } from "../GlobalComponents/DataProvider";
 import { waitTo } from "./Utils";
+import { ThemeContext, ThemeStatus } from "../providers/ThemeProvider";
 
 export default function statusEffect(status: (ThemeStatus | undefined)[], dependencie: boolean, statusClose?: (ThemeStatus | undefined)[], delay?: number) {
-    const { setThemeStatus, themeStatus, theme } = useContext(DataContext);
+    const { setThemeStatus, themeStatus, theme } = useContext(ThemeContext);
     const [actual, setActual] = useState<ThemeStatus[]>([]);
 
     function open() {

@@ -9,7 +9,8 @@ export type ThemeStatus = {
     style: 'light' | 'dark';
 };
 const defaultThemeStatus: ThemeStatus = {
-    color: '#0f4577',
+    //color: '#0f4577',
+    color: '#0B0C0E',
     style: 'light'
 };
 

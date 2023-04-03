@@ -12,30 +12,26 @@ type IProps = {
     textShow: string | undefined;
 };
 
-export class VerifyScreen extends Component<IProps> {
-    constructor(props: IProps) {
-        super(props);
-    }
-    render(): React.ReactNode {
-        return(<CustomModal visible={true} animationIn={'fadeIn'} animationOut={'fadeOut'}>
-            <View style={{ flex: 1, backgroundColor: '#000000', position: 'relative' }}>
-                <LinearGradient style={{ flex: 1 }} colors={['#100E20', '#15122A', '#1663AB']}>
-                    <View style={[styles.contain, { width: '100%', height: '100%' }]}>
-                        <FastImage
-                            source={LogoImage}
-                            resizeMode={'contain'}
-                            style={getForPercentScale(Dimensions.get('window').width, 925, 1160, 65)}
-                        />
-                    </View>
-                    <View style={[styles.contentIndicator, { width: '100%', marginBottom: 100 }]}>
-                        <ActivityIndicator animating size={'large'} />
-                        {(this.props.textShow)&&<Text style={styles.textIndicator}>{this.props.textShow}</Text>}
-                    </View>
-                </LinearGradient>
-            </View>
-        </CustomModal>);
-    }
-}
+export default React.memo(function Verify(props: IProps) {
+    return(<CustomModal visible={props.visible} animationIn={'fadeIn'} animationOut={'fadeOut'}>
+        <View style={{ flex: 1, backgroundColor: '#000000', position: 'relative' }}>
+            <LinearGradient style={{ flex: 1 }} colors={['#100E20', '#15122A', '#1663AB']}>
+                <View style={[styles.contain, { width: '100%', height: '100%' }]}>
+                    <FastImage
+                        source={LogoImage}
+                        resizeMode={'contain'}
+                        style={getForPercentScale(Dimensions.get('window').width, 925, 1160, 65)}
+                    />
+                </View>
+                <View style={[styles.contentIndicator, { width: '100%', marginBottom: 100 }]}>
+                    <ActivityIndicator animating size={'large'} />
+                    {(props.textShow)&&<Text style={styles.textIndicator}>{props.textShow}</Text>}
+                </View>
+            </LinearGradient>
+        </View>
+    </CustomModal>);
+});
+
 const styles = StyleSheet.create({
     contain: {
         flex: 1,

@@ -46,9 +46,13 @@ export default React.memo(function SplashScreen(props: { init: ()=>void; }) {
         viewTitleOP.value = 1;
         viewTitleTX.value = 70;
         await waitTo(1500);
+        const use = { color: '#0B0C0E', style: 'light' };
+        const newUse = { color: '#ff5722', style: 'light' };
+        setThemeStatus([use as any, newUse as any]);
         scbackgroundHeight.value = withTiming('100%', { duration: 500, easing: Easing.circle });
         scbackgroundRadius.value = withTiming(0, { duration: 500, easing: Easing.circle });
         await waitTo(450);
+        setThemeStatus([newUse as any, newUse as any]);
         setStartText(true);
         await waitTo(3000);
         props.init();

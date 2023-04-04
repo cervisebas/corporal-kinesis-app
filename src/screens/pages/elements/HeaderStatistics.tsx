@@ -2,8 +2,8 @@ import React, { PureComponent, ReactNode } from "react";
 import { Dimensions, StyleProp, StyleSheet, ToastAndroid, View, ViewStyle } from "react-native";
 import { Title } from "react-native-paper";
 import { DetailsTrainings } from "../../../scripts/ApiCorporal/types";
-import { CustomCard3 } from "../../components/Components";
 import CustomCard1 from "../../components/CustomCard1";
+import CustomCard3 from "../../components/CustomCard3";
 
 type IProps = {
     goStatistics: (data: number, titleStatistics: string)=>any;

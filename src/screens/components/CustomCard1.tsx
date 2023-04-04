@@ -48,7 +48,7 @@ export default React.memo(function CustomCard1(props: IProps) {
 
     return(<Card style={props.style} accessible={true} onPress={props.onPress}>
         <Card.Content>
-            <Title>{props.value}</Title>
+            <Title style={{ color: '#FFFFFF' }}>{props.value}</Title>
             <Paragraph>{props.title}</Paragraph>
             <IconButton
                 icon={icon}

@@ -8,31 +8,6 @@ import { HostServer } from "../../scripts/ApiCorporal";
 import CombinedTheme from "../../Theme";
 import ImageLazyLoad from "./ImageLazyLoad";
 
-type IProps0 = {
-    onPress: ()=>any;
-    style?: StyleProp<ViewStyle>;
-    title: string;
-    value: string;
-    status: number;
-};
-class CustomCard1 extends PureComponent<IProps0> {
-    constructor(props: IProps0) { super(props); }
-    render(): React.ReactNode {
-        return(<Card style={this.props.style} accessible={true} onPress={()=>this.props.onPress()}>
-            <Card.Content>
-                <Title>{this.props.value}</Title>
-                <Paragraph>{this.props.title}</Paragraph>
-                <IconButton
-                    icon={(this.props.status == -5)? 'timer-sand': (this.props.status == -1)? 'chart-bubble': (this.props.status == 0)? 'chart-timeline-variant': (this.props.status == 1)? 'arrow-up': (this.props.status == 2)? 'arrow-down': 'chart-timeline-variant-shimmer'}
-                    iconColor={(this.props.status == -5)? CombinedTheme.colors.accent: (this.props.status == -1)? MD2Colors.red500: (this.props.status == 0)? MD2Colors.yellow500: (this.props.status == 1)? MD2Colors.green500: (this.props.status == 2)? MD2Colors.red500: MD2Colors.blue500}
-                    size={32}
-                    style={{ position: 'absolute', right: 6, top: 18, backgroundColor: CombinedTheme.colors.background }}
-                />
-            </Card.Content>
-        </Card>);
-    }
-}
-
 type IProps1 = {
     accountName: string;
     date: string;
@@ -392,7 +367,6 @@ class CardButton1 extends PureComponent<IProps16, IState16> {
 }
 
 export {
-    CustomCard1,
     CustomCardComments,
     EmptyListComments,
     CustomItemList,

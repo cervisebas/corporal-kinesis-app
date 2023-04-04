@@ -1,4 +1,4 @@
-import React, { Component, useContext } from "react";
+import React, { useContext } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 import { Text, ActivityIndicator } from "react-native-paper";
 import CustomModal from "./components/CustomModal";

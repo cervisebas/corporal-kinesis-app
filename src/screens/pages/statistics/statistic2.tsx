@@ -1,6 +1,6 @@
-import React, { Component, PureComponent } from "react";
+import React, { PureComponent } from "react";
 import { Dimensions, FlatList, StyleSheet, View } from "react-native";
-import { Appbar, Colors, ProgressBar, Provider as PaperProvider, Text } from 'react-native-paper';
+import { Appbar, MD2Colors, ProgressBar, Provider as PaperProvider, Text } from 'react-native-paper';
 import CombinedTheme from "../../../Theme";
 import { statisticData2 } from "../../../scripts/ApiCorporal/types";
 import { Alert, NoList } from "../../../assets/icons";
@@ -70,8 +70,8 @@ export class Statistics2 extends PureComponent<IProps, IState> {
     }
     getColorItem(past: number | undefined, actual: number | undefined): string {
         var past2: number = (past)? past: 0; var actual2: number = (actual)? actual: 0;
-        if (this.props.title == 'RPE') return (this.exist(past))? (this.exist(actual))? (past == actual)? Colors.blue500: (actual2 < past2)? Colors.green500: Colors.red500: Colors.yellow500: Colors.yellow500;
-        return (this.exist(past))? (this.exist(actual))? (past == actual)? Colors.blue500: (actual2 > past2)? Colors.green500: Colors.red500: Colors.yellow500: Colors.yellow500;
+        if (this.props.title == 'RPE') return (this.exist(past))? (this.exist(actual))? (past == actual)? MD2Colors.blue500: (actual2 < past2)? MD2Colors.green500: MD2Colors.red500: MD2Colors.yellow500: MD2Colors.yellow500;
+        return (this.exist(past))? (this.exist(actual))? (past == actual)? MD2Colors.blue500: (actual2 > past2)? MD2Colors.green500: MD2Colors.red500: MD2Colors.yellow500: MD2Colors.yellow500;
     }
     exist(value: number | undefined): boolean { return !(value == undefined || isNaN(value)); }
     resetDataAndClose() {

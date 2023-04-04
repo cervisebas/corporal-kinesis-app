@@ -15,26 +15,26 @@ export default React.memo(function CustomCard3(props: IProps) {
     const { theme } = useContext(ThemeContext);
     // State's
     const [width, setWidth] = useState(0);
+    const [width2, setWidth2] = useState(0);
     const [color, setColor] = useState(theme.colors.background);
 
-    function _onLayout({ nativeEvent: { layout } }: LayoutChangeEvent) {
-        setWidth(layout.width);
-    }
+    function _onLayout1({ nativeEvent: { layout } }: LayoutChangeEvent) { setWidth(layout.width); }
+    function _onLayout2({ nativeEvent: { layout } }: LayoutChangeEvent) { setWidth2(layout.width); }
     function _onPressStart() { setColor('rgb(213, 0, 0)'); }
     function _onPressEnd() { setColor(theme.colors.background); }
 
     return(<Card
-        onLayout={_onLayout}
+        onLayout={_onLayout1}
         style={props.style}
         accessible={true}
         onPress={props.onPress}
         onTouchStart={_onPressStart}
         onTouchEnd={_onPressEnd}>
         <Card.Content style={{ justifyContent: 'center' }}>
-            <View style={{ width: width - 40, overflow: 'hidden' }}>
-                <Title numberOfLines={1}>{props.title}</Title>
+            <View style={{ width: width - width2 - 40, overflow: 'hidden' }}>
+                <Title style={{ color: '#FFFFFF' }} numberOfLines={1}>{props.title}</Title>
             </View>
-            <View style={{ position: 'absolute', right: 16, height: 24, alignItems: 'center', flexDirection: 'row' }}>
+            <View onLayout={_onLayout2} style={{ position: 'absolute', right: 16, height: 24, alignItems: 'center', flexDirection: 'row' }}>
                 <Text style={{ fontWeight: '700', color: color }}>Ver más detalles</Text>
                 <Icon name="arrow-right" size={24} color={color} style={{ marginLeft: 8 }} />
             </View>

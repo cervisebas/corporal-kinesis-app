@@ -13,6 +13,7 @@ import { ImageSource } from "react-native-vector-icons/Icon";
 import EditAccount from "./pages/editAccount";
 import ImageProfile from "../../assets/profile.webp";
 import { ThemeContext } from "../../providers/ThemeProvider";
+import { GlobalRef } from "../../GlobalRef";
 
 type IProps = {
     showLoading: (show: boolean, text: string)=>any;
@@ -53,6 +54,7 @@ export class Tab2 extends Component<IProps, IState> {
             isLoading: false
         };
         this.openEditAccount = this.openEditAccount.bind(this);
+        this.loadData = this.loadData.bind(this);
     }
     private event: EmitterSubscription | null = null;
     static contextType = ThemeContext;
@@ -70,7 +72,7 @@ export class Tab2 extends Component<IProps, IState> {
     }
     componentDidMount() {
         if (LoadNow && !this.state.isLoading) setTimeout(()=>this.loadData(), 500);
-        this.event = DeviceEventEmitter.addListener('tab2reload', ()=>this.setState({ isLoading: false }, ()=>this.loadData()));
+        this.event = DeviceEventEmitter.addListener('tab2reload', ()=>this.setState({ isLoading: false }, this.loadData));
     }
     componentWillUnmount() {
         this.event?.remove();
@@ -87,16 +89,19 @@ export class Tab2 extends Component<IProps, IState> {
         }
     }
     openEditAccount() {
-        this.props.showLoading(true, 'Cargando información...');
+        GlobalRef.current?.loadingController(true, 'Cargando información...');
         Account.getInfo().then((value)=>{
-            (value)&&this.setState({
-                editVisible: true,
-                editData: value
-            }, ()=>this.props.showLoading(false, ''));
+            if (value) { 
+                this.setState({
+                    editVisible: true,
+                    editData: value
+                });
+                GlobalRef.current?.loadingController(false);
+            }
         }).catch((err)=>this.setState({
             snakbarVisible: true,
             snackbarText: err.cause
-        }, ()=>this.props.showLoading(false, '')));
+        }, ()=>GlobalRef.current?.loadingController(false)));
     }
     render(): React.ReactNode {
         const { theme } = this.context;

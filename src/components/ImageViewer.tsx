@@ -1,43 +1,7 @@
-import React, { PureComponent, forwardRef, useImperativeHandle, useState } from "react";
+import React, { forwardRef, useImperativeHandle, useState } from "react";
 import ImageView from "./ImageViewing/index";
-import statusEffect from "../Scripts/StatusEffect";
-import { ThemeStatus } from "./DataProvider";
-
-type IProps = {};
-type IState = {
-    visible: boolean;
-    source: string;
-};
-
-/*export default class ImageViewer extends PureComponent<IProps, IState> {
-    constructor(props: IProps) {
-        super(props);
-        this.state = {
-            visible: false,
-            source: 'https://tecnicadigital.com.ar/image/default-admin.png'
-        };
-        this.close = this.close.bind(this);
-    }
-    open(source: string) {
-        this.setState({
-            visible: true,
-            source
-        });
-    }
-    close() {
-        this.setState({ visible: false });
-    }
-    render(): React.ReactNode {
-        return(<ImageView
-            images={[{ uri: this.state.source }]}
-            imageIndex={0}
-            visible={this.state.visible}
-            swipeToCloseEnabled={true}
-            doubleTapToZoomEnabled={true}
-            onRequestClose={this.close}
-        />);
-    }
-}*/
+import { ThemeStatus } from "../providers/ThemeProvider";
+import statusEffect from "../scripts/StatusEffect";
 
 export type ImageViewerRef = {
     open: (source: string)=>void;

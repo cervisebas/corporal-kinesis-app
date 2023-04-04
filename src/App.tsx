@@ -13,6 +13,8 @@ import { decode } from 'base-64';
 import VersionCheck from 'react-native-version-check';
 import SplashScreen from './screens/SplashScreen';
 import { ThemeContext } from './providers/ThemeProvider';
+import GlobalComponents from './GlobalComponents';
+import { GlobalRef } from './GlobalRef';
 
 const Stack = createNativeStackNavigator();
 
@@ -112,6 +114,7 @@ export default React.memo(function App() {
                     closeDialogUpdate={_closeDialogUpdate}
                     storeUrl={storeUrl}
                 />
+                <GlobalComponents ref={GlobalRef} />
                 <SplashScreen init={verifyAccount} />
                 <Stack.Navigator initialRouteName="c" screenOptions={{ headerShown: false, animation: 'fade_from_bottom', gestureEnabled: false }} >
                     <Stack.Screen name="c" children={(cProps)=><Client {...cProps} />} />

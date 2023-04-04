@@ -1,19 +1,18 @@
-import { decode, encode } from "base-64";
+import { encode } from "base-64";
 import moment from "moment";
 import React, { Component } from "react";
-import { View, FlatList, EmitterSubscription, DeviceEventEmitter, RefreshControl } from "react-native";
-import { Appbar, ProgressBar, Snackbar, Text } from "react-native-paper";
-import utf8 from "utf8";
-import { NoComment } from "../../assets/icons";
-import { Comment, HostServer, Training } from "../../scripts/ApiCorporal";
+import { View, EmitterSubscription, DeviceEventEmitter } from "react-native";
+import { Appbar, Snackbar, Text } from "react-native-paper";
+import { Comment, Training } from "../../scripts/ApiCorporal";
 import { commentsData, DetailsTrainings, statisticData2 } from "../../scripts/ApiCorporal/types";
 import { LoadNow } from "../../scripts/Global";
 import CombinedTheme from "../../Theme";
-import { CustomCardComments, EmptyListComments } from "../components/Components";
-import HeaderStatistics from "./elements/HeaderStatistics";
 import ViewMoreDetails from "./pages/viewMoreDetails";
 import { Statistics2 } from "./statistics/statistic2";
 import { ThemeContext } from "../../providers/ThemeProvider";
+import Tab1ListComments from "./elements/Tab1ListComments";
+import { refStatistic } from "../clientRefs";
+import { GlobalRef } from "../../GlobalRef";
 
 type IProps = {
     showLoading: (show: boolean, text: string)=>any;
@@ -39,14 +38,6 @@ type IState = {
     viewMoreDetailsVisible: boolean;
 };
 
-const decodeUtf8 = (str: string)=>{
-    try {
-        return utf8.decode(str);
-    } catch {
-        return str;
-    }
-};
-
 export class Tab1 extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
@@ -65,6 +56,9 @@ export class Tab1 extends Component<IProps, IState> {
             viewMoreDetailsVisible: false
         };
         this.goLoading = this.goLoading.bind(this);
+        this.goStatistics = this.goStatistics.bind(this);
+        this._onRefresing = this._onRefresing.bind(this);
+        this._openDetails = this._openDetails.bind(this);
     }
     private event: EmitterSubscription | null = null;
     private timeLoad: number = 512;
@@ -81,16 +75,12 @@ export class Tab1 extends Component<IProps, IState> {
         this.event?.remove();
     }
     goStatistics(data: number, titleStatistics: string) {
-        this.props.showLoading(true, 'Cargando estadísticas...');
+        GlobalRef.current?.loadingController(true, 'Cargando estadísticas...');
         Training.getAllOne2(data).then((value)=>{
-            this.props.showLoading(false, '');
-            this.setState({
-                visibleStatistics: true,
-                titleStatistics: titleStatistics,
-                statistics2: value
-            });
+            GlobalRef.current?.loadingController(false);
+            refStatistic.current?.open(titleStatistics, this.state.dataShow.exercise.name, value);
         }).catch((error)=>{
-            this.props.showLoading(false, '');
+            GlobalRef.current?.loadingController(false);
             this.setState({ dialogShow: true, messageDialog: error.cause });
         });
     }
@@ -127,36 +117,32 @@ export class Tab1 extends Component<IProps, IState> {
             this.setState({ dialogShow: true, messageDialog: error.cause, dataComments: commentError, commentsLoading: false });
         });
     }
+    _onRefresing() { this.setState({ refreshing: true }, this.goLoading); }
+    _openDetails() { this.setState({ viewMoreDetailsVisible: true }); }
+    
     render(): React.ReactNode {
         const { theme } = this.context;
         return(<View style={{ flex: 1, backgroundColor: theme.colors.background }}>
             <Appbar.Header style={{ backgroundColor: theme.colors.background }}>
                 <Appbar.Content title="Estadísticas" />
             </Appbar.Header>
-            <View style={{ flex: 1, overflow: 'hidden' }}>
-                <FlatList
-                    data={this.state.dataComments}
-                    keyExtractor={(item)=>`t1-user-${item.id}`}
-                    refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={this.state.refreshing} onRefresh={()=>this.setState({ showLoading: true, commentsLoading: true, dataComments: [], refreshing: true }, this.goLoading)} />}
-                    ListHeaderComponent={<HeaderStatistics dataShow={this.state.dataShow} showLoading={this.state.showLoading} goStatistics={(data, title)=>this.goStatistics(data, title)} openDetails={()=>this.setState({ viewMoreDetailsVisible: true })} />}
-                    ListEmptyComponent={()=>(!this.state.commentsLoading)? <EmptyListComments message={'No hay comentarios para mostrar'} icon={<NoComment width={96} height={96} />} style={{ marginTop: 32 }} />: <View><ProgressBar indeterminate={true} /></View>}
-                    renderItem={({ item })=><CustomCardComments
-                        key={`t1-user-${item.id}`}
-                        source={(item.id !== '-1')? { uri: `${HostServer}/images/accounts/${decode(item.accountData.image)}` }: require('../../assets/profile.webp')}
-                        accountName={(item.id !== '-1')? `${decode(item.accountData.name)}`: decode(item.accountData.name)}
-                        edit={item.edit}
-                        date={decode(item.date)}
-                        comment={decodeUtf8(decode(item.comment))}
-                    />}
-                />
-            </View>
-            <Statistics2
+            <Tab1ListComments
+                refreshing={this.state.refreshing}
+                loading={this.state.showLoading}
+                data={this.state.dataShow}
+                commentsLoading={this.state.commentsLoading}
+                dataComment={this.state.dataComments}
+                onRefresing={this._onRefresing}
+                openDetails={this._openDetails}
+                goStatistics={this.goStatistics}            
+            />
+            {/*<Statistics2
                 visible={this.state.visibleStatistics}
                 exercise={this.state.dataShow.exercise.name}
                 datas={this.state.statistics2}
                 title={this.state.titleStatistics}
                 close={()=>this.setState({ visibleStatistics: false, statistics2: [] })}
-            />
+            />*/}
             <ViewMoreDetails
                 visible={this.state.viewMoreDetailsVisible}
                 close={()=>this.setState({ viewMoreDetailsVisible: false })}

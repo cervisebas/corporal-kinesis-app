@@ -8,6 +8,9 @@ import { Tab1 } from "./pages/Tab1";
 import { Tab2 } from "./pages/Tab2";
 import LoadingComponent, { LoadingComponentRef } from "./components/LoadingComponent";
 import { ThemeContext } from "../providers/ThemeProvider";
+import { Statistics2 } from "./pages/statistics/statistic2";
+import { refStatistic } from "./clientRefs";
+import Statistic from "./pages/statistics/statistic";
 
 type IProps = {
     navigation: any;
@@ -68,11 +71,6 @@ export default React.memo(function Client(props: IProps) {
     }, []);
 
     return(<View style={{ flex: 1 }}>
-        <LoadingComponent ref={refLoadingComponent} />
-        <OthersComponents
-            ref={refOthersComponents}
-            showLoading={showLoading}
-        />
         <BottomNavigation
             navigationState={{ index, routes }}
             onIndexChange={setIndex}
@@ -87,6 +85,12 @@ export default React.memo(function Client(props: IProps) {
             icon={'account-lock'}
             onPress={()=>props.navigation.navigate('p')}
         />
+        <LoadingComponent ref={refLoadingComponent} />
+        <OthersComponents
+            ref={refOthersComponents}
+            showLoading={showLoading}
+        />
+        <Statistic ref={refStatistic} />
     </View>);
 });
 

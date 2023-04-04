@@ -78,15 +78,9 @@ export class Tab2 extends Component<IProps, IState> {
         this.event?.remove();
     }
     openImage() {
-        if (this.state.isLoading) {
-            var srcImage: any = this.state.viewImage;
-            this.setState({
-                viewImageSource: [srcImage],
-                viewImageShow: true
-            });
-        } else {
-            ToastAndroid.show('Espere por favor...', ToastAndroid.SHORT);
-        }
+        if (!this.state.isLoading) return ToastAndroid.show('Espere por favor...', ToastAndroid.SHORT);
+        if (typeof this.state.viewImage == 'number') return ToastAndroid.show('No se puede abrir...', ToastAndroid.SHORT);
+        GlobalRef.current?.showImageViewer(this.state.viewImage.uri!);
     }
     openEditAccount() {
         GlobalRef.current?.loadingController(true, 'Cargando información...');

@@ -23,8 +23,11 @@ export default function statusEffect(status: (ThemeStatus | undefined)[], depend
         setThemeStatus(statusClose??actual);
     }
 
-    useEffect(()=>{
+    // Actualizacion
+    function update() {
         if (forceInit) if (!init) return setInit(true);
         if (dependencie) open(); else close();
-    }, [dependencie]);
+    }
+
+    useEffect(()=>{ update() }, [dependencie]);
 }

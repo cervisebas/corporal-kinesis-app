@@ -85,7 +85,6 @@ export default React.memo(function App() {
     }, []);
     
     useEffect(()=>{
-        console.log(themeStatus);
         const stStyle = (themeStatus[0].style == 'light')? 'light-content': 'dark-content';
         if (statusColor !== themeStatus[0].color) setStatusColor(themeStatus[0].color);
         if (statusStyle !== stStyle) setStatusStyle(stStyle);

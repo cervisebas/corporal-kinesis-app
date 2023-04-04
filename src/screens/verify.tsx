@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useContext } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 import { Text, ActivityIndicator } from "react-native-paper";
 import CustomModal from "./components/CustomModal";
@@ -6,6 +6,8 @@ import FastImage from "react-native-fast-image";
 import LogoImage from "../assets/logo.webp";
 import { getForPercentScale } from "../scripts/Utils";
 import LinearGradient from "react-native-linear-gradient";
+import statusEffect from "../scripts/StatusEffect";
+import { ThemeContext } from "../providers/ThemeProvider";
 
 type IProps = {
     visible: boolean;
@@ -13,6 +15,13 @@ type IProps = {
 };
 
 export default React.memo(function Verify(props: IProps) {
+    const { theme } = useContext(ThemeContext);
+
+    statusEffect(
+        [{ color: '#100E20', style: 'light' }, { color: '#1663AB', style: 'light' }],
+        props.visible,
+        [{ color: theme.colors.background, style: 'light' }, { color: theme.colors.elevation.level2, style: 'light' }]
+    );
     return(<CustomModal visible={props.visible} animationIn={'fadeIn'} animationOut={'fadeOut'}>
         <View style={{ flex: 1, backgroundColor: '#000000', position: 'relative' }}>
             <LinearGradient style={{ flex: 1 }} colors={['#100E20', '#15122A', '#1663AB']}>

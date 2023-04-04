@@ -53,9 +53,9 @@ export default React.memo(function SplashScreen(props: { init: ()=>void; }) {
         await waitTo(3000);
         props.init();
         setVisible(false);
-        setThemeStatus([{ color: '#1663AB', style: 'light' }, { color: '#1663AB', style: 'light' }]);
+        setThemeStatus([{ color: '#100E20', style: 'light' }, { color: '#1663AB', style: 'light' }]);
     }
-
+    
     return(<CustomModal visible={visible} removeAnimationIn={true} animationOut={'fadeOut'}>
         <View style={styles.background}>
             <Animated.View style={[styles.viewText, viewTitleStyles]}>

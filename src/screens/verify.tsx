@@ -20,7 +20,9 @@ export default React.memo(function Verify(props: IProps) {
     statusEffect(
         [{ color: '#100E20', style: 'light' }, { color: '#1663AB', style: 'light' }],
         props.visible,
-        [{ color: theme.colors.background, style: 'light' }, { color: theme.colors.elevation.level2, style: 'light' }]
+        [{ color: theme.colors.background, style: 'light' }, { color: theme.colors.elevation.level2, style: 'light' }],
+        undefined,
+        true
     );
     return(<CustomModal visible={props.visible} animationIn={'fadeIn'} animationOut={'fadeOut'}>
         <View style={{ flex: 1, backgroundColor: '#000000', position: 'relative' }}>

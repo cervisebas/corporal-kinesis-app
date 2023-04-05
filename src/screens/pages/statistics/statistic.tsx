@@ -66,24 +66,25 @@ export default React.memo(forwardRef(function Statistic(_props: any, ref: React.
             const _dataUse = datas.find((value)=>value.exercise == (_exercise??exercise));
             if (!_dataUse) return ToastAndroid.show('Ocurrió un error al cargar los datos.', ToastAndroid.SHORT);
             // Insertar datos iniciales.
-            setDataShow(dataUse.singles.map((_i, index)=>({ label: '', value: '', id: `load-${index}`, icon: '', color: '' })));
+            setDataShow(dataUse.singles.map((_i, index)=>({ label: '', value: '', id: `load-${index}`, icon: 'chart-timeline-variant-shimmer', color: '' })));
             setDataUse(_dataUse);
             setListExercises(datas.map((value)=>value.exercise));
             setExercise(_dataUse.exercise);
             // Determinar datos a mostrar
-            const _mapDataShow = (value: typeof _dataUse.singles[0], index: number, array: (typeof _dataUse.singles[0])[])=>({
-                id: value.id,
-                icon: _getIconItem(array[index-1].value, value.value),
-                color: _getColorItem(array[index-1].value, value.value),
-                label: value.label,
-                value: value.value
+            const _mapDataShow = (item: typeof _dataUse.singles[0], index: number, array: (typeof _dataUse.singles[0])[])=>({
+                id: item.id,
+                icon: _getIconItem(array[index-1]?.value, item.value),
+                color: _getColorItem(array[index-1]?.value, item.value),
+                label: item.label,
+                value: item.value
             });
-            let _dataShow: DataView[] = _dataUse.singles.map(_mapDataShow);
-            setTimeout(()=>setLoading2(false), 1000);
+            let _dataShow = _dataUse.singles.map(_mapDataShow);
+            // Añadir datos y finalizar la carga.
+            setTimeout(()=>setLoading2(false), 500);
             setTimeout(() => {
                 setDataShow(_dataShow.reverse());
                 setLoading(false);
-            }, 2000);
+            }, 1000);
         } catch (error) {
             console.log(error);
         }
@@ -91,6 +92,7 @@ export default React.memo(forwardRef(function Statistic(_props: any, ref: React.
     function _changeExercise(_exercise: string) {
         setLoading(true);
         setExercise(_exercise);
+        loadData(_exercise);
     }
 
     // FlatList

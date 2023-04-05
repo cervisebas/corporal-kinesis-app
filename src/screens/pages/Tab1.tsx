@@ -8,7 +8,6 @@ import { commentsData, DetailsTrainings, statisticData2 } from "../../scripts/Ap
 import { LoadNow } from "../../scripts/Global";
 import CombinedTheme from "../../Theme";
 import ViewMoreDetails from "./pages/viewMoreDetails";
-import { Statistics2 } from "./statistics/statistic2";
 import { ThemeContext } from "../../providers/ThemeProvider";
 import Tab1ListComments from "./elements/Tab1ListComments";
 import { refStatistic } from "../clientRefs";

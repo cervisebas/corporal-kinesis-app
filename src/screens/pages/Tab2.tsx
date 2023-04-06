@@ -3,34 +3,21 @@ import { decode } from "base-64";
 import React, { Component } from "react";
 import { DeviceEventEmitter, Dimensions, EmitterSubscription, ToastAndroid, TouchableHighlight, View } from "react-native";
 import FastImage, { Source } from "react-native-fast-image";
-import { ActivityIndicator, Appbar, Divider, Snackbar, Text } from "react-native-paper";
+import { ActivityIndicator, Appbar, Divider, Text } from "react-native-paper";
 import { Account, HostServer } from "../../scripts/ApiCorporal";
-import { infoAccount, storageData } from '../../scripts/ApiCorporal/types';
+import { storageData } from '../../scripts/ApiCorporal/types';
 import { LoadNow } from "../../scripts/Global";
 import { CardButton1 } from "../components/Components";
-import ImageView from "react-native-image-viewing";
-import { ImageSource } from "react-native-vector-icons/Icon";
-import EditAccount from "./pages/editAccount";
 import ImageProfile from "../../assets/profile.webp";
 import { ThemeContext } from "../../providers/ThemeProvider";
 import { GlobalRef } from "../../GlobalRef";
-import { refOptions } from "../clientRefs";
+import { refEditAccount, refOptions } from "../clientRefs";
 
 type IProps = {};
 type IState = {
     viewImage: number | Source;
     viewName: string;
     viewSurname: string;
-
-    viewImageShow: boolean;
-    viewImageSource: ImageSource[] | undefined;
-
-    editVisible: boolean;
-    editData: infoAccount | undefined;
-
-    snakbarVisible: boolean;
-    snackbarText: string;
-
     isLoading: boolean;
 };
 
@@ -43,12 +30,6 @@ export class Tab2 extends Component<IProps, IState> {
             viewName: 'Cargando...',
             viewSurname: '-',
             viewImage: ImageProfile,
-            viewImageShow: false,
-            viewImageSource: undefined,
-            editVisible: false,
-            editData: undefined,
-            snakbarVisible: false,
-            snackbarText: '',
             isLoading: false
         };
         this.openEditAccount = this.openEditAccount.bind(this);
@@ -69,7 +50,7 @@ export class Tab2 extends Component<IProps, IState> {
         });
     }
     componentDidMount() {
-        if (LoadNow && !this.state.isLoading) setTimeout(()=>this.loadData(), 500);
+        if (LoadNow && !this.state.isLoading) setTimeout(this.loadData, 500);
         this.event = DeviceEventEmitter.addListener('tab2reload', ()=>this.setState({ isLoading: false }, this.loadData));
     }
     componentWillUnmount() {
@@ -83,17 +64,12 @@ export class Tab2 extends Component<IProps, IState> {
     openEditAccount() {
         GlobalRef.current?.loadingController(true, 'Cargando información...');
         Account.getInfo().then((value)=>{
-            if (value) { 
-                this.setState({
-                    editVisible: true,
-                    editData: value
-                });
-                GlobalRef.current?.loadingController(false);
-            }
-        }).catch((err)=>this.setState({
-            snakbarVisible: true,
-            snackbarText: err.cause
-        }, ()=>GlobalRef.current?.loadingController(false)));
+            if (value) refEditAccount.current?.open(value);
+            GlobalRef.current?.loadingController(false);
+        }).catch((err)=>{
+            GlobalRef.current?.showSimpleAlert(err.cause, '');
+            GlobalRef.current?.loadingController(false);
+        });
     }
     openOptions() { refOptions.current?.open(); }
     render(): React.ReactNode {
@@ -128,28 +104,6 @@ export class Tab2 extends Component<IProps, IState> {
                 <View>
                     <CardButton1 title={'EDITAR DATOS'} icon={'pencil-outline'} onPress={()=>this.openEditAccount()} />
                 </View>
-                <Snackbar
-                    visible={this.state.snakbarVisible}
-                    duration={7000}
-                    style={{ backgroundColor: '#1663AB' }}
-                    onDismiss={()=>this.setState({ snakbarVisible: false })}
-                    action={{ label: 'OCULTAR', onPress: ()=>this.setState({ snakbarVisible: false }) }}>
-                    <Text>{this.state.snackbarText}</Text>
-                </Snackbar>
-                {/* MODALS */}
-                {(this.state.viewImageSource)&&<ImageView
-                    images={this.state.viewImageSource}
-                    imageIndex={0}
-                    visible={this.state.viewImageShow}
-                    onRequestClose={()=>this.setState({ viewImageShow: false })}
-                />}
-                <EditAccount
-                    visible={this.state.editVisible}
-                    close={()=>this.setState({ editVisible: false, editData: undefined })}
-                    datas={this.state.editData}
-                    showLoading={()=>undefined}
-                    showSnackBar={(s, t)=>this.setState({ snakbarVisible: s, snackbarText: t })}
-                />
             </View>
         </View>);
     }

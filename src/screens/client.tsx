@@ -6,9 +6,10 @@ import Options from "./pages/pages/options";
 import { LoadNow } from "../scripts/Global";
 import { Tab1 } from "./pages/Tab1";
 import { Tab2 } from "./pages/Tab2";
-import { refOptions, refStatistic, refViewModeDetails } from "./clientRefs";
+import { refEditAccount, refOptions, refStatistic, refViewModeDetails } from "./clientRefs";
 import Statistic from "./pages/statistics/statistic";
 import ViewModeDetails from "./pages/pages/viewMoreDetails";
+import EditAccount from "./pages/pages/editAccount";
 
 type IProps = {
     navigation: any;
@@ -77,6 +78,7 @@ export default React.memo(function Client(props: IProps) {
         <Statistic ref={refStatistic} />
         <ViewModeDetails ref={refViewModeDetails} />
         <Options ref={refOptions} />
+        <EditAccount ref={refEditAccount} />
     </View>);
 });
 

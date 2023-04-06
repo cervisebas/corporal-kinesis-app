@@ -95,7 +95,7 @@ export default React.memo(forwardRef(function EditAccount(_props: any, ref: Reac
     }
     useImperativeHandle(ref, ()=>({ open, close }));
 
-    return(<CustomModal visible={visible} onRequestClose={close} animationIn={'slideInLeft'} animationOut={'slideOutRight'}>
+    return(<CustomModal visible={visible} onRequestClose={close}>
         <View style={[styles.content,  { backgroundColor: theme.colors.background }]}>
             <Appbar.Header style={{ backgroundColor: theme.colors.background }}>
                 <Appbar.BackAction onPress={close} />

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { DeviceEventEmitter, EmitterSubscription, Linking, View } from "react-native";
+import { Linking } from "react-native";
 import { Paragraph } from "react-native-paper";
 import { MaterialDialog } from "./components/material-dialog";
 import ChangeLog from "./screens/ChangeLog";
@@ -8,7 +8,7 @@ import Session from "./screens/session";
 import VerifyScreen from "./screens/verify";
 import { Global } from "./scripts/Global";
 import CombinedTheme from "./Theme";
-import { refChangeLog, refSession } from "./ExtraContentsRefs";
+import { refChangeLog, refInformation, refSession } from "./ExtraContentsRefs";
 
 type IProps = {
     // Session
@@ -39,13 +39,6 @@ export class ExtraContents extends Component<IProps, IState> {
             showInfoApp: false
         };
     }
-    private event: EmitterSubscription | null = null;
-    componentDidMount() {
-        this.event = DeviceEventEmitter.addListener('open-information', ()=>this.setState({ showInfoApp: true }));
-    }
-    componentWillUnmount() {
-        this.event?.remove();
-    }
     render(): React.ReactNode {
         return(<>
             <VerifyScreen
@@ -62,7 +55,7 @@ export class ExtraContents extends Component<IProps, IState> {
                 loadingText={this.state.textLoading}
             />
             <ChangeLog ref={refChangeLog} />
-            <Information visible={this.state.showInfoApp} close={()=>this.setState({ showInfoApp: false })} />
+            <Information ref={refInformation} />
             <MaterialDialog
                 visible={this.props.viewDialogUpdate}
                 title={"Se ha encontrado una nueva actualización"}

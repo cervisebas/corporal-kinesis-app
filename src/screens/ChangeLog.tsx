@@ -19,7 +19,7 @@ export default React.memo(forwardRef(function ChangeLog(_props: any, ref: React.
     const { theme } = useContext(ThemeContext);
     // State's
     const [visible, setVisible] = useState(false);
-    const [data, setData] = useState(ChangeLogSystem.getFullData());
+    const data = ChangeLogSystem.getFullData();
 
     function _renderItem({ item }: ListRenderItemInfo<JSON>) {
         return(<CustomListChanges
@@ -28,16 +28,6 @@ export default React.memo(forwardRef(function ChangeLog(_props: any, ref: React.
             date={item.date}
             changes={item.changes}
         />);
-        /*return(<CustomItemList6
-            key={`changelog-${item.version}`}
-            title={`V${item.version}`}
-            style={[
-                (index == 0)? { borderWidth: 2, borderColor: MD2Colors.green500 }: undefined,
-                (index == (data.length - 1))? { marginBottom: 8 }: undefined]
-            }
-            subtitle={item.date}
-            message={ChangeLogSystem.tranform_changes(item.changes)}
-        />);*/
     }
     function _keyExtractor(item: JSON, _index: number) {
         return `changelog-${item.version}`;

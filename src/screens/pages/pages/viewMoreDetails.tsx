@@ -9,6 +9,7 @@ import { CustomCard5, CustomCardComments } from "../../components/Components";
 import CustomModal from "../../components/CustomModal";
 import { ThemeContext } from "../../../providers/ThemeProvider";
 import CustomCard4 from "../../components/CustomCard4";
+import statusEffect from "../../../scripts/StatusEffect";
 
 export type ViewModeDetailsRef = {
     open: (data: DetailsTrainings, comment: commentsData | undefined)=>void;
@@ -40,6 +41,10 @@ export default React.memo(forwardRef(function ViewModeDetails(_props: any, ref: 
     }
     
     useImperativeHandle(ref, ()=>({ open }));
+    statusEffect([
+        { color: theme.colors.background, style: 'light' },
+        { color: theme.colors.background, style: 'light' }
+    ], visible, undefined, undefined, true);
 
     return(<CustomModal visible={visible} onRequestClose={close}>
         <View style={{ flex: 1, backgroundColor: theme.colors.background }}>

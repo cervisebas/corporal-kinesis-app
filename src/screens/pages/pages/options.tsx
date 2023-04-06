@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, forwardRef, useContext, useState } from "react";
 import { DeviceEventEmitter, ToastAndroid, View } from "react-native";
 import { Appbar, Text, Provider as PaperProvider, Button, Portal, Dialog } from "react-native-paper";
 import CombinedTheme from "../../../Theme";
@@ -6,6 +6,8 @@ import CustomModal from "../../components/CustomModal";
 import DeviceInfo from "react-native-device-info";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CardButton1 } from "../../components/Components";
+import { ThemeContext } from "../../../providers/ThemeProvider";
+import statusEffect from "../../../scripts/StatusEffect";
 
 type IProps = {
     show: boolean;
@@ -17,7 +19,7 @@ type IState = {
     // Dialog close
     showDialog: boolean;
 };
-export default class Options extends Component<IProps, IState> {
+/*export default class Options extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
@@ -64,4 +66,33 @@ export default class Options extends Component<IProps, IState> {
             </PaperProvider>
         </CustomModal>);
     }
-}
+}*/
+
+export default React.memo(forwardRef(function Options() {
+    // Context's
+    const { theme } = useContext(ThemeContext);
+    // State's
+    const [visible, setVisible] = useState(false);
+    
+    function close() { setVisible(false); }
+    
+    statusEffect([
+        { color: theme.colors.background, style: 'light' },
+        { color: theme.colors.background, style: 'light' }
+    ], visible, undefined, undefined, true);
+
+    return(<CustomModal visible={visible} onRequestClose={close}>
+        <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+            <Appbar.Header style={{ backgroundColor: theme.colors.background }}>
+                <Appbar.BackAction onPress={close} />
+                <Appbar.Content title="Opciones" />
+            </Appbar.Header>
+            <View style={{ flex: 2 }}>
+                <CardButton1 title={'VER LISTA DE CAMBIOS'} icon={'note-text-outline'} onPress={()=>DeviceEventEmitter.emit('openChangeLog')} />
+                <CardButton1 title={'INFORMACION'} icon={'information-outline'} onPress={()=>DeviceEventEmitter.emit('open-information')} />
+                <CardButton1 title={'CERRAR SESIÓN'} icon={'logout'} color="red" />
+                <Text style={{ width: '100%', textAlign: 'center', marginTop: 32 }}>Version {DeviceInfo.getVersion()}</Text>
+            </View>
+        </View>
+    </CustomModal>);
+}));

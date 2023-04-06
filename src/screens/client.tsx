@@ -86,10 +86,6 @@ export default React.memo(function Client(props: IProps) {
             onPress={()=>props.navigation.navigate('p')}
         />
         <LoadingComponent ref={refLoadingComponent} />
-        <OthersComponents
-            ref={refOthersComponents}
-            showLoading={showLoading}
-        />
         <Statistic ref={refStatistic} />
         <ViewModeDetails ref={refViewModeDetails} />
     </View>);
@@ -113,9 +109,9 @@ class OthersComponents extends PureComponent<IProps2, IState2> {
     render(): React.ReactNode {
         return(<>
             <Options
-                show={this.state.visible}
+                /*show={this.state.visible}
                 close={this.close}
-                showLoading={this.props.showLoading}
+                showLoading={this.props.showLoading}*/
             />
         </>);
     }

@@ -1,7 +1,7 @@
 import React from "react";
 import { View } from "react-native";
 import { statisticData2 } from "../../../scripts/ApiCorporal/types";
-import Graphic2 from "./graphics2";
+import Graphic from "./graphics";
 import CustomPicker from "../../../components/CustomPicker";
 
 type IProps = {
@@ -24,7 +24,7 @@ export default React.memo(function HeaderList(props: IProps) {
                 onChange={_onChange}
             />
         </View>
-        <Graphic2
+        <Graphic
             datas={props.datas}
             isLoading={props.isLoading}
         />

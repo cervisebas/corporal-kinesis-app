@@ -126,7 +126,7 @@ export default React.memo(forwardRef(function Statistic(_props: any, ref: React.
 
     return(<CustomModal visible={visible} onRequestClose={_close}>
         <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-            <Appbar.Header>
+            <Appbar.Header style={{ backgroundColor: theme.colors.background }}>
                 <Appbar.BackAction onPress={_close} />
                 <Appbar.Content title={title} />
             </Appbar.Header>

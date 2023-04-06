@@ -24,7 +24,7 @@ export default React.memo(forwardRef(function ImageViewer(_props: any, ref: Reac
         setVisible(false);
     }
 
-    statusEffect([_status, _status], visible);
+    statusEffect([_status, _status], visible, undefined, undefined, true);
 
     useImperativeHandle(ref, ()=>({ open }));
 

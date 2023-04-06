@@ -4,16 +4,15 @@ import { Paragraph } from "react-native-paper";
 import { MaterialDialog } from "./components/material-dialog";
 import { ChangeLog } from "./screens/ChangeLog";
 import Information from "./screens/information";
-import { Session } from "./screens/session";
+import Session from "./screens/session";
 import VerifyScreen from "./screens/verify";
 import { Global } from "./scripts/Global";
 import CombinedTheme from "./Theme";
+import { refSession } from "./ExtraContentsRefs";
 
 type IProps = {
     // Session
-    openSession: boolean;
-    closeSession: ()=>any;
-    setLoadData: (data: boolean)=>any;
+    reVerify: ()=>void;
 
     // Verify
     showVerify: boolean;
@@ -58,10 +57,9 @@ export class ExtraContents extends Component<IProps, IState> {
                 textShow={this.props.textVerify}
             />
             <Session
-                visible={this.props.openSession}
-                close={this.props.closeSession}
+                ref={refSession}
                 setLoading={(view, text)=>this.setState({ viewLoading: view, textLoading: text })}
-                setLoadData={this.props.setLoadData}
+                reVerify={this.props.reVerify}
             />
             <Global
                 loadingView={this.state.viewLoading}

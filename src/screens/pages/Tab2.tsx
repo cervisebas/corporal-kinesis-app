@@ -14,11 +14,9 @@ import EditAccount from "./pages/editAccount";
 import ImageProfile from "../../assets/profile.webp";
 import { ThemeContext } from "../../providers/ThemeProvider";
 import { GlobalRef } from "../../GlobalRef";
+import { refOptions } from "../clientRefs";
 
-type IProps = {
-    showLoading: (show: boolean, text: string)=>any;
-    openOptions: ()=>any;
-};
+type IProps = {};
 type IState = {
     viewImage: number | Source;
     viewName: string;
@@ -97,12 +95,13 @@ export class Tab2 extends Component<IProps, IState> {
             snackbarText: err.cause
         }, ()=>GlobalRef.current?.loadingController(false)));
     }
+    openOptions() { refOptions.current?.open(); }
     render(): React.ReactNode {
         const { theme } = this.context;
         return(<View style={{ flex: 1 }}>
             <Appbar.Header style={{ backgroundColor: theme.colors.background }}>
                 <Appbar.Content title={"Mi cuenta"} />
-                <Appbar.Action icon={'cog'} onPress={this.props.openOptions} />
+                <Appbar.Action icon={'cog'} onPress={this.openOptions} />
             </Appbar.Header>
             <View style={{ flex: 2 }}>
                 <View style={{ width: '100%', height: 120, marginTop: 8, flexDirection: 'row' }}>
@@ -148,7 +147,7 @@ export class Tab2 extends Component<IProps, IState> {
                     visible={this.state.editVisible}
                     close={()=>this.setState({ editVisible: false, editData: undefined })}
                     datas={this.state.editData}
-                    showLoading={this.props.showLoading}
+                    showLoading={()=>undefined}
                     showSnackBar={(s, t)=>this.setState({ snakbarVisible: s, snackbarText: t })}
                 />
             </View>

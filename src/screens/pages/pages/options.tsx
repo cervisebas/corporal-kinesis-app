@@ -1,4 +1,4 @@
-import React, { Component, forwardRef, useContext, useState } from "react";
+import React, { Component, forwardRef, useContext, useImperativeHandle, useState } from "react";
 import { DeviceEventEmitter, ToastAndroid, View } from "react-native";
 import { Appbar, Text, Provider as PaperProvider, Button, Portal, Dialog } from "react-native-paper";
 import CombinedTheme from "../../../Theme";
@@ -8,6 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CardButton1 } from "../../components/Components";
 import { ThemeContext } from "../../../providers/ThemeProvider";
 import statusEffect from "../../../scripts/StatusEffect";
+import { GlobalRef } from "../../../GlobalRef";
 
 type IProps = {
     show: boolean;
@@ -68,14 +69,34 @@ type IState = {
     }
 }*/
 
-export default React.memo(forwardRef(function Options() {
+export type OptionsRef = {
+    open: ()=>void;
+};
+
+export default React.memo(forwardRef(function Options(_props: any, ref: React.Ref<OptionsRef>) {
     // Context's
     const { theme } = useContext(ThemeContext);
     // State's
     const [visible, setVisible] = useState(false);
     
     function close() { setVisible(false); }
+    function open() { setVisible(true); }
+
+    function logout() {
+        GlobalRef.current?.loadingController(true, 'Cerrando sesión...');
+        AsyncStorage.removeItem('account_session').then(()=>setTimeout(()=>{
+            DeviceEventEmitter.emit('nowVerify');
+            DeviceEventEmitter.emit('goToHome');
+            GlobalRef.current?.loadingController(false);
+            close();
+        }, 1200));
+    }
+    function onLogout() {
+        GlobalRef.current?.showDoubleAlert('¿Estás seguro que quieres cerrar sesión?', '', logout);
+    }
     
+    useImperativeHandle(ref, ()=>({ open }));
+
     statusEffect([
         { color: theme.colors.background, style: 'light' },
         { color: theme.colors.background, style: 'light' }
@@ -90,7 +111,7 @@ export default React.memo(forwardRef(function Options() {
             <View style={{ flex: 2 }}>
                 <CardButton1 title={'VER LISTA DE CAMBIOS'} icon={'note-text-outline'} onPress={()=>DeviceEventEmitter.emit('openChangeLog')} />
                 <CardButton1 title={'INFORMACION'} icon={'information-outline'} onPress={()=>DeviceEventEmitter.emit('open-information')} />
-                <CardButton1 title={'CERRAR SESIÓN'} icon={'logout'} color="red" />
+                <CardButton1 title={'CERRAR SESIÓN'} icon={'logout'} color="red" onPress={onLogout} />
                 <Text style={{ width: '100%', textAlign: 'center', marginTop: 32 }}>Version {DeviceInfo.getVersion()}</Text>
             </View>
         </View>

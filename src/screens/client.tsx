@@ -1,4 +1,4 @@
-import React, { PureComponent, createRef, useContext, useEffect, useState } from "react";
+import React, { PureComponent, useEffect, useState } from "react";
 import { DeviceEventEmitter, EmitterSubscription, StyleSheet, View } from "react-native";
 import { BottomNavigation, FAB } from "react-native-paper";
 import { Permission } from "../scripts/ApiCorporal";
@@ -6,9 +6,7 @@ import Options from "./pages/pages/options";
 import { LoadNow } from "../scripts/Global";
 import { Tab1 } from "./pages/Tab1";
 import { Tab2 } from "./pages/Tab2";
-import LoadingComponent, { LoadingComponentRef } from "./components/LoadingComponent";
-import { ThemeContext } from "../providers/ThemeProvider";
-import { refStatistic, refViewModeDetails } from "./clientRefs";
+import { refOptions, refStatistic, refViewModeDetails } from "./clientRefs";
 import Statistic from "./pages/statistics/statistic";
 import ViewModeDetails from "./pages/pages/viewMoreDetails";
 
@@ -18,15 +16,10 @@ type IProps = {
 };
 
 export default React.memo(function Client(props: IProps) {
-    // Context's
-    const { theme } = useContext(ThemeContext);
     // States
     const [index, setIndex] = React.useState(0);
     const [loadingAdmin, setLoadingAdmin] = useState(true);
     const [showButtonAdmin, setShowButtonAdmin] = useState(true);
-    // Ref's
-    const refLoadingComponent = createRef<LoadingComponentRef>();
-    const refOthersComponents = createRef<OthersComponents>();
     // Variables
     var event: EmitterSubscription | undefined = undefined;
     
@@ -37,9 +30,9 @@ export default React.memo(function Client(props: IProps) {
     const renderScene = ({ route }: any) => {
         switch (route.key) {
             case 'statistics':
-                return(<Tab1 showLoading={showLoading} />);
+                return(<Tab1 />);
             case 'account':
-                return(<Tab2 showLoading={showLoading} openOptions={showViewOptions} />);
+                return(<Tab2 />);
         }
     };
     function verifyAdmin() {
@@ -60,9 +53,6 @@ export default React.memo(function Client(props: IProps) {
         }
     }, 512);
 
-    function showViewOptions() { refOthersComponents.current?.open(); }
-    function showLoading(visible: boolean, message?: string) { refLoadingComponent.current?.controller(visible, message); }
-
     useEffect(()=>{
         event = DeviceEventEmitter.addListener('goToHome', ()=>setIndex(0));
         return ()=>{
@@ -80,14 +70,13 @@ export default React.memo(function Client(props: IProps) {
         <FAB
             style={styles.fab}
             loading={loadingAdmin}
-            disabled={loadingAdmin}
             visible={showButtonAdmin}
             icon={'account-lock'}
-            onPress={()=>props.navigation.navigate('p')}
+            onPress={()=>(!loadingAdmin)&&props.navigation.navigate('p')}
         />
-        <LoadingComponent ref={refLoadingComponent} />
         <Statistic ref={refStatistic} />
         <ViewModeDetails ref={refViewModeDetails} />
+        <Options ref={refOptions} />
     </View>);
 });
 

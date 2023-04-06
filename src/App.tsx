@@ -15,6 +15,7 @@ import SplashScreen from './screens/SplashScreen';
 import { ThemeContext } from './providers/ThemeProvider';
 import GlobalComponents from './GlobalComponents';
 import { GlobalRef } from './GlobalRef';
+import { refSession } from './ExtraContentsRefs';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,7 +26,6 @@ export default React.memo(function App() {
     // Context's
     const { theme, navTheme, themeStatus } = useContext(ThemeContext);
     // State's
-    const [openSession, setOpenSession] = useState<boolean>(false);
     const [showVerify, setShowVerify] = useState<boolean>(false);
     const [textAnimVerify, setTextAnimVerify] = useState<string|undefined>(undefined);
     const [changeLoadView, setChangeLoadView] = useState<boolean>(false);
@@ -38,7 +38,6 @@ export default React.memo(function App() {
     const [navStyle, setNavStyle] = useState(themeStatus[1].style);
 
     // Functions Extra Contentents
-    function _closeSession() { setOpenSession(false); }
     function _closeChangeLoad() { setChangeLoadView(false); }
     function _closeDialogUpdate() { setViewDialogUpdate(false); }
 
@@ -48,7 +47,7 @@ export default React.memo(function App() {
         Account.verify().then((value)=>{
             setTextAnimVerify(`Accediendo como "${decode(value.email).slice(0, 5)}...${decode(value.email).slice(decode(value.email).indexOf('@'), decode(value.email).length)}"`);
             setTimeout(()=>{
-                setOpenSession(!value);
+                if (!value) refSession.current?.open(); else refSession.current?.close();
                 setShowVerify(false);
                 if (value) {
                     setLoadNow(true);
@@ -61,9 +60,9 @@ export default React.memo(function App() {
                 }
             }, 2500);
         }).catch((error)=>{
-            if (error.action == 1) return setOpenSession(true);
+            if (error.action == 1) return refSession.current?.open();
             setTextAnimVerify(error.cause);
-            setTimeout(_closeSession, 1500);
+            setTimeout(()=>refSession.current?.close(), 1500);
         });
     }
 
@@ -102,9 +101,6 @@ export default React.memo(function App() {
         <PaperProvider theme={theme}>
             <NavigationContainer theme={navTheme}>
                 <ExtraContents
-                    openSession={openSession}
-                    closeSession={_closeSession}
-                    setLoadData={setLoadNow}
                     showVerify={showVerify}
                     textVerify={textAnimVerify}
                     visibleChangeLoad={changeLoadView}
@@ -112,6 +108,7 @@ export default React.memo(function App() {
                     viewDialogUpdate={viewDialogUpdate}
                     closeDialogUpdate={_closeDialogUpdate}
                     storeUrl={storeUrl}
+                    reVerify={verifyAccount}
                 />
                 <GlobalComponents ref={GlobalRef} />
                 <SplashScreen init={verifyAccount} />

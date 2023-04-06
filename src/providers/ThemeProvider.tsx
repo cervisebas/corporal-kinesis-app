@@ -1,7 +1,6 @@
-import { createContext, useState } from "react";
+import React, { createContext, useState } from "react";
 import { MD3DarkTheme, MD3Theme } from "react-native-paper";
 import { Theme as NavTheme, DarkTheme as NavDarkTheme } from "@react-navigation/native";
-import React from "react";
 import { Theme, ThemeNavigation } from "../scripts/Theme";
 
 export type ThemeStatus = {

@@ -7,15 +7,12 @@ import { Comment, Training } from "../../scripts/ApiCorporal";
 import { commentsData, DetailsTrainings, statisticData2 } from "../../scripts/ApiCorporal/types";
 import { LoadNow } from "../../scripts/Global";
 import CombinedTheme from "../../Theme";
-import ViewMoreDetails from "./pages/viewMoreDetails";
 import { ThemeContext } from "../../providers/ThemeProvider";
 import Tab1ListComments from "./elements/Tab1ListComments";
 import { refStatistic, refViewModeDetails } from "../clientRefs";
 import { GlobalRef } from "../../GlobalRef";
 
-type IProps = {
-    showLoading: (show: boolean, text: string)=>any;
-};
+type IProps = {};
 type IState = {
     visiblemenu: boolean;
     showLoading: boolean;

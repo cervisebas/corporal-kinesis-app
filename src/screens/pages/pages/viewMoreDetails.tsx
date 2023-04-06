@@ -1,88 +1,80 @@
 import { decode } from "base-64";
-import moment from "moment";
-import React, { PureComponent } from "react";
+import React, { forwardRef, useContext, useImperativeHandle, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { Appbar, MD2Colors, Provider as PaperProvider, Text } from "react-native-paper";
+import { Appbar, MD2Colors, Text } from "react-native-paper";
 import utf8 from "utf8";
 import { HostServer } from "../../../scripts/ApiCorporal";
 import { commentsData, details, DetailsTrainings } from "../../../scripts/ApiCorporal/types";
-import CombinedTheme from "../../../Theme";
-import { CustomCard4, CustomCard5, CustomCardComments } from "../../components/Components";
+import { CustomCard5, CustomCardComments } from "../../components/Components";
 import CustomModal from "../../components/CustomModal";
+import { ThemeContext } from "../../../providers/ThemeProvider";
+import CustomCard4 from "../../components/CustomCard4";
 
-type IProps = {
-    visible: boolean;
-    close: ()=>any;
-    dataShow: DetailsTrainings;
-    commentData: commentsData | undefined;
-};
-type IState = {};
-
-const decodeUtf8 = (str: string)=>{
-    try {
-        return utf8.decode(str);
-    } catch {
-        return str;
-    }
+export type ViewModeDetailsRef = {
+    open: (data: DetailsTrainings, comment: commentsData | undefined)=>void;
 };
 
-export default class ViewMoreDetails extends PureComponent<IProps, IState> {
-    constructor(props: IProps) {
-        super(props);
-        this.state = {};
-    }
-    processShow(data: details, isRPE?: boolean): any {
+const decodeUtf8 = (str: string)=>{ try { return utf8.decode(str); } catch { return str; } };
+
+const _defaultDataShow: DetailsTrainings = { id: '-1', date: { value: '-', status: -1, difference: undefined }, session_number: { value: '-', status: -1, difference: undefined }, rds: { value: '-', status: -1, difference: undefined }, rpe: { value: '-', status: -1, difference: undefined }, pulse: { value: '-', status: -1, difference: undefined }, repetitions: { value: '-', status: -1, difference: undefined }, kilage: { value: '-', status: -1, difference: undefined }, tonnage: { value: '-', status: -1, difference: undefined }, exercise: { name: 'No disponible', status: -1, description: '' } };
+
+export default React.memo(forwardRef(function ViewModeDetails(_props: any, ref: React.Ref<ViewModeDetailsRef>) {
+    // Context's
+    const { theme } = useContext(ThemeContext);
+    // State's
+    const [visible, setVisible] = useState(false);
+    const [dataShow, setDataShow] = useState<DetailsTrainings>(_defaultDataShow);
+    const [commentData, setCommentData] = useState<commentsData|undefined>(undefined);
+
+    function processShow(data: details, isRPE?: boolean): any {
         if (isRPE) return(<Text>{data.value} <Text style={{ color: (data.difference)&&(data.difference > 0)? (data.difference == -9999999999)? MD2Colors.yellow500: MD2Colors.red500: MD2Colors.green500 }}>{`(${(data.difference == -9999999999)? '~': data.difference})`}</Text></Text>);
         return(<Text>{data.value} <Text style={{ color: (data.difference)&&(data.difference < 0)? (data.difference == -9999999999)? MD2Colors.yellow500: MD2Colors.red500: MD2Colors.green500 }}>{`(${(data.difference == -9999999999)? '~': data.difference})`}</Text></Text>);
     }
-    processTitle(exercise: string): any { return(<Text>Ejercicio realizado: <Text style={{ fontWeight: '700' }}>{exercise}</Text></Text>); }
-    processParagraph(paragraph: string) { return (paragraph == 'none')? 'No hay descripción disponible.': paragraph; }
-    calcYears(date: string): string {
-        var dateNow = new Date();
-        var processDate = moment(date, 'DD-MM-YYYY').toDate();
-        var years = dateNow.getFullYear() - processDate.getFullYear();
-        var months = dateNow.getMonth() - processDate.getMonth();
-        if (months < 0 || (months === 0 && dateNow.getDate() < processDate.getDate())) years--;
-        return String(years);
+    function processTitle(exercise: string): any { return(<Text>Ejercicio realizado: <Text style={{ fontWeight: '700' }}>{exercise}</Text></Text>); }
+    function processParagraph(paragraph: string): any { return (paragraph == 'none')? 'No hay descripción disponible.': paragraph; }
+    function close() { setVisible(false); }
+    function open(data: DetailsTrainings, comment: commentsData | undefined) {
+        setDataShow(data);
+        setCommentData(comment);
+        setVisible(true);
     }
-    render(): React.ReactNode {
-        return(<CustomModal visible={this.props.visible} onRequestClose={this.props.close}>
-            <PaperProvider theme={CombinedTheme}>
-                <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background }}>
-                    <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
-                        <Appbar.BackAction onPress={()=>this.props.close()} />
-                        <Appbar.Content title={`Más detalles (${this.props.dataShow.date.value})`}/>
-                    </Appbar.Header>
-                    {(this.props.visible)&&<ScrollView style={{ flex: 2, paddingBottom: 16 }}>
-                        <View style={{ flexDirection: 'row' }}>
-                            <View style={{ ...styles.row, paddingLeft: 8, paddingRight: 4 }}>
-                                <CustomCard4 style={styles.card} title={'RDS'} iconName={'arrow-up-thick'} value={this.processShow(this.props.dataShow.rds)} />
-                                <CustomCard4 style={styles.card} title={'Pulso'} iconName={'heart-pulse'} value={this.processShow(this.props.dataShow.pulse)} />
-                                <CustomCard4 style={styles.card} title={'Kilaje'} iconName={'dumbbell'} value={this.processShow(this.props.dataShow.kilage)} />
-                            </View>
-                            <View style={{ ...styles.row, paddingLeft: 4, paddingRight: 8 }}>
-                                <CustomCard4 style={styles.card} title={'RPE'} iconName={'arrow-down-thick'} value={this.processShow(this.props.dataShow.rpe, true)} />
-                                <CustomCard4 style={styles.card} title={'Repeticiones'} iconName={'autorenew'} value={this.processShow(this.props.dataShow.repetitions)} />
-                                <CustomCard4 style={styles.card} title={'Tonelaje'} iconName={'weight'} value={this.processShow(this.props.dataShow.tonnage)} />
-                            </View>
-                        </View>
-                        <CustomCard5 style={{ margin: 8 }} title={this.processTitle(this.props.dataShow.exercise.name)} paragraph={this.processParagraph(this.props.dataShow.exercise.description)} />
-                        {(this.props.commentData)&&<View style={{ marginTop: 8 }}>
-                            <View style={{ marginLeft: 8, marginBottom: 16 }}><Text style={{ fontSize: 18 }}>Comentario:</Text></View>
-                            <CustomCardComments
-                                source={{ uri: `${HostServer}/images/accounts/${decode(this.props.commentData?.accountData.image)}` }}
-                                accountName={`${decode(this.props.commentData?.accountData.name)}`}
-                                edit={this.props.commentData?.edit}
-                                date={decode(this.props.commentData?.date)}
-                                comment={decodeUtf8(decode(this.props.commentData?.comment))}
-                            />
-                        </View>}
-                    </ScrollView>}
+    
+    useImperativeHandle(ref, ()=>({ open }));
+
+    return(<CustomModal visible={visible} onRequestClose={close}>
+        <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+            <Appbar.Header style={{ backgroundColor: theme.colors.background }}>
+                <Appbar.BackAction onPress={close} />
+                <Appbar.Content title={`Más detalles (${dataShow.date.value})`}/>
+            </Appbar.Header>
+            <ScrollView style={{ flex: 2, paddingBottom: 16 }}>
+                <View style={{ flexDirection: 'row' }}>
+                    <View style={[styles.row, { paddingLeft: 8, paddingRight: 4 }]}>
+                        <CustomCard4 style={styles.card} title={'RDS'} iconName={'arrow-up-thick'} value={processShow(dataShow.rds)} />
+                        <CustomCard4 style={styles.card} title={'Pulso'} iconName={'heart-pulse'} value={processShow(dataShow.pulse)} />
+                        <CustomCard4 style={styles.card} title={'Kilaje'} iconName={'dumbbell'} value={processShow(dataShow.kilage)} />
+                    </View>
+                    <View style={[styles.row, { paddingLeft: 4, paddingRight: 8 }]}>
+                        <CustomCard4 style={styles.card} title={'RPE'} iconName={'arrow-down-thick'} value={processShow(dataShow.rpe, true)} />
+                        <CustomCard4 style={styles.card} title={'Repeticiones'} iconName={'autorenew'} value={processShow(dataShow.repetitions)} />
+                        <CustomCard4 style={styles.card} title={'Tonelaje'} iconName={'weight'} value={processShow(dataShow.tonnage)} />
+                    </View>
                 </View>
-            </PaperProvider>
-        </CustomModal>);
-    }
-}
+                <CustomCard5 style={{ margin: 8 }} title={processTitle(dataShow.exercise.name)} paragraph={processParagraph(dataShow.exercise.description)} />
+                {(commentData)&&<View style={{ marginTop: 8 }}>
+                    <View style={{ marginLeft: 8, marginBottom: 16 }}><Text style={{ fontSize: 18 }}>Comentario:</Text></View>
+                    <CustomCardComments
+                        source={{ uri: `${HostServer}/images/accounts/${decode(commentData.accountData.image)}` }}
+                        accountName={`${decode(commentData.accountData.name)}`}
+                        edit={commentData.edit}
+                        date={decode(commentData.date)}
+                        comment={decodeUtf8(decode(commentData.comment))}
+                    />
+                </View>}
+            </ScrollView>
+        </View>
+    </CustomModal>);
+}));
 
 const styles = StyleSheet.create({
     row: {

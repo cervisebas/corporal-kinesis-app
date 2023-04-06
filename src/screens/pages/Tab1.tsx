@@ -10,7 +10,7 @@ import CombinedTheme from "../../Theme";
 import ViewMoreDetails from "./pages/viewMoreDetails";
 import { ThemeContext } from "../../providers/ThemeProvider";
 import Tab1ListComments from "./elements/Tab1ListComments";
-import { refStatistic } from "../clientRefs";
+import { refStatistic, refViewModeDetails } from "../clientRefs";
 import { GlobalRef } from "../../GlobalRef";
 
 type IProps = {
@@ -32,9 +32,6 @@ type IState = {
     // Comments
     commentsLoading: boolean;
     dataComments: commentsData[];
-
-    // View More Details
-    viewMoreDetailsVisible: boolean;
 };
 
 export class Tab1 extends Component<IProps, IState> {
@@ -51,8 +48,7 @@ export class Tab1 extends Component<IProps, IState> {
             dialogShow: false,
             messageDialog: '',
             commentsLoading: true,
-            dataComments: [],
-            viewMoreDetailsVisible: false
+            dataComments: []
         };
         this.goLoading = this.goLoading.bind(this);
         this.goStatistics = this.goStatistics.bind(this);
@@ -117,7 +113,10 @@ export class Tab1 extends Component<IProps, IState> {
         });
     }
     _onRefresing() { this.setState({ refreshing: true }, this.goLoading); }
-    _openDetails() { this.setState({ viewMoreDetailsVisible: true }); }
+    _openDetails() {
+        const _comment = this.state.dataComments.find((value)=>value.id_training == this.state.dataShow.id);
+        refViewModeDetails.current?.open(this.state.dataShow, _comment);
+    }
     
     render(): React.ReactNode {
         const { theme } = this.context;
@@ -135,19 +134,12 @@ export class Tab1 extends Component<IProps, IState> {
                 openDetails={this._openDetails}
                 goStatistics={this.goStatistics}            
             />
-            {/*<Statistics2
-                visible={this.state.visibleStatistics}
-                exercise={this.state.dataShow.exercise.name}
-                datas={this.state.statistics2}
-                title={this.state.titleStatistics}
-                close={()=>this.setState({ visibleStatistics: false, statistics2: [] })}
-            />*/}
-            <ViewMoreDetails
+            {/*<ViewMoreDetails
                 visible={this.state.viewMoreDetailsVisible}
                 close={()=>this.setState({ viewMoreDetailsVisible: false })}
                 dataShow={this.state.dataShow}
                 commentData={this.state.dataComments.find((value)=>value.id_training == this.state.dataShow.id)}
-            />
+            />*/}
             <Snackbar
                 visible={this.state.dialogShow}
                 theme={CombinedTheme}

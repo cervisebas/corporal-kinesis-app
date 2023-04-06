@@ -8,9 +8,9 @@ import { Tab1 } from "./pages/Tab1";
 import { Tab2 } from "./pages/Tab2";
 import LoadingComponent, { LoadingComponentRef } from "./components/LoadingComponent";
 import { ThemeContext } from "../providers/ThemeProvider";
-import { Statistics2 } from "./pages/statistics/statistic2";
-import { refStatistic } from "./clientRefs";
+import { refStatistic, refViewModeDetails } from "./clientRefs";
 import Statistic from "./pages/statistics/statistic";
+import ViewModeDetails from "./pages/pages/viewMoreDetails";
 
 type IProps = {
     navigation: any;
@@ -91,6 +91,7 @@ export default React.memo(function Client(props: IProps) {
             showLoading={showLoading}
         />
         <Statistic ref={refStatistic} />
+        <ViewModeDetails ref={refViewModeDetails} />
     </View>);
 });
 

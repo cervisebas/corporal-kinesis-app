@@ -1,14 +1,17 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DeviceInfo from "react-native-device-info";
 import { decode, encode } from "base-64";
+import json_data from './ChangeLogData.json';
 
 type JSON = {
     version: string;
     date: string;
-    changes: string[];
+    changes: {
+        type: number;
+        text: string;
+    }[];
 };
 
-const json_data = require('./ChangeLogData.json');
 
 export default class SystemChangeLog {
     constructor() {}
@@ -30,8 +33,7 @@ export default class SystemChangeLog {
         });
     }
     getFullData(): JSON[] {
-        var json = json_data;
-        return json.data;
+        return json_data;
     }
     tranform_changes(changes: string[]) {
         var strchanges: string = '';

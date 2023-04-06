@@ -28,7 +28,6 @@ export default React.memo(function App() {
     // State's
     const [showVerify, setShowVerify] = useState<boolean>(false);
     const [textAnimVerify, setTextAnimVerify] = useState<string|undefined>(undefined);
-    const [changeLoadView, setChangeLoadView] = useState<boolean>(false);
     const [viewDialogUpdate, setViewDialogUpdate] = useState<boolean>(false);
     const [storeUrl, setStoreUrl] = useState<string>('');
     // State's StatusBar and NavBar
@@ -38,7 +37,6 @@ export default React.memo(function App() {
     const [navStyle, setNavStyle] = useState(themeStatus[1].style);
 
     // Functions Extra Contentents
-    function _closeChangeLoad() { setChangeLoadView(false); }
     function _closeDialogUpdate() { setViewDialogUpdate(false); }
 
     // Funtions
@@ -53,7 +51,7 @@ export default React.memo(function App() {
                     setLoadNow(true);
                     ChangeLogSystem.getVerify().then((value)=>{
                         if (value) {
-                            setChangeLoadView(true);
+                            //setChangeLoadView(true);
                             ChangeLogSystem.setNewVersion();
                         }
                     });
@@ -68,7 +66,7 @@ export default React.memo(function App() {
 
     useEffect(()=>{
         event = DeviceEventEmitter.addListener('nowVerify', verifyAccount);
-        event2 = DeviceEventEmitter.addListener('openChangeLog', ()=>setChangeLoadView(true));
+        //event2 = DeviceEventEmitter.addListener('openChangeLog', ()=>setChangeLoadView(true));
         Notification.init();
         VersionCheck.needUpdate({ ignoreErrors: true }).then((value)=>{
             if (value.isNeeded) {
@@ -103,8 +101,6 @@ export default React.memo(function App() {
                 <ExtraContents
                     showVerify={showVerify}
                     textVerify={textAnimVerify}
-                    visibleChangeLoad={changeLoadView}
-                    closeChangeLoad={_closeChangeLoad}
                     viewDialogUpdate={viewDialogUpdate}
                     closeDialogUpdate={_closeDialogUpdate}
                     storeUrl={storeUrl}

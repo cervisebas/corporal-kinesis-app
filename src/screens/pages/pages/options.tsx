@@ -9,6 +9,7 @@ import { CardButton1 } from "../../components/Components";
 import { ThemeContext } from "../../../providers/ThemeProvider";
 import statusEffect from "../../../scripts/StatusEffect";
 import { GlobalRef } from "../../../GlobalRef";
+import { refChangeLog } from "../../../ExtraContentsRefs";
 
 type IProps = {
     show: boolean;
@@ -91,10 +92,9 @@ export default React.memo(forwardRef(function Options(_props: any, ref: React.Re
             close();
         }, 1200));
     }
-    function onLogout() {
-        GlobalRef.current?.showDoubleAlert('¿Estás seguro que quieres cerrar sesión?', '', logout);
-    }
-    
+    function _onLogout() { GlobalRef.current?.showDoubleAlert('¿Estás seguro que quieres cerrar sesión?', '', logout); }
+    function _openChangeLog() { refChangeLog.current?.open(); }
+
     useImperativeHandle(ref, ()=>({ open }));
 
     statusEffect([
@@ -109,9 +109,9 @@ export default React.memo(forwardRef(function Options(_props: any, ref: React.Re
                 <Appbar.Content title="Opciones" />
             </Appbar.Header>
             <View style={{ flex: 2 }}>
-                <CardButton1 title={'VER LISTA DE CAMBIOS'} icon={'note-text-outline'} onPress={()=>DeviceEventEmitter.emit('openChangeLog')} />
+                <CardButton1 title={'VER LISTA DE CAMBIOS'} icon={'note-text-outline'} onPress={_openChangeLog} />
                 <CardButton1 title={'INFORMACION'} icon={'information-outline'} onPress={()=>DeviceEventEmitter.emit('open-information')} />
-                <CardButton1 title={'CERRAR SESIÓN'} icon={'logout'} color="red" onPress={onLogout} />
+                <CardButton1 title={'CERRAR SESIÓN'} icon={'logout'} color="red" onPress={_onLogout} />
                 <Text style={{ width: '100%', textAlign: 'center', marginTop: 32 }}>Version {DeviceInfo.getVersion()}</Text>
             </View>
         </View>

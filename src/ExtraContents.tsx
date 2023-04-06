@@ -2,13 +2,13 @@ import React, { Component } from "react";
 import { DeviceEventEmitter, EmitterSubscription, Linking, View } from "react-native";
 import { Paragraph } from "react-native-paper";
 import { MaterialDialog } from "./components/material-dialog";
-import { ChangeLog } from "./screens/ChangeLog";
+import ChangeLog from "./screens/ChangeLog";
 import Information from "./screens/information";
 import Session from "./screens/session";
 import VerifyScreen from "./screens/verify";
 import { Global } from "./scripts/Global";
 import CombinedTheme from "./Theme";
-import { refSession } from "./ExtraContentsRefs";
+import { refChangeLog, refSession } from "./ExtraContentsRefs";
 
 type IProps = {
     // Session
@@ -17,10 +17,6 @@ type IProps = {
     // Verify
     showVerify: boolean;
     textVerify: string | undefined;
-
-    // ChangeLoad
-    visibleChangeLoad: boolean;
-    closeChangeLoad: ()=>any;
 
     viewDialogUpdate: boolean;
     closeDialogUpdate: ()=>any;
@@ -65,10 +61,7 @@ export class ExtraContents extends Component<IProps, IState> {
                 loadingView={this.state.viewLoading}
                 loadingText={this.state.textLoading}
             />
-            <ChangeLog
-                visible={this.props.visibleChangeLoad}
-                close={this.props.closeChangeLoad}
-            />
+            <ChangeLog ref={refChangeLog} />
             <Information visible={this.state.showInfoApp} close={()=>this.setState({ showInfoApp: false })} />
             <MaterialDialog
                 visible={this.props.viewDialogUpdate}

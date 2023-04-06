@@ -8,6 +8,7 @@ import CustomModal from "./components/CustomModal";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { GlobalRef } from "../GlobalRef";
 import { calcYears, waitTo } from "../scripts/Utils";
+import statusEffect from "../scripts/StatusEffect";
 
 type IProps = {
     setLoading: (view: boolean, text: string)=>any;
@@ -163,6 +164,13 @@ export default React.memo(forwardRef(function Session(props: IProps, ref: React.
     function close() { setVisible(false); }
     
     useImperativeHandle(ref, ()=>({ open, close }));
+    statusEffect([
+        { color: '#0B0C0E', style: 'light' },
+        { color: '#0B0C0E', style: 'light' }
+    ], visible, [
+        { color: '#100E20', style: 'light' },
+        { color: '#1663AB', style: 'light' }
+    ], undefined, true);
     
     return(<CustomModal visible={visible} animationIn={'fadeIn'} animationOut={'fadeOut'} onRequestClose={BackHandler.exitApp}>
         <View style={{ flex: 1, backgroundColor: '#0B0C0E', position: 'relative' }}>

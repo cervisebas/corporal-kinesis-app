@@ -12,6 +12,7 @@ import { launchImageLibrary } from "react-native-image-picker";
 import ImageProfile from "../../../assets/profile.webp";
 import { ThemeContext } from "../../../providers/ThemeProvider";
 import { GlobalRef } from "../../../GlobalRef";
+import statusEffect from "../../../scripts/StatusEffect";
 
 type IProps = {
     visible: boolean;
@@ -94,6 +95,10 @@ export default React.memo(forwardRef(function EditAccount(_props: any, ref: Reac
         setVisible(true);
     }
     useImperativeHandle(ref, ()=>({ open, close }));
+    statusEffect([
+        { color: theme.colors.background, style: 'light' },
+        { color: theme.colors.background, style: 'light' }
+    ], visible, undefined, undefined, true);
 
     return(<CustomModal visible={visible} onRequestClose={close}>
         <View style={[styles.content,  { backgroundColor: theme.colors.background }]}>

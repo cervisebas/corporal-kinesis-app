@@ -1,5 +1,5 @@
 import moment from "moment";
-import React, { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import React, { forwardRef, useContext, useImperativeHandle, useRef, useState } from "react";
 import { Dimensions, KeyboardAvoidingView, StyleSheet, View, TextInput as NativeTextInput, TouchableWithoutFeedback, Keyboard, BackHandler } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 import { Logo } from "../assets/icons";
@@ -9,6 +9,7 @@ import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { GlobalRef } from "../GlobalRef";
 import { calcYears, waitTo } from "../scripts/Utils";
 import statusEffect from "../scripts/StatusEffect";
+import { ThemeContext } from "../providers/ThemeProvider";
 
 type IProps = {
     setLoading: (view: boolean, text: string)=>any;
@@ -21,6 +22,8 @@ export type SessionRef = {
 
 export default React.memo(forwardRef(function Session(props: IProps, ref: React.Ref<SessionRef>) {
     const { width } = Dimensions.get('window');
+    // Context's
+    const { theme } = useContext(ThemeContext);
     // State's
     const [visible, setVisible] = useState(false);
     const [sessionEmail, setSessionEmail] = useState('');
@@ -179,7 +182,7 @@ export default React.memo(forwardRef(function Session(props: IProps, ref: React.
                     <View style={styles.contain}>
                         <View style={[styles.card, { width: (width - 64), display: (viewPanel == 1)? 'flex': 'none' }]}>
                             <Logo width={128} height={128} />
-                            <View style={[styles.form, { width: (width - 80) }]}>
+                            <View style={[styles.form, { width: (width - 80), borderRadius: (theme.roundness * 5) }]}>
                                 <TextInput
                                     style={styles.textInput}
                                     mode={'outlined'}
@@ -211,7 +214,7 @@ export default React.memo(forwardRef(function Session(props: IProps, ref: React.
                                 <Button onPress={changeViewPanel} style={{ marginTop: 8 }}>Registrarse</Button>
                             </View>
                         </View>
-                        <View style={[styles.card, { width: (width - 64), display: (viewPanel == 2)? 'flex': 'none' }]}>
+                        <View style={[styles.card, { width: (width - 64), borderRadius: (theme.roundness * 5), display: (viewPanel == 2)? 'flex': 'none' }]}>
                             <Text style={{ fontSize: 28, color: '#ED7035', textAlign: 'center' }}>{'Bienvenid@ a \nCorporal Kinesis App'}</Text>
                             <View style={[styles.form, { width: (width - 80) }]}>
                                 <TextInput
@@ -316,7 +319,7 @@ const styles = StyleSheet.create({
         padding: 16,
         backgroundColor: '#1663AB',
         alignItems: 'center',
-        borderRadius: 8
+        //borderRadius: 8
     },
     textInput: {
         marginLeft: 16,

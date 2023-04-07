@@ -70,7 +70,7 @@ export default React.memo(forwardRef(function EditAccount(_props: any, ref: Reac
         formData.append('dni', encode(formDni));
         formData.append('birthday', encode(formBirthday));
         formData.append('phone', encode(formPhone));
-        (formImage)&&formData.append('image', formImage);
+        if (formImage) formData.append('image', formImage);
         Account.modify(formData).then(()=>{
             GlobalRef.current?.loadingController(false);
             GlobalRef.current?.showSimpleAlert('Datos modificados con éxito.', '');

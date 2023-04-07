@@ -180,9 +180,9 @@ export default React.memo(forwardRef(function Session(props: IProps, ref: React.
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                 <KeyboardAvoidingView style={{ flex: 1 }} behavior={'height'} keyboardVerticalOffset={0}>
                     <View style={styles.contain}>
-                        <View style={[styles.card, { width: (width - 64), display: (viewPanel == 1)? 'flex': 'none' }]}>
+                        <View style={[styles.card, { width: (width - 64), borderRadius: (theme.roundness * 5), display: (viewPanel == 1)? 'flex': 'none' }]}>
                             <Logo width={128} height={128} />
-                            <View style={[styles.form, { width: (width - 80), borderRadius: (theme.roundness * 5) }]}>
+                            <View style={[styles.form, { width: (width - 80) }]}>
                                 <TextInput
                                     style={styles.textInput}
                                     mode={'outlined'}
@@ -215,7 +215,7 @@ export default React.memo(forwardRef(function Session(props: IProps, ref: React.
                             </View>
                         </View>
                         <View style={[styles.card, { width: (width - 64), borderRadius: (theme.roundness * 5), display: (viewPanel == 2)? 'flex': 'none' }]}>
-                            <Text style={{ fontSize: 28, color: '#ED7035', textAlign: 'center' }}>{'Bienvenid@ a \nCorporal Kinesis App'}</Text>
+                            <Text style={{ fontSize: 28, color: '#ED7035', textAlign: 'center', fontWeight: 'bold' }}>{'Bienvenid@ a \nCorporal Kinesis App'}</Text>
                             <View style={[styles.form, { width: (width - 80) }]}>
                                 <TextInput
                                     style={styles.textInput}

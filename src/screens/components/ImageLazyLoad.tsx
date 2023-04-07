@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { useEffect, useState } from "react";
 import { ImageSourcePropType, StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import FastImage, { FastImageProps, ResizeMode } from "react-native-fast-image";
@@ -17,62 +17,45 @@ type IProps = {
     onLoad?: ()=>any;
     nativeImageProps?: FastImageProps;
 };
-type IState = {
-    isLoading: boolean;
-    source: ImageSourcePropType | undefined;
-};
 
-export default class ImageLazyLoad extends PureComponent<IProps, IState> {
-    constructor(props: IProps) {
-        super(props);
-        this.state = {
-            isLoading: true,
-            source: undefined
-        };
-        this.updateImage = this.updateImage.bind(this);
+export default React.memo(function ImageLazyLoad(props: IProps) {
+    const [loading, setLoading] = useState(true);
+    const [source, setSource] = useState<ImageSourcePropType>(ProfilePicture);
+
+    async function loadNow() {
+        try {
+            const fileName = props.source.uri.split('/').pop();
+            const uriFile = `file://${RNFS.CachesDirectoryPath}/${fileName}`;
+            const exist = await RNFS.exists(uriFile);
+            if (exist) {
+                setSource({ uri: uriFile });
+                return setLoading(false);
+            }
+            await RNFS.downloadFile({ fromUrl: props.source.uri, toFile: uriFile }).promise;
+            setSource({ uri: uriFile });
+            setLoading(false);
+        } catch {
+            setSource(ProfilePicture);
+            setLoading(false);
+        }
     }
-    private _isMount: boolean = false;
-    componentDidMount() {
-        this._isMount = true;
-        this.updateImage();
-    }
-    componentWillUnmount(): void {
-        this._isMount = false;
-    }
-    componentDidUpdate(prevProps: Readonly<IProps>): void {
-        if (prevProps.source.uri !== this.props.source.uri) this.forceNowUpdate();
-    }
-    forceNowUpdate() {
-        this.setState({
-            isLoading: true,
-            source: undefined
-        }, this.updateImage);
-    }
-    updateImage() {
-        var fileName = this.props.source.uri.split('/').pop();
-        RNFS.exists(`${RNFS.CachesDirectoryPath}/${fileName}`).then((val)=>{
-            if (val) return (this._isMount)&&this.setState({ source: { uri: `file://${RNFS.CachesDirectoryPath}/${fileName}` }, isLoading: false });
-            RNFS.downloadFile({ fromUrl: this.props.source.uri, toFile: `${RNFS.CachesDirectoryPath}/${fileName}` }).promise
-                .then(()=>(this._isMount)&&this.setState({ source: { uri: `file://${RNFS.CachesDirectoryPath}/${fileName}` }, isLoading: false }))
-                .catch(()=>(this._isMount)&&this.setState({ source: ProfilePicture, isLoading: false }));
-        }).catch(()=>(this._isMount)&&this.setState({ source: ProfilePicture, isLoading: false }));
-    }
-    render(): React.ReactNode {
-        return(<View style={[styles.view, { width: this.props.size, height: this.props.size }, this.props.style, (this.props.circle)? styles.circle: undefined, (this.props.circle)? { shadowColor: '#FFFFFF' }: undefined]}>
-            {(this.state.isLoading)?<SkeletonPlaceholder>
-                <SkeletonPlaceholder.Item width={'100%'} height={'100%'} />
-            </SkeletonPlaceholder>:
-            <FastImage
-                source={this.state.source! as any}
-                style={styles.image}
-                resizeMode={this.props.resizeMode}
-                onLoad={this.props.onLoad}
-                onError={this.props.onLoad}
-                {...this.props.nativeImageProps}
-            />}
-        </View>);
-    }
-}
+
+    useEffect(()=>{ loadNow(); }, [props.source]);
+
+    return(<View style={[styles.view, { width: props.size, height: props.size }, props.style, (props.circle)? styles.circle: undefined, (props.circle)? { shadowColor: '#FFFFFF' }: undefined]}>
+        {(loading)?<SkeletonPlaceholder>
+            <SkeletonPlaceholder.Item width={'100%'} height={'100%'} />
+        </SkeletonPlaceholder>:
+        <FastImage
+            source={source! as any}
+            style={styles.image}
+            resizeMode={props.resizeMode}
+            onLoad={props.onLoad}
+            onError={props.onLoad}
+            {...props.nativeImageProps}
+        />}
+    </View>);
+});
 
 const styles = StyleSheet.create({
     view: {

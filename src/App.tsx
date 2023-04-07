@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { EventArg, NavigationContainer } from '@react-navigation/native';
+import { NativeStackNavigationOptions, createNativeStackNavigator } from '@react-navigation/native-stack';
 import SystemNavigationBar from "react-native-system-navigation-bar";
 import { DeviceEventEmitter, EmitterSubscription, StatusBar, StatusBarStyle, View } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
@@ -19,12 +19,18 @@ import { refSession } from './ExtraContentsRefs';
 
 const Stack = createNativeStackNavigator();
 
+const _screenOptions: NativeStackNavigationOptions = {
+    headerShown: false,
+    animation: 'fade_from_bottom',
+    gestureEnabled: false
+};
+
 var event: EmitterSubscription | undefined = undefined;
 var event2: EmitterSubscription | undefined = undefined;
 
 export default React.memo(function App() {
     // Context's
-    const { theme, navTheme, themeStatus } = useContext(ThemeContext);
+    const { theme, navTheme, themeStatus, setThemeStatus } = useContext(ThemeContext);
     // State's
     const [showVerify, setShowVerify] = useState<boolean>(false);
     const [textAnimVerify, setTextAnimVerify] = useState<string|undefined>(undefined);
@@ -62,6 +68,11 @@ export default React.memo(function App() {
             setTextAnimVerify(error.cause);
             setTimeout(()=>refSession.current?.close(), 1500);
         });
+    }
+    function changeScreen({ data }: EventArg<"state", undefined, unknown>) {
+        const _index = (data as any).state.index;
+        if (_index == 0) return setThemeStatus([{ color: theme.colors.background, style: 'light' }, { color: theme.colors.elevation.level2, style: 'light' }]);
+        if (_index == 1) return setThemeStatus([{ color: theme.colors.background, style: 'light' }, { color: theme.colors.background, style: 'light' }]);
     }
 
     useEffect(()=>{
@@ -108,7 +119,7 @@ export default React.memo(function App() {
                 />
                 <GlobalComponents ref={GlobalRef} />
                 <SplashScreen init={verifyAccount} />
-                <Stack.Navigator initialRouteName="c" screenOptions={{ headerShown: false, animation: 'fade_from_bottom', gestureEnabled: false }} >
+                <Stack.Navigator initialRouteName="c" screenOptions={_screenOptions} screenListeners={{ state: changeScreen }}>
                     <Stack.Screen name="c" children={(cProps)=><Client {...cProps} />} />
                     <Stack.Screen name="p" children={(cProps)=><Profesional {...cProps} />} />
                 </Stack.Navigator>

@@ -128,7 +128,7 @@ export default React.memo(forwardRef(function ViewClietDetails(props: IProps, re
                 <Divider />
                 <View>
                     {(userData)&&<Card style={{ margin: 16, display: (userData.type == '1')? 'flex': 'none' }}>
-                        <Card.Title title="Medios de contacto:" />
+                        <Card.Title title="Medios de contacto:" titleStyle={{ fontSize: 18 }} />
                         <Card.Content>
                             <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 12 }}>
                                 <IconButton iconColor="#15b2f7" animated={true} icon={'phone'} style={styles.buttonsContacts} onPress={()=>Linking.openURL(`tel:+549${decode(userData!.phone)}`)}/>

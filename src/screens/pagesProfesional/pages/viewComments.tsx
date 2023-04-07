@@ -1,187 +1,166 @@
 import { decode, encode } from "base-64";
-import React, { Component } from "react";
-import { FlatList, ToastAndroid, View } from "react-native";
-import { Button, Appbar, Dialog, Paragraph, Portal, Provider as PaperProvider, TextInput } from "react-native-paper";
+import React, { forwardRef, useContext, useImperativeHandle, useState } from "react";
+import { FlatList, ListRenderItemInfo, View } from "react-native";
+import { Button, Appbar, Dialog, Portal, TextInput } from "react-native-paper";
 import utf8 from "utf8";
 import { NoList } from "../../../assets/icons";
 import { Comment, HostServer } from "../../../scripts/ApiCorporal";
 import { commentsData } from "../../../scripts/ApiCorporal/types";
-import CombinedTheme from "../../../Theme";
 import { CustomCardComments2, EmptyListComments } from "../../components/Components";
 import CustomModal from "../../components/CustomModal";
-
-type IProps = {
-    goLoading: (show: boolean, text?: string)=>void;
-};
-type IState = {
-    visible: boolean;
-    data: commentsData[];
-    clientId: string;
-    
-    errorView: boolean;
-    errorTitle: string;
-    errorMessage: string;
-    confirmView: boolean;
-    actualId: string;
-
-    // Edit Comment
-    showEditComment: boolean;
-    valueEditComment: string;
-    setEditComment: {
-        id: string;
-        actualComment: string;
-        actualDate: string;
-    };
-};
+import { ThemeContext } from "../../../providers/ThemeProvider";
+import { GlobalRef } from "../../../GlobalRef";
 
 const decodeUtf8 = (str: string)=>{ try { return utf8.decode(str); } catch { return str; } };
 const encodeUtf8 = (str: string)=>{ try { return utf8.encode(str); } catch { return str; } };
 
-export default class ViewComments extends Component<IProps, IState> {
-    constructor(props: IProps) {
-        super(props);
-        this.state = {
-            visible: false,
-            data: [],
-            clientId: '-1',
-            errorView: false,
-            errorTitle: '',
-            errorMessage: '',
-            confirmView: false,
-            actualId: '',
-            showEditComment: false,
-            valueEditComment: '',
-            setEditComment: {
-                id: '0',
-                actualComment: '',
-                actualDate: '00/00/0000'
-            }
-        };
-        this.close = this.close.bind(this);
-        this.deleteComment = this.deleteComment.bind(this);
-    }
-    reload() {
-        this.props.goLoading(true, 'Obteniendo información...');
-        Comment.admin_getAllAccount(this.state.clientId)
+export type ViewCommentsRef = {
+    open: (data: commentsData[], clientId: string)=>void;
+    close: ()=>void;
+};
+
+export default React.memo(forwardRef(function ViewComments(_props: any, ref: React.Ref<ViewCommentsRef>) {
+    // Context's
+    const { theme } = useContext(ThemeContext);
+    // State's
+    const [visible, setVisible] = useState(false);
+    const [data, setData] = useState<commentsData[]>([]);
+    const [clientId, setClientId] = useState('-1');
+    const [actualId, setActualId] = useState('');
+    const [showEditComment, setShowEditComment] = useState(false);
+    const [valueEditComment, setValueEditComment] = useState('');
+    const [editComment, setEditComment] = useState<{ id: string; actualComment: string; actualDate: string; }>({
+        id: '0',
+        actualComment: '',
+        actualDate: '00/00/0000'
+    });
+
+    function reload() {
+        GlobalRef.current?.loadingController(true, 'Obteniendo información...');
+        Comment.admin_getAllAccount(clientId)
             .then((value)=>{
-                this.setState({ data: value.reverse() });
-                this.props.goLoading(false);
+                setData(value.reverse());
+                GlobalRef.current?.loadingController(false);
             })
             .catch((error)=>{
-                this.setState({ errorView: true, errorTitle: 'Ocurrio un error', errorMessage: error.cause })
-                this.props.goLoading(false);
+                GlobalRef.current?.loadingController(false);
+                GlobalRef.current?.showSimpleAlert('Ocurrio un error', error.cause);
             });
     }
     
-    listEmptyComponent() { return(<View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}><EmptyListComments icon={<NoList width={96} height={96} />} message={'No hay comentarios...'} /></View>); }
-    deleteComment() {
-        this.props.goLoading(true, 'Borrando comentario...');
-        Comment.admin_delete(this.state.actualId)
+    function deleteComment() {
+        GlobalRef.current?.loadingController(true, 'Borrando comentario...');
+        Comment.admin_delete(actualId)
             .then(()=>{
-                this.reload();
-                this.props.goLoading(false);
+                reload();
+                GlobalRef.current?.loadingController(false);
             })
             .catch((error)=>{
-                this.setState({ errorView: true, errorTitle: 'Ocurrio un error', errorMessage: error.cause });
-                this.props.goLoading(false);
+                GlobalRef.current?.loadingController(false);
+                GlobalRef.current?.showSimpleAlert('Ocurrio un error', error.cause);
             });
     }
-    editComment() {
-        this.props.goLoading(true, 'Editando comentario...');
-        Comment.admin_modify(this.state.setEditComment.id, encode(encodeUtf8(this.state.valueEditComment)))
-            .then(()=>this.setState({ valueEditComment: '', setEditComment: { id: '0', actualComment: '', actualDate: '00/00/0000' } }, ()=>{
-                this.reload();
-                this.props.goLoading(false);
-            }))
+    function _editComment() {
+        GlobalRef.current?.loadingController(true, 'Editando comentario...');
+        Comment.admin_modify(editComment.id, encode(encodeUtf8(valueEditComment)))
+            .then(()=>{
+                GlobalRef.current?.loadingController(false);
+                setValueEditComment('');
+                setEditComment({ id: '0', actualComment: '', actualDate: '00/00/0000' });
+                reload();
+            })
             .catch((error)=>{
-                this.setState({ errorView: true, errorTitle: 'Ocurrio un error', errorMessage: error.cause });
-                this.props.goLoading(false);
+                GlobalRef.current?.loadingController(false);
+                GlobalRef.current?.showSimpleAlert('Ocurrio un error', error.cause);
             });
     }
-    goDelete(data: commentsData) {
-        return (data.id_training == '0' || data.id_training == '-1')? this.setState({ confirmView: true, actualId: data.id }): ToastAndroid.show('No se puede eliminar este comentario', ToastAndroid.SHORT);
+    function _goDelete(_data: commentsData) {
+        setActualId(_data.id);
+        GlobalRef.current?.showDoubleAlert('Advertencia de confirmación', '¿Estas seguro que quieres borrar este comentario?', deleteComment);
     }
-    goEdit(data: commentsData) {
-        return (data.id_training == '0' || data.id_training == '-1')? this.setState({ showEditComment: true, valueEditComment: decodeUtf8(decode(data.comment)), setEditComment: { id: data.id, actualComment: decodeUtf8(decode(data.comment)), actualDate: decode(data.date) } }): ToastAndroid.show('No se puede editar este comentario', ToastAndroid.SHORT);
-    }
-
-    // Controller
-    open(data: commentsData[], clientId: string) {
-        this.setState({
-            visible: true,
-            data,
-            clientId
+    function _goEdit(data: commentsData) {
+        setShowEditComment(true);
+        setValueEditComment(decodeUtf8(decode(data.comment)));
+        setEditComment({
+            id: data.id,
+            actualComment: decodeUtf8(decode(data.comment)),
+            actualDate: decode(data.date)
         });
     }
-    close() { this.setState({ visible: false }); }
 
-
-    render(): React.ReactNode {
-        return(<CustomModal visible={this.state.visible} onRequestClose={this.close} onClose={this.close}>
-            <PaperProvider theme={CombinedTheme}>
-                <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background }}>
-                    <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
-                        <Appbar.BackAction onPress={this.close} />
-                        <Appbar.Content title={'Comentarios'} />
-                    </Appbar.Header>
-                    <View style={{ flex: 2 }}>
-                        <FlatList
-                            data={this.state.data}
-                            extraData={this.state}
-                            keyExtractor={(item)=>`viewC-admin-${item.id}`}
-                            contentContainerStyle={{ paddingTop: (this.state.data.length !== 0)? 16: undefined, flex: (this.state.data.length == 0)? 3: undefined }}
-                            ListEmptyComponent={<this.listEmptyComponent />}
-                            renderItem={({ item })=><CustomCardComments2
-                                key={`viewC-admin-${item.id}`}
-                                accountName={decode(item.accountData.name)}
-                                source={{ uri: `${HostServer}/images/accounts/${decode(item.accountData.image)}` }}
-                                edit={item.edit}
-                                comment={decodeUtf8(decode(item.comment))}
-                                date={decode(item.date)}
-                                buttonDelete={()=>this.goDelete(item)}
-                                buttonEdit={()=>this.goEdit(item)}
-                            />}
-                        />
-                        <Portal>
-                            <Dialog visible={this.state.errorView} onDismiss={()=>this.setState({ errorView: false })}>
-                                <Dialog.Title>{this.state.errorTitle}</Dialog.Title>
-                                <Dialog.Content>
-                                    <Paragraph>{this.state.errorMessage}</Paragraph>
-                                </Dialog.Content>
-                                <Dialog.Actions>
-                                    <Button onPress={()=>this.setState({ errorView: false })}>Aceptar</Button>
-                                </Dialog.Actions>
-                            </Dialog>
-                            <Dialog visible={this.state.confirmView} onDismiss={()=>this.setState({ confirmView: false })}>
-                                <Dialog.Title>Advertencia de confirmación</Dialog.Title>
-                                <Dialog.Content>
-                                    <Paragraph>¿Estas seguro que quieres borrar este comentario?</Paragraph>
-                                </Dialog.Content>
-                                <Dialog.Actions>
-                                    <Button onPress={()=>this.setState({ confirmView: false })}>Cancelar</Button>
-                                    <Button onPress={()=>this.setState({ confirmView: false }, this.deleteComment)}>Aceptar</Button>
-                                </Dialog.Actions>
-                            </Dialog>
-                            <Dialog visible={this.state.showEditComment} onDismiss={()=>this.setState({ showEditComment: false })}>
-                                <Dialog.Title>Editar comentario ({this.state.setEditComment.actualDate})</Dialog.Title>
-                                <Dialog.Content>
-                                    <TextInput
-                                        multiline={true}
-                                        numberOfLines={5}
-                                        value={this.state.valueEditComment}
-                                        onChangeText={(text)=>this.setState({ valueEditComment: text })}
-                                        placeholder={'Escribe aquí...'}
-                                    />
-                                </Dialog.Content>
-                                <Dialog.Actions>
-                                    <Button onPress={()=>this.setState({ showEditComment: false })}>Cancelar</Button>
-                                    <Button onPress={()=>this.setState({ showEditComment: false }, ()=>this.editComment())}>Editar</Button>
-                                </Dialog.Actions>
-                            </Dialog>
-                        </Portal>
-                    </View>
-                </View>
-            </PaperProvider>
-        </CustomModal>);
+    function _keyExtractor(item: commentsData, index: number) {
+        return `viewC-admin-${item.id}`;
     }
-}
+    function _renderItem({ item }: ListRenderItemInfo<commentsData>) {
+        return(<CustomCardComments2
+            key={`viewC-admin-${item.id}`}
+            accountName={decode(item.accountData.name)}
+            source={{ uri: `${HostServer}/images/accounts/${decode(item.accountData.image)}` }}
+            edit={item.edit}
+            comment={decodeUtf8(decode(item.comment))}
+            date={decode(item.date)}
+            buttonDelete={()=>_goDelete(item)}
+            buttonEdit={()=>_goEdit(item)}
+        />);
+    }
+
+    function _closeEditComment() { setShowEditComment(false); }
+    function _goEditComment() { setShowEditComment(false); _editComment(); }
+
+    function close() { setVisible(false); }
+    function open(_data: commentsData[], _clientId: string) {
+        setData(_data);
+        setClientId(_clientId);
+        setVisible(true);
+    }
+    useImperativeHandle(ref, ()=>({ open, close }));
+
+    return(<CustomModal visible={visible} onRequestClose={close} onClose={close}>
+        <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+            <Appbar.Header style={{ backgroundColor: theme.colors.background }}>
+                <Appbar.BackAction onPress={close} />
+                <Appbar.Content title={'Comentarios'} />
+            </Appbar.Header>
+            <View style={{ flex: 2 }}>
+                <FlatList
+                    data={data}
+                    keyExtractor={_keyExtractor}
+                    contentContainerStyle={{ paddingTop: (data.length !== 0)? 8: undefined, flex: (data.length == 0)? 3: undefined }}
+                    ListEmptyComponent={<ListEmptyComponent />}
+                    renderItem={_renderItem}
+                />
+                <Portal>
+                    <Dialog visible={showEditComment} onDismiss={_closeEditComment}>
+                        <Dialog.Title>Editar comentario ({editComment.actualDate})</Dialog.Title>
+                        <Dialog.Content>
+                            <TextInput
+                                mode={'outlined'}
+                                multiline={true}
+                                numberOfLines={5}
+                                value={valueEditComment}
+                                onChangeText={setValueEditComment}
+                                placeholder={'Escribe aquí...'}
+                            />
+                        </Dialog.Content>
+                        <Dialog.Actions>
+                            <Button onPress={_closeEditComment}>Cancelar</Button>
+                            <Button onPress={_goEditComment}>Editar</Button>
+                        </Dialog.Actions>
+                    </Dialog>
+                </Portal>
+            </View>
+        </View>
+    </CustomModal>);
+}));
+
+const ListEmptyComponent = React.memo(function ListEmptyComponent() {
+    return(<View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}>
+        <EmptyListComments
+            icon={<NoList
+                width={96}
+                height={96}
+            />}
+            message={'No hay ejercicios cargados...'}
+        />
+    </View>);
+});

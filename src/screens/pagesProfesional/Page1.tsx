@@ -3,7 +3,6 @@ import { DeviceEventEmitter, Dimensions, EmitterSubscription, FlatList, ListRend
 import { ActivityIndicator, Appbar, Divider, FAB, Portal } from "react-native-paper";
 import { Account, Exercise, HostServer, Options } from "../../scripts/ApiCorporal";
 import { commentsData, dataExercise, dataListUsers, DetailsTrainings, trainings, userData } from "../../scripts/ApiCorporal/types";
-import CombinedTheme from "../../Theme";
 import { decode } from "base-64";
 import { CustomItemList2, CustomShowError } from "../components/Components";
 import ViewMoreDetails from "./pages/viewMoreDetails2";
@@ -13,7 +12,7 @@ import SearchClient from "./pages/searchClient";
 import SelectClient from "./pages/selectClient";
 import SetCommentUser from "./pages/setCommentUser";
 import ViewClietDetails, { ViewClietDetailsRef } from "./pages/viewClientDetails";
-import ViewComments from "./pages/viewComments";
+import ViewComments, { ViewCommentsRef } from "./pages/viewComments";
 import ViewTraining, { ViewTrainingRef } from "./pages/viewTraining";
 import EditClientProfessional, { EditClientProfessionalRef } from "./pages/editClient";
 import CustomCard2 from "../components/CustomCard2";
@@ -50,7 +49,7 @@ export default React.memo(function Page1(props: IProps) {
     const refViewTraining = useRef<ViewTrainingRef>(null);
     const refViewMoreDetails = useRef<ViewMoreDetails>(null);
     const refImageViewer = useRef<ImageViewer>(null);
-    const refViewComments = useRef<ViewComments>(null);
+    const refViewComments = useRef<ViewCommentsRef>(null);
     const refSetCommentUser = useRef<SetCommentUser>(null);
     const refAddNewAccount = useRef<AddNewAccount>(null);
     const refDeleteUser = useRef<DeleteUserRef>(null);

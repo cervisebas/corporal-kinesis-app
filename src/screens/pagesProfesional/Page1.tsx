@@ -1,12 +1,12 @@
 import React, { PureComponent, useContext, useEffect, useRef, useState } from "react";
 import { DeviceEventEmitter, Dimensions, EmitterSubscription, FlatList, ListRenderItemInfo, RefreshControl, StyleSheet, ToastAndroid, View } from "react-native";
 import { ActivityIndicator, Appbar, Divider, FAB, Portal } from "react-native-paper";
-import { Account, Exercise, HostServer, Options } from "../../scripts/ApiCorporal";
+import { Account, Exercise, Options } from "../../scripts/ApiCorporal";
 import { commentsData, dataExercise, dataListUsers, DetailsTrainings, trainings, userData } from "../../scripts/ApiCorporal/types";
 import { decode } from "base-64";
 import { CustomItemList2, CustomShowError } from "../components/Components";
 import ViewMoreDetails, { ViewMoreDetailsRef } from "./pages/viewMoreDetails";
-import AddNewAccount from "./pages/addNewAccount";
+import AddNewAccount, { AddNewAccountRef } from "./pages/addNewAccount";
 import AddTraining from "./pages/addTraining";
 import SearchClient from "./pages/searchClient";
 import SelectClient from "./pages/selectClient";
@@ -16,7 +16,6 @@ import ViewComments, { ViewCommentsRef } from "./pages/viewComments";
 import ViewTraining, { ViewTrainingRef } from "./pages/viewTraining";
 import EditClientProfessional, { EditClientProfessionalRef } from "./pages/editClient";
 import CustomCard2 from "../components/CustomCard2";
-import ImageViewer from "./pages/ImageViewer";
 import DeleteUser, { DeleteUserRef } from "./pages/deleteUser";
 import { ThemeContext } from "../../providers/ThemeProvider";
 import { GlobalRef } from "../../GlobalRef";
@@ -50,7 +49,7 @@ export default React.memo(function Page1(props: IProps) {
     const refViewMoreDetails = useRef<ViewMoreDetailsRef>(null);
     const refViewComments = useRef<ViewCommentsRef>(null);
     const refSetCommentUser = useRef<SetCommentUser>(null);
-    const refAddNewAccount = useRef<AddNewAccount>(null);
+    const refAddNewAccount = useRef<AddNewAccountRef>(null);
     const refDeleteUser = useRef<DeleteUserRef>(null);
     const refSearchClient = useRef<SearchClient>(null);
     const refAddTraining = useRef<AddTraining>(null);
@@ -207,8 +206,8 @@ export default React.memo(function Page1(props: IProps) {
         <EditClientProfessional ref={refEditClientProfessional} finish={_reopenViewClient} />
         <ViewTraining ref={refViewTraining} goMoreDetails={_goMoreDetails} />
         <ViewComments ref={refViewComments} goLoading={()=>undefined} />
-        
         <ViewMoreDetails ref={refViewMoreDetails} />
+        
         <AddNewAccount ref={refAddNewAccount} />
         <SearchClient
             ref={refSearchClient}

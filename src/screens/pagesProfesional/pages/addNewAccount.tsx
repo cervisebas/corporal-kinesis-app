@@ -1,196 +1,143 @@
 import { encode } from 'base-64';
 import moment from 'moment';
-import React, { Component } from 'react';
-import { DeviceEventEmitter, Dimensions, KeyboardAvoidingView, ScrollView, StyleSheet, ToastAndroid, View } from 'react-native';
-import DatePicker from 'react-native-date-picker';
-import { Button, Appbar, Avatar, Portal, TextInput, Provider as PaperProvider, Dialog, Snackbar, Text, Paragraph } from 'react-native-paper';
+import React, { forwardRef, useContext, useImperativeHandle, useState } from 'react';
+import { DeviceEventEmitter, Dimensions, ScrollView, StyleSheet, View } from 'react-native';
+import { Button, Appbar, Avatar, TextInput } from 'react-native-paper';
 import { Account } from '../../../scripts/ApiCorporal';
-import CombinedTheme from '../../../Theme';
 import CustomModal from '../../components/CustomModal';
 import ImageProfile from "../../../assets/profile.webp";
+import { ThemeContext } from '../../../providers/ThemeProvider';
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import { calcYears } from '../../../scripts/Utils';
+import { GlobalRef } from '../../../GlobalRef';
 
-const { width } = Dimensions.get('window');
-
-type IProps = {};
-type IState = {
-    visible: boolean;
-
-    name: string;
-    dni: string;
-    date: string;
-    actualDate: Date;
-
-    alertName: boolean;
-    alertDni: boolean;
-    alertDate: boolean;
-
-    viewModalDate: boolean;
-
-    textButton: string;
-
-    isLoading: boolean;
-
-    viewSnackbar: boolean;
-
-    dialogErrorView: boolean;
-    dialogErrorMessage: string;
+export type AddNewAccountRef = {
+    open: ()=>void;
 };
-export default class AddNewAccount extends Component<IProps, IState> {
-    constructor(props: IProps) {
-        super(props);
-        this.state = {
-            visible: false,
-            name: '',
-            dni: '',
-            date: moment(new Date()).format('DD/MM/YYYY'),
-            actualDate: new Date(),
-            alertName: false,
-            alertDni: false,
-            alertDate: false,
-            viewModalDate: false,
-            textButton: 'Crear ahora',
-            isLoading: false,
-            viewSnackbar: false,
-            dialogErrorView: false,
-            dialogErrorMessage: ''
-        };
-        this.close = this.close.bind(this);
+
+export default React.memo(forwardRef(function AddNewAccount(_props: any, ref: React.Ref<AddNewAccountRef>) {
+    const { width } = Dimensions.get('window');
+    //Context's
+    const { theme } = useContext(ThemeContext);
+    // State's
+    const [visible, setVisible] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [name, setName] = useState('');
+    const [dni, setDni] = useState('');
+    const [date, setDate] = useState(moment().format('DD/MM/YYYY'));
+    const [actualDate, setActualDate] = useState(new Date());
+
+    function clean() {
+        setName('');
+        setDni('');
+        setDate(moment().format('DD/MM/YYYY'));
+        setActualDate(new Date());
     }
-    close() {
-        if (this.state.isLoading) return ToastAndroid.show('Espere...', ToastAndroid.SHORT);
-        this.setState({
-            visible: false,
-            name: '',
-            dni: '',
-            date: moment(new Date()).format('DD/MM/YYYY'),
-            actualDate: new Date(),
-            alertName: false,
-            alertDni: false,
-            alertDate: false,
+    function verifyData() {
+        if (name.length < 5) {
+            GlobalRef.current?.showSimpleAlert('Coloca un nombre valido por favor.', '');
+            return false;
+        }
+        if (dni.length != 8) {
+            GlobalRef.current?.showSimpleAlert('Coloca un D.N.I valido por favor.', '');
+            return false;
+        }
+        if (parseInt(calcYears(date)) < 12) {
+            GlobalRef.current?.showSimpleAlert('Coloca una fecha de nacimiento valida por favor.', '');
+            return false;
+        }
+        return true;
+    }
+    function createNow() {
+        setLoading(true);
+        if (!verifyData()) return setLoading(false);
+        Account.admin_create(encode(name), encode(dni), encode(date))
+            .then(()=>{
+                const _name = name;
+                GlobalRef.current?.showSimpleAlert('Enhorabuena', `Se creo el perfil de “${_name}” correctamente, ya puedes visualizarlo en la lista de usuarios.`)
+                clean();
+                setLoading(false);
+                DeviceEventEmitter.emit('adminPage1Reload');
+            })
+            .catch((error)=>{
+                setLoading(false);
+                GlobalRef.current?.showSimpleAlert('Ocurrio un error', error.cause);
+            });
+    }
+    function _openDatePicker() {
+        DateTimePickerAndroid.open({
+            value: actualDate,
+            mode: 'date',
+            onChange: ({ type }, date)=>{
+                if (type == 'dismissed') return;
+                if (!date) return;
+                setActualDate(date);
+                setDate(moment(date).format('DD/MM/YYYY'));
+            }
         });
     }
-    calcYears(date: string): number {
-        var dateProcess = moment(date, 'DD/MM/YYYY').toDate();
-        var now = new Date();
-        var birthday = new Date(dateProcess);
-        var year = now.getFullYear() - birthday.getFullYear();
-        var m = now.getMonth() - birthday.getMonth();
-        if (m < 0 || (m === 0 && now.getDate() < birthday.getDate())) { year--; }
-        return year;
-    }
-    verifyData(): Promise<boolean> {
-        return new Promise((resolve)=>{
-            if (this.state.name.length < 5) {
-                this.setState({ alertName: true });
-                return resolve(false);
-            }
-            if (this.state.dni.length != 8) {
-                this.setState({ alertDni: true });
-                return resolve(false);
-            }
-            if (this.calcYears(this.state.date) < 12) {
-                this.setState({ alertDate: true });
-                return resolve(false);
-            }
-            return resolve(true);
-        });
-    }
-    createNow() {
-        this.setState({ isLoading: true });
-        this.verifyData().then((verify)=>{
-            if (!verify) return this.setState({ isLoading: false });
-            Account.admin_create(encode(this.state.name), encode(this.state.dni), encode(this.state.date))
-                .then(()=>this.setState({ name: '', dni: '', date: moment(new Date()).format('DD/MM/YYYY'), actualDate: new Date(), viewSnackbar: true, isLoading: false }, ()=>DeviceEventEmitter.emit('adminPage1Reload')))
-                .catch((error)=>this.setState({ dialogErrorView: true, dialogErrorMessage: error.cause, isLoading: false }));
-        });
+    function _setDni(text: string) {
+        const regex = /[0-9]/g;
+        let numeros = text.match(regex);
+        setDni(numeros!.join(""));
     }
 
-    // Controller
-    open() { this.setState({ visible: true }); }
+    function close() { setVisible(false); }
+    function open() { setVisible(true); }
 
-    render(): React.ReactNode {
-        return(<CustomModal visible={this.state.visible} onRequestClose={this.close} animationIn={'slideInLeft'} animationOut={'slideOutRight'}>
-            <PaperProvider theme={CombinedTheme}>
-                <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background }}>
-                    <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
-                        <Appbar.BackAction onPress={this.close}/>
-                        <Appbar.Content title={'Añadir nuevo usuario'} />
-                    </Appbar.Header>
-                    <KeyboardAvoidingView style={{ flex: 2 }} behavior={'height'} keyboardVerticalOffset={0}>
-                        <ScrollView style={{ flex: 3 }}>
-                            <View style={{ width, alignItems: 'center', paddingTop: 18 }}>
-                                <Avatar.Image size={156} source={ImageProfile} />
-                            </View>
-                            <View style={{ flex: 4, marginTop: 32 }}>
-                                <TextInput
-                                    style={styles.textInput}
-                                    mode={'outlined'}
-                                    label={'Nombre y apellido'}
-                                    textContentType={'nickname'}
-                                    error={this.state.alertName}
-                                    keyboardType={'default'}
-                                    value={this.state.name}
-                                    disabled={this.state.isLoading}
-                                    onChangeText={(text)=>this.setState({ name: text, alertName: false })} />
-                                <TextInput
-                                    style={styles.textInput}
-                                    mode={'outlined'}
-                                    label={'D.N.I'}
-                                    keyboardType={'numeric'}
-                                    error={this.state.alertDni}
-                                    value={this.state.dni}
-                                    disabled={this.state.isLoading}
-                                    onChangeText={(text)=>this.setState({ dni: text.replace(/\ /gi, '').replace(/\./gi, '').replace(/\,/gi, '').replace(/\-/gi, ''), alertDni: false })} />
-                                <TextInput
-                                    style={styles.textInput}
-                                    mode={'outlined'}
-                                    label={'Fecha de nacimiento'}
-                                    error={this.state.alertDate}
-                                    value={this.state.date}
-                                    disabled={this.state.isLoading}
-                                    editable={false}
-                                    right={<TextInput.Icon icon="calendar-range" disabled={this.state.isLoading} onPress={()=>this.setState({ viewModalDate: true })} />} />
-                                <Button mode={'contained'} loading={this.state.isLoading} onPress={()=>(!this.state.isLoading)? this.createNow(): ToastAndroid.show('Espere...', ToastAndroid.SHORT)} style={{ marginTop: 8, marginLeft: 16, marginRight: 16 }}>
-                                    {this.state.textButton}
-                                </Button>
-                            </View>
-                        </ScrollView>
-                    </KeyboardAvoidingView>
-                    <Portal>
-                        <Dialog visible={this.state.viewModalDate} dismissable={true} onDismiss={()=>this.setState({ viewModalDate: false })}>
-                            <Dialog.Title>Fecha de nacimiento</Dialog.Title>
-                            <Dialog.Content>
-                                {<DatePicker
-                                    date={this.state.actualDate}
-                                    mode={'date'}
-                                    fadeToColor={'#323335'}
-                                    textColor={'#FFFFFF'}
-                                    onDateChange={(date)=>this.setState({ actualDate: date })}
-                                />}
-                            </Dialog.Content>
-                            <Dialog.Actions>
-                                <Button onPress={()=>this.setState({ viewModalDate: false })}>Cancelar</Button>
-                                <Button onPress={()=>this.setState({ date: moment(this.state.actualDate).format('DD/MM/YYYY'), alertDate: false, viewModalDate: false })}>Aceptar</Button>
-                            </Dialog.Actions>
-                        </Dialog>
-                        <Dialog visible={this.state.dialogErrorView} dismissable={false}>
-                            <Dialog.Title>Ocurrio un error</Dialog.Title>
-                            <Dialog.Content>
-                                <Paragraph>{this.state.dialogErrorMessage}</Paragraph>
-                            </Dialog.Content>
-                            <Dialog.Actions>
-                                <Button onPress={()=>this.setState({ dialogErrorView: false })}>Aceptar</Button>
-                            </Dialog.Actions>
-                        </Dialog>
-                    </Portal>
-                    <Snackbar visible={this.state.viewSnackbar} onDismiss={()=>this.setState({ viewSnackbar: false })} style={{ backgroundColor: '#1663AB' }} duration={3500}>
-                        <Text>Usuario creado correctamente.</Text>
-                    </Snackbar>
+    useImperativeHandle(ref, ()=>({ open }));
+
+    return(<CustomModal visible={visible} onRequestClose={(!loading)? close: undefined}>
+        <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+            <Appbar.Header style={{ backgroundColor: theme.colors.background }}>
+                <Appbar.BackAction onPress={(!loading)? close: undefined}/>
+                <Appbar.Content title={'Añadir nuevo usuario'} />
+            </Appbar.Header>
+            <ScrollView style={{ flex: 3 }}>
+                <View style={{ width, alignItems: 'center', paddingTop: 18 }}>
+                    <Avatar.Image size={156} source={ImageProfile} />
                 </View>
-            </PaperProvider>
-        </CustomModal>);
-    }
-};
+                <View style={{ flex: 4, marginTop: 32 }}>
+                    <TextInput
+                        style={styles.textInput}
+                        mode={'outlined'}
+                        label={'Nombre y apellido'}
+                        textContentType={'nickname'}
+                        keyboardType={'default'}
+                        value={name}
+                        editable={!loading}
+                        onChangeText={setName} />
+                    <TextInput
+                        style={styles.textInput}
+                        mode={'outlined'}
+                        label={'D.N.I'}
+                        keyboardType={'numeric'}
+                        value={dni}
+                        editable={!loading}
+                        onChangeText={_setDni} />
+                    <TextInput
+                        style={styles.textInput}
+                        mode={'outlined'}
+                        label={'Fecha de nacimiento'}
+                        value={date}
+                        editable={false}
+                        right={<TextInput.Icon
+                            icon={'calendar-range'}
+                            onPress={(!loading)? _openDatePicker: undefined}
+                        />}
+                    />
+                    <Button
+                        mode={'contained'}
+                        loading={loading}
+                        onPress={(!loading)? createNow: undefined}
+                        style={{ marginTop: 8, marginLeft: 16, marginRight: 16 }}
+                        children={(loading)? 'Enviando...': 'Crear ahora'}
+                    />
+                </View>
+            </ScrollView>
+        </View>
+    </CustomModal>);
+}));
 
 const styles = StyleSheet.create({
     textInput: {

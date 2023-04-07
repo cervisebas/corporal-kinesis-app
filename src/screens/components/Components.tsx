@@ -125,7 +125,6 @@ const CustomItemList2 = React.memo(function(props: IProps6) {
         title={props.title}
         onPress={props.onPress}
         onLongPress={showMenu}
-        style={{ height: 64 }}
         left={leftAvatar}
         right={rightMenu}
     />);
@@ -221,73 +220,6 @@ class CustomItemList4 extends PureComponent<IProps10, IState10> {
     }
 }
 
-type IProps11 = {
-    onPress: ()=>any;
-    style?: StyleProp<ViewStyle>;
-    title: string;
-};
-type IState11 = {
-    clickColor: string;
-    heightComponent: number;
-    widthCard: number;
-    widthViewButton: number;
-};
-class CustomCard3 extends PureComponent<IProps11, IState11> {
-    constructor(props: IProps11) {
-        super(props);
-        this.state = {
-            clickColor: CombinedTheme.colors.background,
-            heightComponent: 68,
-            widthCard: 0,
-            widthViewButton: 0
-        };
-    }
-    onPressClick() {
-        this.setState({ clickColor: 'rgb(213, 0, 0)' }, ()=>{
-            this.props.onPress();
-            setTimeout(()=>this.setState({ clickColor: CombinedTheme.colors.background }), 150);
-        });
-    }
-    render(): React.ReactNode {
-        return(<Card onLayout={({ nativeEvent })=>this.setState({ heightComponent: nativeEvent.layout.height, widthCard: nativeEvent.layout.width })} style={this.props.style} accessible={true} onPress={()=>this.onPressClick()}>
-            <Card.Content style={{ justifyContent: 'center' }}>
-                <View style={{ width: (this.state.widthCard - this.state.widthViewButton) - 40, overflow: 'hidden' }}>
-                    <Title numberOfLines={1}>{this.props.title}</Title>
-                </View>
-                <View style={{ position: 'absolute', right: 16, height: 24, alignItems: 'center', flexDirection: 'row' }}>
-                    <Text style={{ fontWeight: '700', color: this.state.clickColor }}>Ver más detalles</Text>
-                    <Icon name="arrow-right" size={24} color={this.state.clickColor} style={{ marginLeft: 8 }} />
-                </View>
-            </Card.Content>
-        </Card>);
-    }
-}
-
-type IProps12 = {
-    onPress?: ()=>any;
-    style?: StyleProp<ViewStyle>;
-    title: string;
-    value: string;
-    iconName: string;
-};
-class CustomCard4 extends PureComponent<IProps12> {
-    constructor(props: IProps12) { super(props); }
-    render(): React.ReactNode {
-        return(<Card style={this.props.style} accessible={true} onPress={(this.props.onPress)&&this.props.onPress}>
-            <Card.Content>
-                <Title>{this.props.value}</Title>
-                <Paragraph>{this.props.title}</Paragraph>
-                <IconButton
-                    icon={this.props.iconName}
-                    iconColor={MD2Colors.blue500}
-                    size={26}
-                    style={{ position: 'absolute', right: 6, top: 18, backgroundColor: CombinedTheme.colors.background }}
-                />
-            </Card.Content>
-        </Card>);
-    }
-}
-
 type IProps13 = {
     onPress?: ()=>any;
     style?: StyleProp<ViewStyle>;
@@ -360,7 +292,7 @@ class CardButton1 extends PureComponent<IProps16, IState16> {
                 left={(this.props.icon)? (props)=><List.Icon {...props} icon={String(this.props.icon)} color={this.props.color} />: undefined}
                 title={this.props.title}
                 titleStyle={(this.props.color)? { color: this.props.color }: undefined}
-                onPress={()=>(this.props.onPress)&&this.props.onPress()}
+                onPress={this.props.onPress}
             />
         </Card>);
     }
@@ -375,8 +307,6 @@ export {
     CustomItemList3,
     CustomCardComments2,
     CustomItemList4,
-    CustomCard3,
-    CustomCard4,
     CustomCard5,
     CustomItemList6,
     CardButton1

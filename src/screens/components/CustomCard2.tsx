@@ -12,7 +12,7 @@ type IProps5 = {
 };
 
 export default React.memo(function CustomCard2(props: IProps5) {
-    return(<Card style={props.style} accessible={true} onPress={(!props.disabled)? props.onPress: undefined}>
+    return(<Card style={props.style} mode={'outlined'} onPress={(!props.disabled)? props.onPress: undefined}>
         <View style={styles.content}>
             <Icon size={28} color={'#FFFFFF'} name={props.icon} />
             <Title style={styles.title}>{props.title}</Title>
@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
     },
     title: {
         marginLeft: 8,
-        fontSize: 18
+        fontSize: 18,
+        color: '#FFFFFF'
     }
 });

@@ -1,5 +1,5 @@
 import { decode } from "base-64";
-import React, { PureComponent, createRef, useEffect, useState } from "react";
+import React, { PureComponent, createRef, useContext, useEffect, useRef, useState } from "react";
 import { DeviceEventEmitter, Dimensions, EmitterSubscription, FlatList, ListRenderItemInfo, RefreshControl, StyleSheet, ToastAndroid, View } from "react-native";
 import { ActivityIndicator, Appbar, Divider, FAB, Portal } from "react-native-paper";
 import { Account, Exercise, HostServer, Options } from "../../scripts/ApiCorporal";
@@ -22,51 +22,18 @@ import AlertDialog, { AlertDialogRef } from "../components/AlertDialog";
 import CustomSnackbar, { CustomSnackbarRef } from "../components/CustomSnackbar";
 import ImageViewer from "./pages/ImageViewer";
 import DeleteUser, { DeleteUserRef } from "./pages/deleteUser";
+import { ThemeContext } from "../../providers/ThemeProvider";
 
-const { width } = Dimensions.get('window');
 
 type IProps = {
     navigation: any;
     route: any;
 };
-type IState = {
-    showAddTraining: boolean;
-    showSearchClient: boolean;
-    isLoading: boolean;
-    isError: boolean;
-    messageError: string;
-    userList: dataListUsers[];
-    userList2: dataListUsers[];
-    userList3: dataListUsers[];
-    refreshing: boolean;
-    loadingView: boolean;
-    loadingText: string;
-    errorView: boolean;
-    errorTitle: string;
-    errorMessage: string;
-    detailsClientView: boolean;
-    detailsClientData: userData;
-    showAddNewUser: boolean;
-    showSnackBar: boolean;
-    textSnackBar: string;
-    idActualDeleteClient: string;
-    showQuestionDeleteUser: boolean;
-    showSendComment: boolean;
-    idActualSendComment: string;
-    viewComments: boolean;
-    dataComments: commentsData[];
-    excercisesList: dataExercise[];
-    viewTrainigsDetails: boolean;
-    dataTrainigsDetails: trainings[];
-    viewMoreDetailsVisible: boolean;
-    viewMoreDetailsTraining: DetailsTrainings;
-    viewMoreDetailsComment: commentsData | undefined;
-    addTrainingUserSelect: { id: string; name: string; } | undefined;
-    showUserSelect: boolean;
-    viewImageShow: boolean;
-};
 
 export default React.memo(function Page1(props: IProps) {
+    // Context
+    const { theme } = useContext(ThemeContext);
+    // State's
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [mError, setMerror] = useState('');
@@ -75,27 +42,28 @@ export default React.memo(function Page1(props: IProps) {
     const [excList, setExcList] = useState<dataExercise[]>([]);
     const [completeList, setCompleteList] = useState<dataListUsers[]>([]);
     // Variables
+    const { width } = Dimensions.get('window');
     var event: EmitterSubscription | undefined = undefined;
     var actualIDAccount: string = '-1';
     // Ref's
-    const refEditClientProfessional = createRef<EditClientProfessionalRef>();
-    const refViewClietDetails = createRef<ViewClietDetails>();
-    const refLoadingComponent = createRef<LoadingComponentRef>();
-    const refAlertDialog = createRef<AlertDialogRef>();
-    const refViewTraining = createRef<ViewTraining>();
-    const refViewMoreDetails = createRef<ViewMoreDetails>();
-    const refCustomSnackbar = createRef<CustomSnackbarRef>();
-    const refImageViewer = createRef<ImageViewer>();
-    const refViewComments = createRef<ViewComments>();
-    const refSetCommentUser = createRef<SetCommentUser>();
-    const refAddNewAccount = createRef<AddNewAccount>();
-    const refDeleteUser = createRef<DeleteUserRef>();
-    const refSearchClient = createRef<SearchClient>();
-    const refAddTraining = createRef<AddTraining>();
-    const refSelectClient = createRef<SelectClient>();
+    const refEditClientProfessional = useRef<EditClientProfessionalRef>(null);
+    const refViewClietDetails = useRef<ViewClietDetails>(null);
+    const refLoadingComponent = useRef<LoadingComponentRef>(null);
+    const refAlertDialog = useRef<AlertDialogRef>(null);
+    const refViewTraining = useRef<ViewTraining>(null);
+    const refViewMoreDetails = useRef<ViewMoreDetails>(null);
+    const refCustomSnackbar = useRef<CustomSnackbarRef>(null);
+    const refImageViewer = useRef<ImageViewer>(null);
+    const refViewComments = useRef<ViewComments>(null);
+    const refSetCommentUser = useRef<SetCommentUser>(null);
+    const refAddNewAccount = useRef<AddNewAccount>(null);
+    const refDeleteUser = useRef<DeleteUserRef>(null);
+    const refSearchClient = useRef<SearchClient>(null);
+    const refAddTraining = useRef<AddTraining>(null);
+    const refSelectClient = useRef<SelectClient>(null);
 
     /* ##### FlatList ##### */
-    function _getItemLayout(_i: any, index: number) { return {length: 64, offset: 64 * index, index}; }
+    function _getItemLayout(_i: any, index: number) { return { length: 80, offset: 80 * index, index }; }
     function _keyExtractor(item: dataListUsers, _i: number) { return `p1-admin-${item.id}`; }
     function _ItemSeparatorComponent() { return(<Divider />); }
     function _renderItem({ item }: ListRenderItemInfo<dataListUsers>) {
@@ -221,9 +189,9 @@ export default React.memo(function Page1(props: IProps) {
         };
     }, []);
 
-    return(<View style={{ flex: 1 }}>
-        <Appbar style={{ backgroundColor: '#1663AB', height: 56 }}>
-            <Appbar.Action icon="menu" onPress={props.navigation.openDrawer} />
+    return(<View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+        <Appbar style={{ backgroundColor: theme.colors.background }}>
+            <Appbar.Action icon={'menu'} onPress={props.navigation.openDrawer} />
             <Appbar.Content title={'Inicio'}  />
         </Appbar>
         <View style={{ flex: 2, overflow: 'hidden' }}>
@@ -311,6 +279,7 @@ class ButtonsHeaderList extends PureComponent<{ load: boolean; click1: ()=>any; 
         ToastAndroid.show('No se puede abrir este apartado en este momento...', ToastAndroid.SHORT);
     }
     render(): React.ReactNode {
+        const { width } = Dimensions.get('window');
         return(<View style={[styles.cardRowContent, { width: width }]}>
             <View style={[styles.cardContents, { paddingLeft: 8, paddingRight: 5 }]}>
                 <CustomCard2
@@ -347,7 +316,7 @@ const styles = StyleSheet.create({
     styleCard: {
         width: '100%',
         marginTop: 12,
-        backgroundColor: '#ED7035',
+        //backgroundColor: '#ED7035',
         height: 56
     },
     loadingContent: {

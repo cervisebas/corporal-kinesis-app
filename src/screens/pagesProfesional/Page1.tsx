@@ -5,7 +5,7 @@ import { Account, Exercise, HostServer, Options } from "../../scripts/ApiCorpora
 import { commentsData, dataExercise, dataListUsers, DetailsTrainings, trainings, userData } from "../../scripts/ApiCorporal/types";
 import { decode } from "base-64";
 import { CustomItemList2, CustomShowError } from "../components/Components";
-import ViewMoreDetails from "./pages/viewMoreDetails2";
+import ViewMoreDetails, { ViewMoreDetailsRef } from "./pages/viewMoreDetails";
 import AddNewAccount from "./pages/addNewAccount";
 import AddTraining from "./pages/addTraining";
 import SearchClient from "./pages/searchClient";
@@ -47,8 +47,7 @@ export default React.memo(function Page1(props: IProps) {
     const refEditClientProfessional = useRef<EditClientProfessionalRef>(null);
     const refViewClietDetails = useRef<ViewClietDetailsRef>(null);
     const refViewTraining = useRef<ViewTrainingRef>(null);
-    const refViewMoreDetails = useRef<ViewMoreDetails>(null);
-    const refImageViewer = useRef<ImageViewer>(null);
+    const refViewMoreDetails = useRef<ViewMoreDetailsRef>(null);
     const refViewComments = useRef<ViewCommentsRef>(null);
     const refSetCommentUser = useRef<SetCommentUser>(null);
     const refAddNewAccount = useRef<AddNewAccount>(null);
@@ -142,10 +141,6 @@ export default React.memo(function Page1(props: IProps) {
     function _goMoreDetails(training: DetailsTrainings, comment?: commentsData) {
         refViewMoreDetails.current?.open(training, comment);
     }
-    function _openViewImage(src: string) {
-        const pSrc = `${HostServer}/images/accounts/${decode(src)}`;
-        refImageViewer.current?.open(pSrc);
-    }
     function _openAllComments(data: commentsData[], clientId: string) {
         refViewComments.current?.open(data, clientId);
     }
@@ -211,9 +206,8 @@ export default React.memo(function Page1(props: IProps) {
         <ViewClietDetails ref={refViewClietDetails} openAllComment={_openAllComments} openAllTrainings={_openAllTrainings} openEditClient={_openEditClient} />
         <EditClientProfessional ref={refEditClientProfessional} finish={_reopenViewClient} />
         <ViewTraining ref={refViewTraining} goMoreDetails={_goMoreDetails} />
-        
         <ViewComments ref={refViewComments} goLoading={()=>undefined} />
-        <ImageViewer ref={refImageViewer} />
+        
         <ViewMoreDetails ref={refViewMoreDetails} />
         <AddNewAccount ref={refAddNewAccount} />
         <SearchClient

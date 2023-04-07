@@ -336,7 +336,7 @@ export default class AddTraining extends Component<IProps, IState> {
                         {<DatePicker
                             date={this.state.date}
                             mode={'date'}
-                            fadeToColor={'#323335'}
+                            fadeToColor={theme.colors.elevation.level3}
                             textColor={'#FFFFFF'}
                             onDateChange={(date)=>this.setState({ date: date })}
                         />}

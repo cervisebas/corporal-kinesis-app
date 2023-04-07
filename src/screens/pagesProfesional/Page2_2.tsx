@@ -37,11 +37,7 @@ type IState = {
     isFilter: boolean;
 };
 
-export default React.memo(function Page2(props: IProps) {
-    return(<></>);
-});
-
-/*export default class Page2 extends Component<IProps, IState> {
+export default class Page2 extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
@@ -121,8 +117,10 @@ export default React.memo(function Page2(props: IProps) {
         }));
     }
 
+    /*###### FlatList Control ######*/
     _getItemLayout(_i: any, index: number) { return { length: 72, offset: 72 * index, index }; }
     _keyExtractor(item: permissionItem, _i: number) { return `p2-admin-${item.id}`; }
+    /*##############################*/
 
     render(): ReactNode {
         return(<View style={{ flex: 1 }}>
@@ -170,7 +168,7 @@ export default React.memo(function Page2(props: IProps) {
             </View>
         </View>);
     }
-}*/
+}
 
 class ShowLoading extends PureComponent {
     constructor(props: any) { super(props); }

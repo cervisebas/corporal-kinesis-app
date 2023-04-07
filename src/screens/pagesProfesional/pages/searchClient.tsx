@@ -1,13 +1,14 @@
-import React, { PureComponent, ReactNode } from "react";
+import React, { PureComponent, ReactNode, forwardRef, useContext, useImperativeHandle, useState } from "react";
 import { decode } from "base-64";
-import { ListRenderItemInfo, NativeSyntheticEvent, StyleSheet, TextInputSubmitEditingEventData, View } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
+import { Keyboard, ListRenderItemInfo, NativeSyntheticEvent, StyleSheet, TextInputSubmitEditingEventData, View } from "react-native";
+import { FlatList, TouchableWithoutFeedback } from "react-native-gesture-handler";
 import { Appbar, Searchbar, Provider as PaperProvider, Divider } from "react-native-paper";
 import { dataListUsers } from "../../../scripts/ApiCorporal/types";
 import CombinedTheme from "../../../Theme";
 import { CustomItemList2 } from "../../components/Components";
 import filter from 'lodash.filter';
 import CustomModal from "../../components/CustomModal";
+import { ThemeContext } from "../../../providers/ThemeProvider";
 
 type IProps = {
     deleteAccount: (id: string)=>void;
@@ -17,113 +18,103 @@ type IProps = {
     showLoading: (visible: boolean, message?: string)=>void;
     showSnackOut: (text: string)=>void;
 };
-type IState = {
-    visible: boolean;
-    listUsers: dataListUsers[];
-    searchQuery: string;
-    listSearch: dataListUsers[];
+
+export type SearchClientRef = {
+    open: (listUsers: dataListUsers[])=>void;
 };
-export default class SearchClient extends PureComponent<IProps, IState> {
-    constructor(props : IProps) {
-        super(props);
-        this.state = {
-            visible: false,
-            listUsers: [],
-            listSearch: [],
-            searchQuery: ''
-        };
-        this.onChangeSearch = this.onChangeSearch.bind(this);
-        this.goSearch = this.goSearch.bind(this);
-        this._renderItem = this._renderItem.bind(this);
-        this.close = this.close.bind(this);
+
+export default React.memo(forwardRef(function SearchClient(props: IProps, ref: React.Ref<SearchClientRef>) {
+    // Context's
+    const { theme } = useContext(ThemeContext);
+    // State's
+    const [visible, setVisible] = useState(false);
+    const [listUsers, setListUsers] = useState<dataListUsers[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [listSearch, setListSearch] = useState<dataListUsers[]>([]);
+
+    function onChangeSearch(Query: string) {
+        if (searchQuery.length > Query.length) {
+            setSearchQuery(Query);
+            setListSearch(listUsers);
+            return;
+        }
+        setSearchQuery(Query);
     }
-    onChangeSearch(Query: string) {
-        if (this.state.searchQuery.length > Query.length) return this.setState({ searchQuery: Query, listUsers: this.state.listUsers });
-        this.setState({ searchQuery: Query });
-    }
-    goSearch({ nativeEvent: { text } }: NativeSyntheticEvent<TextInputSubmitEditingEventData>) {
+    function goSearch({ nativeEvent: { text } }: NativeSyntheticEvent<TextInputSubmitEditingEventData>) {
         const formattedQuery = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        const data = filter(this.state.listUsers, (user)=>this.contains(decode(user.name).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""), formattedQuery));
-        this.setState({ listSearch: data });
+        const data = filter(listUsers, (user)=>contains(decode(user.name).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""), formattedQuery));
+        setListSearch(data);
     }
-    contains(nameUser: string, query: string) {
+    function contains(nameUser: string, query: string) {
         if (nameUser.includes(query) || nameUser.includes(query) || nameUser.includes(query)) return true;
         return false;
     }
-    _goToDelete(id: string) {
-        this.props.deleteAccount(id);
-        this.close();
+    function _goToDelete(id: string) {
+        props.deleteAccount(id);
+        close();
     }
-    _goToComment(id: string) {
-        this.props.sendComment(id);
-        this.close();
+    function _goToComment(id: string) {
+        props.sendComment(id);
+        close();
     }
 
-    /*###### FlatList Control ######*/
-    _getItemLayout(_i: any, index: number) { return { length: 64, offset: 64 * index, index }; }
-    _keyExtractor(item: dataListUsers, _i: number) { return `p1-admin-${item.id}`; }
-    _ItemSeparatorComponent() { return(<Divider />); }
-    _renderItem({ item }: ListRenderItemInfo<dataListUsers>) {
+    function _getItemLayout(_i: any, index: number) { return { length: 64, offset: 64 * index, index }; }
+    function _keyExtractor(item: dataListUsers, _i: number) { return `p1-admin-${item.id}`; }
+    function _ItemSeparatorComponent() { return(<Divider />); }
+    function _renderItem({ item }: ListRenderItemInfo<dataListUsers>) {
         return(<CustomItemList2
             key={`p1-admin-${item.id}`}
             title={decode(item.name)}
             image={item.image}
-            onPress={()=>this.props.goDetailsClient(item.id)}
-            actionDelete={()=>this._goToDelete(item.id)}
-            actionComment={()=>this._goToComment(item.id)}
+            onPress={()=>props.goDetailsClient(item.id)}
+            actionDelete={()=>_goToDelete(item.id)}
+            actionComment={()=>_goToComment(item.id)}
         />);
-    }    
-    /*##############################*/
-
-
-    open(listUsers: dataListUsers[]) {
-        this.setState({
-            visible: true,
-            listUsers,
-            listSearch: listUsers,
-            searchQuery: ''
-        });
-    }
-    close() {
-        this.setState({ visible: false });
     }
 
-    render(): ReactNode {
-        return(<CustomModal visible={this.state.visible} onRequestClose={this.close}>
-            <PaperProvider theme={CombinedTheme}>
-                <View style={styles.content}>
-                    <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
-                        <Appbar.BackAction onPress={this.close} />
-                        <Appbar.Content title={'Buscar cliente'} />
-                    </Appbar.Header>
-                    <View style={{ flex: 2 }}>
-                        <FlatList
-                            data={this.state.listSearch}
-                            keyExtractor={this._keyExtractor}
-                            getItemLayout={this._getItemLayout}
-                            ItemSeparatorComponent={this._ItemSeparatorComponent}
-                            ListHeaderComponent={<Searchbar
-                                value={this.state.searchQuery}
-                                style={styles.flatlistSearch}
-                                placeholder={'Escribe para buscar...'}
-                                onChangeText={this.onChangeSearch}
-                                onSubmitEditing={this.goSearch}
-                            />}
-                            renderItem={this._renderItem}
-                        />
-                    </View>
+    function close() { setVisible(false); }
+    function open(_listUsers: dataListUsers[]) {
+        setListUsers(_listUsers);
+        setListSearch(_listUsers.slice());
+        setSearchQuery('');
+        setVisible(true);
+    }
+
+    useImperativeHandle(ref, ()=>({ open }));
+
+    return(<CustomModal visible={visible} onRequestClose={close}>
+        <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+            <TouchableWithoutFeedback style={{ width: '100%', height: '100%' }} onPress={Keyboard.dismiss} accessible={false}>
+                <Appbar.Header style={{ backgroundColor: theme.colors.background }}>
+                    <Appbar.BackAction onPress={close} />
+                    <Appbar.Content title={'Buscar cliente'} />
+                </Appbar.Header>
+                <View style={{ flex: 2 }}>
+                    <FlatList
+                        data={listSearch}
+                        keyExtractor={_keyExtractor}
+                        getItemLayout={_getItemLayout}
+                        ItemSeparatorComponent={_ItemSeparatorComponent}
+                        ListHeaderComponent={<Searchbar
+                            value={searchQuery}
+                            style={styles.flatlistSearch}
+                            placeholder={'Escribe para buscar...'}
+                            onChangeText={onChangeSearch}
+                            onSubmitEditing={goSearch}
+                        />}
+                        renderItem={_renderItem}
+                    />
                 </View>
-            </PaperProvider>
-        </CustomModal>);
-    }
-}
+            </TouchableWithoutFeedback>
+        </View>
+    </CustomModal>);
+}));
 
 const styles = StyleSheet.create({
-    content: {
-        flex: 1,
-        backgroundColor: CombinedTheme.colors.background
-    },
     flatlistSearch: {
-        marginTop: 8, marginLeft: 8, marginRight: 8, marginBottom: 12
+        marginTop: 8,
+        marginLeft: 8,
+        marginRight: 8,
+        marginBottom: 12
     }
 });

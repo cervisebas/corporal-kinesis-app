@@ -8,7 +8,7 @@ import { CustomItemList2, CustomShowError } from "../components/Components";
 import ViewMoreDetails, { ViewMoreDetailsRef } from "./pages/viewMoreDetails";
 import AddNewAccount, { AddNewAccountRef } from "./pages/addNewAccount";
 import AddTraining from "./pages/addTraining";
-import SearchClient from "./pages/searchClient";
+import SearchClient, { SearchClientRef } from "./pages/searchClient";
 import SelectClient from "./pages/selectClient";
 import SetCommentUser from "./pages/setCommentUser";
 import ViewClietDetails, { ViewClietDetailsRef } from "./pages/viewClientDetails";
@@ -51,7 +51,7 @@ export default React.memo(function Page1(props: IProps) {
     const refSetCommentUser = useRef<SetCommentUser>(null);
     const refAddNewAccount = useRef<AddNewAccountRef>(null);
     const refDeleteUser = useRef<DeleteUserRef>(null);
-    const refSearchClient = useRef<SearchClient>(null);
+    const refSearchClient = useRef<SearchClientRef>(null);
     const refAddTraining = useRef<AddTraining>(null);
     const refSelectClient = useRef<SelectClient>(null);
 
@@ -207,8 +207,8 @@ export default React.memo(function Page1(props: IProps) {
         <ViewTraining ref={refViewTraining} goMoreDetails={_goMoreDetails} />
         <ViewComments ref={refViewComments} goLoading={()=>undefined} />
         <ViewMoreDetails ref={refViewMoreDetails} />
-        
         <AddNewAccount ref={refAddNewAccount} />
+        
         <SearchClient
             ref={refSearchClient}
             goDetailsClient={openViewDetailsClient}

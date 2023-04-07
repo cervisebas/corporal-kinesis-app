@@ -1,17 +1,18 @@
-import React, { Component, ReactNode, createRef } from "react";
+import React, { forwardRef, useContext, useImperativeHandle, useState } from "react";
 import { View } from "react-native";
-import { Button, Appbar, Dialog, Paragraph, Portal, Provider as PaperProvider } from "react-native-paper";
+import { Appbar } from "react-native-paper";
 import { NoList } from "../../../assets/icons";
 import { Training } from "../../../scripts/ApiCorporal";
 import { commentsData, DetailsTrainings, trainings } from "../../../scripts/ApiCorporal/types";
-import CombinedTheme from "../../../Theme";
 import { EmptyListComments } from "../../components/Components";
 import CustomModal from "../../components/CustomModal";
-import CustomSnackbar, { CustomSnackbarRef } from "../../components/CustomSnackbar";
 import { decode } from "base-64";
 import { MaterialTopTabNavigationOptions, createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import ViewTrainingPage from "./viewTrainingPage";
-
+import { ThemeContext } from "../../../providers/ThemeProvider";
+import { GlobalRef } from "../../../GlobalRef";
+import TabBar from "../../../components/TabBar";
+import statusEffect from "../../../scripts/StatusEffect";
 
 type dataTabTraining = {
     id: string;
@@ -20,17 +21,11 @@ type dataTabTraining = {
 };
 
 type IProps = {
-    goLoading: (visible: boolean, message?: string)=>any;
     goMoreDetails: (training: DetailsTrainings, comment: commentsData | undefined)=>any;
 };
-type IState = {
-    visible: boolean;
-    tabData: dataTabTraining[];
-    //trainings: trainings[];
-    accountId: string;
-
-    confirmView: boolean;
-    actualId: string;
+export type ViewTrainingRef = {
+    open: (trainings: trainings[], accountId: string)=>void;
+    close: ()=>void;
 };
 
 const Tab = createMaterialTopTabNavigator();
@@ -42,63 +37,40 @@ const screenOptions: MaterialTopTabNavigationOptions = {
     tabBarStyle: { backgroundColor: '#1663AB' }
 };
 
-export default class ViewTraining extends Component<IProps, IState> {
-    constructor(props: IProps) {
-        super(props);
-        this.state = {
-            visible: false,
-            tabData: [],
-            accountId: '-1',
-            confirmView: false,
-            actualId: '0'
-        };
-        this.close = this.close.bind(this);
-        this.deleteTraining = this.deleteTraining.bind(this);
-        this._deleteItem = this._deleteItem.bind(this);
-        this._renderTab = this._renderTab.bind(this);
-        this.goMoreDetails = this.goMoreDetails.bind(this);
-    }
-    private refCustomSnackbar = createRef<CustomSnackbarRef>();
+export default React.memo(forwardRef(function ViewTraining(props: IProps, ref: React.Ref<ViewTrainingRef>) {
+    // Context
+    const { theme } = useContext(ThemeContext);
+    // State's
+    const [visible, setVisible] = useState(false);
+    const [tabData, setTabData] = useState<dataTabTraining[]>([]);
+    const [accountId, setAccountId] = useState('-1');
+    const [actualId, setActualId] = useState('0');
     
-    listEmptyComponent() { return(<View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}><EmptyListComments icon={<NoList width={96} height={96} />} message={'No hay ejercicios cargados...'} /></View>); }
-    deleteTraining() {
-        this.props.goLoading(true, 'Borrando ejercicio...');
-        Training.admin_delete(this.state.actualId)
-            .then(()=>{
-                this.props.goLoading(false);
-                this.refCustomSnackbar.current?.open('Ejercicio borrado correctamente...');
-                this.refresh();
-            })
-            .catch((error)=>{
-                this.props.goLoading(false);
-                this.refCustomSnackbar.current?.open(error.cause);
-            });
-    }
-    goMoreDetails(idTraining: string) {
-        this.props.goLoading(true, 'Obteniendo información...');
-        Training.admin_getEspecificTraining(idTraining, this.state.accountId)
+    function goMoreDetails(idTraining: string) {
+        GlobalRef.current?.loadingController(true, 'Obteniendo información...');
+        Training.admin_getEspecificTraining(idTraining, accountId)
             .then((data)=>{
-                this.props.goLoading(false);
-                this.props.goMoreDetails(data.t, data.c);
+                GlobalRef.current?.loadingController(false);
+                props.goMoreDetails(data.t, data.c);
             })
             .catch((error)=>{
-                this.props.goLoading(false);
-                this.refCustomSnackbar.current?.open(error.cause);
+                GlobalRef.current?.loadingController(false);
+                GlobalRef.current?.showSimpleAlert(error.cause, '');
             });
     }
-    refresh() {
-        this.props.goLoading(true, 'Obteniendo información...');
-        Training.admin_getAllAccount(this.state.accountId)
+    function refresh() {
+        GlobalRef.current?.loadingController(true, 'Obteniendo información...');
+        Training.admin_getAllAccount(accountId)
             .then((value)=>{
-                this.props.goLoading(false);
-                this.setState({ tabData: this.processData(value.reverse()) });
+                GlobalRef.current?.loadingController(false);
+                setTabData(processData(value.reverse()));
             })
             .catch((error)=>{
-                this.props.goLoading(false);
-                this.refCustomSnackbar.current?.open(error.cause);
+                GlobalRef.current?.loadingController(false);
+                GlobalRef.current?.showSimpleAlert(error.cause, '');
             });
     }
-    processData(data: trainings[]) {
+    function processData(data: trainings[]) {
         const tabData: dataTabTraining[] = [];
         data.forEach((value)=>{
             const findIndex = tabData.findIndex((a)=>a.id == value.exercise.id);
@@ -111,59 +83,73 @@ export default class ViewTraining extends Component<IProps, IState> {
         });
         return tabData;
     }
-
-    _deleteItem(id: string) { this.setState({ actualId: id, confirmView: true }); }
-    _renderTab(value: dataTabTraining) {
+    function deleteTraining() {
+        GlobalRef.current?.loadingController(true, 'Borrando ejercicio...');
+        Training.admin_delete(actualId)
+            .then(()=>{
+                GlobalRef.current?.loadingController(false);
+                GlobalRef.current?.showSimpleAlert('Ejercicio borrado correctamente.', '');
+                refresh();
+            })
+            .catch((error)=>{
+                GlobalRef.current?.loadingController(false);
+                GlobalRef.current?.showSimpleAlert(error.cause, '');
+            });
+    }
+    function _deleteItem(_id: string) {
+        setActualId(_id);
+        GlobalRef.current?.showDoubleAlert('Advertencia de confirmación', '¿Estas seguro que quieres borrar este comentario?', deleteTraining);
+    }
+    function _renderTab(value: dataTabTraining) {
         return(<Tab.Screen
             key={`tab-training-${value.id}`}
             name={`${value.title} (${value.data.length})`}
             children={()=><ViewTrainingPage
                 data={value.data}
-                goMoreDetails={this.goMoreDetails}
-                deleteItem={this._deleteItem}
+                goMoreDetails={goMoreDetails}
+                deleteItem={_deleteItem}
             />}
         />);
     }
 
     // Controller
-    open(trainings: trainings[], accountId: string) {
-        const tabData = this.processData(trainings);
-        this.setState({
-            visible: true,
-            tabData,
-            accountId
-        });
+    function open(_trainings: trainings[], _accountId: string) {
+        const _tabData = processData(_trainings);
+        setAccountId(_accountId);
+        setTabData(_tabData);
+        setVisible(true);
     }
-    close() { this.setState({ visible: false }); }
+    function close() { setVisible(false); }
 
-    render(): ReactNode {
-        return(<CustomModal visible={this.state.visible} onRequestClose={this.close}>
-            <PaperProvider theme={CombinedTheme}>
-                <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background }}>
-                    <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
-                        <Appbar.BackAction onPress={this.close} />
-                        <Appbar.Content title={'Rendimiento'} />
-                    </Appbar.Header>
-                    <View style={{ flex: 2 }}>
-                        {(this.state.tabData.length !== 0)? <Tab.Navigator screenOptions={screenOptions}>
-                            {this.state.tabData.map(this._renderTab)}
-                        </Tab.Navigator>: <this.listEmptyComponent />}
-                        <Portal>
-                            <Dialog visible={this.state.confirmView} onDismiss={()=>this.setState({ confirmView: false })}>
-                                <Dialog.Title>Advertencia de confirmación</Dialog.Title>
-                                <Dialog.Content>
-                                    <Paragraph>¿Estas seguro que quieres borrar este comentario?</Paragraph>
-                                </Dialog.Content>
-                                <Dialog.Actions>
-                                    <Button onPress={()=>this.setState({ confirmView: false })}>Cancelar</Button>
-                                    <Button onPress={()=>this.setState({ confirmView: false }, this.deleteTraining)}>Aceptar</Button>
-                                </Dialog.Actions>
-                            </Dialog>
-                        </Portal>
-                        <CustomSnackbar ref={this.refCustomSnackbar} />
-                    </View>
-                </View>
-            </PaperProvider>
-        </CustomModal>);
-    }
-}
+    useImperativeHandle(ref, ()=>({ open, close }));
+    statusEffect([
+        { color: theme.colors.background, style: 'light' },
+        { color: theme.colors.elevation.level2, style: 'light' }
+    ], visible, undefined, undefined, true);
+
+    return(<CustomModal visible={visible} onRequestClose={close}>
+        <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+            <Appbar.Header style={{ backgroundColor: theme.colors.background }}>
+                <Appbar.BackAction onPress={close} />
+                <Appbar.Content title={'Rendimiento'} />
+            </Appbar.Header>
+            <View style={{ flex: 2 }}>
+                {(tabData.length !== 0)? <Tab.Navigator screenOptions={screenOptions} tabBarPosition={'bottom'} tabBar={(props)=><TabBar {...props} />}>
+                    {tabData.map(_renderTab)}
+                </Tab.Navigator>: <ListEmptyComponent />}
+            </View>
+        </View>
+    </CustomModal>);
+}));
+
+const ListEmptyComponent = React.memo(function ListEmptyComponent() {
+    return(<View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}>
+        <EmptyListComments
+            icon={<NoList
+                width={96}
+                height={96}
+            />}
+            message={'No hay ejercicios cargados...'}
+        />
+    </View>);
+});

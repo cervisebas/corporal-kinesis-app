@@ -16,6 +16,7 @@ import { ThemeContext } from './providers/ThemeProvider';
 import GlobalComponents from './GlobalComponents';
 import { GlobalRef } from './GlobalRef';
 import { refSession } from './ExtraContentsRefs';
+import { refProfesional } from './screens/profesionalRef';
 
 const Stack = createNativeStackNavigator();
 
@@ -121,7 +122,7 @@ export default React.memo(function App() {
                 <SplashScreen init={verifyAccount} />
                 <Stack.Navigator initialRouteName="c" screenOptions={_screenOptions} screenListeners={{ state: changeScreen }}>
                     <Stack.Screen name="c" children={(cProps)=><Client {...cProps} />} />
-                    <Stack.Screen name="p" children={(cProps)=><Profesional {...cProps} />} />
+                    <Stack.Screen name="p" children={(cProps)=><Profesional ref={refProfesional} {...cProps} />} />
                 </Stack.Navigator>
             </NavigationContainer>
         </PaperProvider>

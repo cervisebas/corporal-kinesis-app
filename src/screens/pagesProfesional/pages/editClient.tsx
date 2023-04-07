@@ -1,15 +1,15 @@
-import React, { createRef, forwardRef, useImperativeHandle, useState } from "react";
+import React, { forwardRef, useContext, useImperativeHandle, useState } from "react";
 import { StyleSheet, ToastAndroid, View } from "react-native";
 import CustomModal from "../../components/CustomModal";
-import CombinedTheme from "../../../Theme";
-import { Appbar, Button, Provider, Snackbar, TextInput } from "react-native-paper";
+import { Appbar, Button, TextInput } from "react-native-paper";
 import { ScrollView } from "react-native-gesture-handler";
 import { userData } from "../../../scripts/ApiCorporal/types";
 import { decode, encode } from "base-64";
 import { DateTimePickerAndroid, DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import moment from "moment";
 import { Account } from "../../../scripts/ApiCorporal";
-import CustomSnackbar, { CustomSnackbarRef } from "../../components/CustomSnackbar";
+import { ThemeContext } from "../../../providers/ThemeProvider";
+import { GlobalRef } from "../../../GlobalRef";
 
 type IProps = {
     finish: ()=>void;
@@ -19,6 +19,9 @@ export type EditClientProfessionalRef = {
 };
 
 export default React.memo(forwardRef(function EditClientProfessional(_props: IProps, ref: React.Ref<EditClientProfessionalRef>) {
+    // Context's
+    const { theme } = useContext(ThemeContext);
+    // State's
     const [visible, setVisible] = useState(false);
     const [loading, setLoading] = useState(false);
     const [name, setName] = useState('');
@@ -31,7 +34,6 @@ export default React.memo(forwardRef(function EditClientProfessional(_props: IPr
     const [aDate, setADate] = useState(new Date());
     const [id, setId] = useState('-1');
     const [datas, setDatas] = useState<userData | undefined>(undefined);
-    const refCustomSnackbar = createRef<CustomSnackbarRef>();
 
     function close() {
         if (loading) return ToastAndroid.show('No se puede cerrar en este momento.', ToastAndroid.SHORT);
@@ -122,7 +124,7 @@ export default React.memo(forwardRef(function EditClientProfessional(_props: IPr
             const getData = getModifyData();
             if (!getData) {
                 setLoading(false);
-                return refCustomSnackbar.current?.open('No se detecto ningun dato a modificar.');
+                return GlobalRef.current?.showSimpleAlert('No se detecto ningun dato a modificar.', '');
             }
             await Account.admin_modify(getData);
             setLoading(false);
@@ -131,40 +133,37 @@ export default React.memo(forwardRef(function EditClientProfessional(_props: IPr
             ToastAndroid.show('Usuario editado con exito.', ToastAndroid.SHORT);
         } catch (error: any) {
             setLoading(false);
-            refCustomSnackbar.current?.open((error.cause)? error.cause: 'Ocurrió un error inesperado.');
+            GlobalRef.current?.showSimpleAlert('Ocurrió un error inesperado', error.cause??'');
         }
     }
 
     useImperativeHandle(ref, ()=>({ open }));
 
     return(<CustomModal visible={visible} onRequestClose={close}>
-        <Provider theme={CombinedTheme}>
-            <View style={styles.content}>
-                <Appbar.Header style={styles.header}>
-                    <Appbar.BackAction onPress={close} />
-                    <Appbar.Content title={'Editar usuario'} />
-                    <Appbar.Action icon={'restore'} onPress={restoreData} />
-                </Appbar.Header>
-                <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollView}>
-                    <TextInput label={'Nombre y Apellido'} disabled={loading} style={styles.textInput} mode={'outlined'} value={name} onChangeText={setName} autoCapitalize={'words'} keyboardType={'default'} textContentType={'name'} blurOnSubmit={false} />
-                    <TextInput label={'D.N.I'} disabled={loading} style={styles.textInput} mode={'outlined'} value={dni} onChangeText={setDNI} keyboardType={'numeric'} blurOnSubmit={false} />
-                    <TextInput label={'Teléfono'} disabled={loading} style={styles.textInput} mode={'outlined'} value={phone} onChangeText={setPhone} keyboardType={'phone-pad'} textContentType={'telephoneNumber'} blurOnSubmit={false} />
-                    <TextInput label={'E-Mail'} disabled={loading} style={styles.textInput} mode={'outlined'} value={email} onChangeText={setEmail} autoCapitalize={'none'} keyboardType={'email-address'} textContentType={'emailAddress'} blurOnSubmit={false} />
-                    <TextInput label={'Fecha de nacimiento'} disabled={loading} style={styles.textInput} mode={'outlined'} value={birthday} editable={false} blurOnSubmit={false} right={rightBithday()} />
-                    <TextInput label={'Contraseña'} disabled={loading} style={styles.textInput} mode={'outlined'} value={password} onChangeText={setPassword} autoCapitalize={'none'} secureTextEntry={!showPassword} textContentType={'newPassword'} blurOnSubmit={false} onBlur={hidenPassword} right={rightPassword()} />
-                    <View style={styles.buttonContent}>
-                        <Button
-                            mode={'contained'}
-                            style={styles.buttonSend}
-                            loading={loading}
-                            disabled={loading}
-                            onPress={sendEditing}
-                        >Enviar</Button>
-                    </View>
-                </ScrollView>
-            </View>
-            <CustomSnackbar ref={refCustomSnackbar} />
-        </Provider>
+        <View style={[styles.content, { backgroundColor: theme.colors.background }]}>
+            <Appbar.Header style={[styles.header, { backgroundColor: theme.colors.background }]}>
+                <Appbar.BackAction onPress={close} />
+                <Appbar.Content title={'Editar usuario'} />
+                <Appbar.Action icon={'restore'} onPress={restoreData} />
+            </Appbar.Header>
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollView}>
+                <TextInput label={'Nombre y Apellido'} disabled={loading} style={styles.textInput} mode={'outlined'} value={name} onChangeText={setName} autoCapitalize={'words'} keyboardType={'default'} textContentType={'name'} blurOnSubmit={false} />
+                <TextInput label={'D.N.I'} disabled={loading} style={styles.textInput} mode={'outlined'} value={dni} onChangeText={setDNI} keyboardType={'numeric'} blurOnSubmit={false} />
+                <TextInput label={'Teléfono'} disabled={loading} style={styles.textInput} mode={'outlined'} value={phone} onChangeText={setPhone} keyboardType={'phone-pad'} textContentType={'telephoneNumber'} blurOnSubmit={false} />
+                <TextInput label={'E-Mail'} disabled={loading} style={styles.textInput} mode={'outlined'} value={email} onChangeText={setEmail} autoCapitalize={'none'} keyboardType={'email-address'} textContentType={'emailAddress'} blurOnSubmit={false} />
+                <TextInput label={'Fecha de nacimiento'} disabled={loading} style={styles.textInput} mode={'outlined'} value={birthday} editable={false} blurOnSubmit={false} right={rightBithday()} />
+                <TextInput label={'Contraseña'} disabled={loading} style={styles.textInput} mode={'outlined'} value={password} onChangeText={setPassword} autoCapitalize={'none'} secureTextEntry={!showPassword} textContentType={'newPassword'} blurOnSubmit={false} onBlur={hidenPassword} right={rightPassword()} />
+                <View style={styles.buttonContent}>
+                    <Button
+                        mode={'contained'}
+                        style={styles.buttonSend}
+                        loading={loading}
+                        disabled={loading}
+                        onPress={sendEditing}
+                    >Enviar</Button>
+                </View>
+            </ScrollView>
+        </View>
     </CustomModal>);
 }));
 
@@ -174,7 +173,7 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        backgroundColor: CombinedTheme.colors.background
+        //backgroundColor: CombinedTheme.colors.background
     },
     scrollView: {
         paddingTop: 12,

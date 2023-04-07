@@ -1,7 +1,6 @@
 import { DrawerNavigationOptions, createDrawerNavigator } from "@react-navigation/drawer";
-import React from "react";
-import { StyleSheet, View } from "react-native";
-import { FAB } from "react-native-paper";
+import React, { forwardRef, useImperativeHandle } from "react";
+import { View } from "react-native";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CustomDrawerNavegation from "./components/CustomDrawerNavegation";
 
@@ -13,6 +12,9 @@ import PageOptions from "./pagesProfesional/PageOptions";
 type IProps = {
     navigation: any;
 };
+export type ProfesionalRef = {
+    logOut: ()=>void;
+};
 
 const Drawer = createDrawerNavigator();
 const _screenOptions: DrawerNavigationOptions = {
@@ -22,8 +24,9 @@ const _screenOptions: DrawerNavigationOptions = {
     }
 };
 
-export default React.memo(function Profesional (props: IProps) {
-    function logout() { return props.navigation.navigate('c'); }
+export default React.memo(forwardRef(function Profesional(props: IProps, ref: React.Ref<ProfesionalRef>) {
+    function logOut() { return props.navigation.navigate('c'); }
+    useImperativeHandle(ref, ()=>({ logOut }));
     return(<View style={{ flex: 2 }}>
         <Drawer.Navigator initialRouteName="Inicio" screenOptions={_screenOptions} drawerContent={(props)=><CustomDrawerNavegation {...props} />}>
             <Drawer.Screen
@@ -47,19 +50,5 @@ export default React.memo(function Profesional (props: IProps) {
                 options={{ drawerLabel: 'Opciones', drawerIcon: (props)=><Icon {...props} name={'cog-outline'} /> }}
             />
         </Drawer.Navigator>
-        <FAB
-            style={styles.fab}
-            icon={'logout'}
-            onPress={logout}
-        />
     </View>);
-});
-
-const styles = StyleSheet.create({
-    fab: {
-      position: 'absolute',
-      margin: 16,
-      right: 0,
-      bottom: 8,
-    },
-});
+}));

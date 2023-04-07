@@ -12,15 +12,16 @@ import AddTraining from "./pages/addTraining";
 import SearchClient from "./pages/searchClient";
 import SelectClient from "./pages/selectClient";
 import SetCommentUser from "./pages/setCommentUser";
-import ViewClietDetails from "./pages/viewClientDetails";
+import ViewClietDetails, { ViewClietDetailsRef } from "./pages/viewClientDetails";
 import ViewComments from "./pages/viewComments";
-import ViewTraining from "./pages/viewTraining";
+import ViewTraining, { ViewTrainingRef } from "./pages/viewTraining";
 import EditClientProfessional, { EditClientProfessionalRef } from "./pages/editClient";
 import CustomCard2 from "../components/CustomCard2";
 import ImageViewer from "./pages/ImageViewer";
 import DeleteUser, { DeleteUserRef } from "./pages/deleteUser";
 import { ThemeContext } from "../../providers/ThemeProvider";
 import { GlobalRef } from "../../GlobalRef";
+import { refProfesional } from "../profesionalRef";
 
 
 type IProps = {
@@ -45,8 +46,8 @@ export default React.memo(function Page1(props: IProps) {
     var actualIDAccount: string = '-1';
     // Ref's
     const refEditClientProfessional = useRef<EditClientProfessionalRef>(null);
-    const refViewClietDetails = useRef<ViewClietDetails>(null);
-    const refViewTraining = useRef<ViewTraining>(null);
+    const refViewClietDetails = useRef<ViewClietDetailsRef>(null);
+    const refViewTraining = useRef<ViewTrainingRef>(null);
     const refViewMoreDetails = useRef<ViewMoreDetails>(null);
     const refImageViewer = useRef<ImageViewer>(null);
     const refViewComments = useRef<ViewComments>(null);
@@ -171,6 +172,8 @@ export default React.memo(function Page1(props: IProps) {
         refSelectClient.current?.open();
     }
 
+    function _logout() { refProfesional.current?.logOut(); }
+
     /* ##### UseEffects ##### */
     useEffect(()=>{
         event = DeviceEventEmitter.addListener('adminPage1Reload', loadData);
@@ -192,28 +195,24 @@ export default React.memo(function Page1(props: IProps) {
                 keyExtractor={_keyExtractor}
                 getItemLayout={_getItemLayout}
                 contentContainerStyle={{ flex: (loading || error || userList.length == 0)? 3: undefined, paddingBottom: 160 }}
-                refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={refresh} onRefresh={refreshing} />}
+                refreshControl={<RefreshControl
+                    colors={[theme.colors.primary]}
+                    progressBackgroundColor={theme.colors.elevation.level2}
+                    refreshing={refresh}
+                    onRefresh={refreshing}
+                />}
                 ItemSeparatorComponent={_ItemSeparatorComponent}
                 ListEmptyComponent={(loading)? <ShowLoading />: (error)? <CustomShowError message={mError} />: undefined}
                 ListHeaderComponent={<ButtonsHeaderList load={!loading || error} click1={_openAddTraining} click2={_openSearchView} />}
                 renderItem={_renderItem}
             />
         </View>
+        <FAB visible={!loading} icon={'account-plus'} style={styles.fab} onPress={_openAddNewAccount} />
+        <FAB style={styles.fab0} icon={'logout'} onPress={_logout} />
+        <ViewClietDetails ref={refViewClietDetails} openAllComment={_openAllComments} openAllTrainings={_openAllTrainings} openEditClient={_openEditClient} />
         <EditClientProfessional ref={refEditClientProfessional} finish={_reopenViewClient} />
-        <ViewClietDetails
-            ref={refViewClietDetails}
-            goLoading={()=>undefined}
-            openAllComment={_openAllComments}
-            openAllTrainings={_openAllTrainings}
-            showExternalSnackbar={()=>undefined}
-            viewImage={_openViewImage}
-            openEditClient={_openEditClient}
-        />
-        <ViewTraining
-            ref={refViewTraining}
-            goLoading={()=>undefined}
-            goMoreDetails={_goMoreDetails}
-        />
+        
+        <ViewTraining ref={refViewTraining} goMoreDetails={_goMoreDetails} />
         <ViewComments ref={refViewComments} goLoading={()=>undefined} />
         <ImageViewer ref={refImageViewer} />
         <ViewMoreDetails ref={refViewMoreDetails} />
@@ -241,12 +240,6 @@ export default React.memo(function Page1(props: IProps) {
             <SetCommentUser ref={refSetCommentUser} goLoading={()=>undefined} />
             <DeleteUser ref={refDeleteUser} goLoading={()=>undefined} externalSnackbar={()=>undefined} reload={refreshing} />
         </Portal>
-        <FAB
-            visible={!loading}
-            icon={'account-plus'}
-            style={styles.fab}
-            onPress={_openAddNewAccount}
-        />
     </View>);
 });
 
@@ -306,6 +299,12 @@ const styles = StyleSheet.create({
         flex: 2,
         alignItems: 'center',
         justifyContent: 'center'
+    },
+    fab0: {
+        position: 'absolute',
+        margin: 16,
+        right: 0,
+        bottom: 8
     },
     fab: {
         position: 'absolute',

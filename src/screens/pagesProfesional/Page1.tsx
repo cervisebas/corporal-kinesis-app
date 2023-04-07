@@ -1,10 +1,10 @@
-import { decode } from "base-64";
-import React, { PureComponent, createRef, useContext, useEffect, useRef, useState } from "react";
+import React, { PureComponent, useContext, useEffect, useRef, useState } from "react";
 import { DeviceEventEmitter, Dimensions, EmitterSubscription, FlatList, ListRenderItemInfo, RefreshControl, StyleSheet, ToastAndroid, View } from "react-native";
 import { ActivityIndicator, Appbar, Divider, FAB, Portal } from "react-native-paper";
 import { Account, Exercise, HostServer, Options } from "../../scripts/ApiCorporal";
 import { commentsData, dataExercise, dataListUsers, DetailsTrainings, trainings, userData } from "../../scripts/ApiCorporal/types";
 import CombinedTheme from "../../Theme";
+import { decode } from "base-64";
 import { CustomItemList2, CustomShowError } from "../components/Components";
 import ViewMoreDetails from "./pages/viewMoreDetails2";
 import AddNewAccount from "./pages/addNewAccount";
@@ -17,12 +17,10 @@ import ViewComments from "./pages/viewComments";
 import ViewTraining from "./pages/viewTraining";
 import EditClientProfessional, { EditClientProfessionalRef } from "./pages/editClient";
 import CustomCard2 from "../components/CustomCard2";
-import LoadingComponent, { LoadingComponentRef } from "../components/LoadingComponent";
-import AlertDialog, { AlertDialogRef } from "../components/AlertDialog";
-import CustomSnackbar, { CustomSnackbarRef } from "../components/CustomSnackbar";
 import ImageViewer from "./pages/ImageViewer";
 import DeleteUser, { DeleteUserRef } from "./pages/deleteUser";
 import { ThemeContext } from "../../providers/ThemeProvider";
+import { GlobalRef } from "../../GlobalRef";
 
 
 type IProps = {
@@ -48,11 +46,8 @@ export default React.memo(function Page1(props: IProps) {
     // Ref's
     const refEditClientProfessional = useRef<EditClientProfessionalRef>(null);
     const refViewClietDetails = useRef<ViewClietDetails>(null);
-    const refLoadingComponent = useRef<LoadingComponentRef>(null);
-    const refAlertDialog = useRef<AlertDialogRef>(null);
     const refViewTraining = useRef<ViewTraining>(null);
     const refViewMoreDetails = useRef<ViewMoreDetails>(null);
-    const refCustomSnackbar = useRef<CustomSnackbarRef>(null);
     const refImageViewer = useRef<ImageViewer>(null);
     const refViewComments = useRef<ViewComments>(null);
     const refSetCommentUser = useRef<SetCommentUser>(null);
@@ -113,7 +108,6 @@ export default React.memo(function Page1(props: IProps) {
             })
             .catch(setErrAlert);
     }
-    function loadingController(visible: boolean, message?: string): void { return refLoadingComponent.current?.controller(visible, message); }
 
     function refreshing() {
         setRefresh(true);
@@ -125,16 +119,16 @@ export default React.memo(function Page1(props: IProps) {
         refEditClientProfessional.current?.open(data);
     }
     function openViewDetailsClient(id: string) {
-        loadingController(true, 'Cargando datos del usuario...');
+        GlobalRef.current?.loadingController(true, 'Cargando datos del usuario...');
         Account.admin_getUserData(id)
             .then((data)=>{
-                loadingController(false);
+                GlobalRef.current?.loadingController(false);
                 actualIDAccount = id;
                 refViewClietDetails.current?.open(data);
             })
             .catch((error)=>{
-                refLoadingComponent.current?.controller(false);
-                refAlertDialog.current?.open('Ocurrio un error', error.cause);
+                GlobalRef.current?.loadingController(false);
+                GlobalRef.current?.showSimpleAlert('Ocurrio un error', error.cause);
             })
     }
     function _reopenViewClient() {
@@ -147,9 +141,6 @@ export default React.memo(function Page1(props: IProps) {
     }
     function _goMoreDetails(training: DetailsTrainings, comment?: commentsData) {
         refViewMoreDetails.current?.open(training, comment);
-    }
-    function _controllerSnackbar(text: string) {
-        refCustomSnackbar.current?.open(text);
     }
     function _openViewImage(src: string) {
         const pSrc = `${HostServer}/images/accounts/${decode(src)}`;
@@ -207,71 +198,63 @@ export default React.memo(function Page1(props: IProps) {
                 ListHeaderComponent={<ButtonsHeaderList load={!loading || error} click1={_openAddTraining} click2={_openSearchView} />}
                 renderItem={_renderItem}
             />
-            <EditClientProfessional ref={refEditClientProfessional} finish={_reopenViewClient} />
-            <ViewClietDetails
-                ref={refViewClietDetails}
-                goLoading={loadingController}
-                openAllComment={_openAllComments}
-                openAllTrainings={_openAllTrainings}
-                showExternalSnackbar={_controllerSnackbar}
-                viewImage={_openViewImage}
-                openEditClient={_openEditClient}
-            />
-            <ViewTraining
-                ref={refViewTraining}
-                goLoading={loadingController}
-                goMoreDetails={_goMoreDetails}
-            />
-            <ViewComments ref={refViewComments} goLoading={loadingController} />
-            <ImageViewer ref={refImageViewer} />
-            <ViewMoreDetails ref={refViewMoreDetails} />
-            <AddNewAccount ref={refAddNewAccount} />
-
-            <SearchClient
-                ref={refSearchClient}
-                goDetailsClient={openViewDetailsClient}
-                showLoading={loadingController}
-                showSnackOut={_controllerSnackbar}
-                deleteAccount={_deleteUser}
-                sendComment={_openSetComment}
-            />
-            <AddTraining
-                ref={refAddTraining}
-                listUsers={completeList}
-                listExercise={excList}
-                openUserSelect={_openSelectClient}
-            />
-            <SelectClient
-                ref={refSelectClient}
-                dataUser={completeList}
-                onSelect={_updateUserSelect}
-            />
-
-            <LoadingComponent ref={refLoadingComponent} />
-            <CustomSnackbar ref={refCustomSnackbar} />
-            <Portal>
-                <AlertDialog ref={refAlertDialog} />
-                <SetCommentUser ref={refSetCommentUser} goLoading={loadingController} />
-                <DeleteUser ref={refDeleteUser} goLoading={loadingController} externalSnackbar={_controllerSnackbar} reload={refreshing} />
-            </Portal>
-            <FAB
-                visible={!loading}
-                icon={'account-plus'}
-                style={styles.fab}
-                onPress={_openAddNewAccount}
-            />
         </View>
+        <EditClientProfessional ref={refEditClientProfessional} finish={_reopenViewClient} />
+        <ViewClietDetails
+            ref={refViewClietDetails}
+            goLoading={()=>undefined}
+            openAllComment={_openAllComments}
+            openAllTrainings={_openAllTrainings}
+            showExternalSnackbar={()=>undefined}
+            viewImage={_openViewImage}
+            openEditClient={_openEditClient}
+        />
+        <ViewTraining
+            ref={refViewTraining}
+            goLoading={()=>undefined}
+            goMoreDetails={_goMoreDetails}
+        />
+        <ViewComments ref={refViewComments} goLoading={()=>undefined} />
+        <ImageViewer ref={refImageViewer} />
+        <ViewMoreDetails ref={refViewMoreDetails} />
+        <AddNewAccount ref={refAddNewAccount} />
+        <SearchClient
+            ref={refSearchClient}
+            goDetailsClient={openViewDetailsClient}
+            showLoading={()=>undefined}
+            showSnackOut={()=>undefined}
+            deleteAccount={_deleteUser}
+            sendComment={_openSetComment}
+        />
+        <AddTraining
+            ref={refAddTraining}
+            listUsers={completeList}
+            listExercise={excList}
+            openUserSelect={_openSelectClient}
+        />
+        <SelectClient
+            ref={refSelectClient}
+            dataUser={completeList}
+            onSelect={_updateUserSelect}
+        />
+        <Portal>
+            <SetCommentUser ref={refSetCommentUser} goLoading={()=>undefined} />
+            <DeleteUser ref={refDeleteUser} goLoading={()=>undefined} externalSnackbar={()=>undefined} reload={refreshing} />
+        </Portal>
+        <FAB
+            visible={!loading}
+            icon={'account-plus'}
+            style={styles.fab}
+            onPress={_openAddNewAccount}
+        />
     </View>);
 });
 
-class ShowLoading extends PureComponent {
-    constructor(props: any) { super(props); }
-    render(): React.ReactNode {
-        return(<View style={styles.loadingContent}>
-            <ActivityIndicator size={'large'} color={CombinedTheme.colors.accent} />
-        </View>);
-    }
-}
+const ShowLoading = React.memo(function ShowLoading() {
+    return(<View style={styles.loadingContent}>
+        <ActivityIndicator size={'large'} />
+    </View>); 
+});
 
 class ButtonsHeaderList extends PureComponent<{ load: boolean; click1: ()=>any; click2: ()=>any; }> {
     constructor(props: any) { super(props); }

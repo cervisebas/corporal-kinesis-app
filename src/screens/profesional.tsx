@@ -1,4 +1,4 @@
-import { createDrawerNavigator } from "@react-navigation/drawer";
+import { DrawerNavigationOptions, createDrawerNavigator } from "@react-navigation/drawer";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { FAB } from "react-native-paper";
@@ -15,11 +15,17 @@ type IProps = {
 };
 
 const Drawer = createDrawerNavigator();
+const _screenOptions: DrawerNavigationOptions = {
+    headerShown: false,
+    drawerStyle: {
+        backgroundColor: 'transparent'
+    }
+};
 
 export default React.memo(function Profesional (props: IProps) {
     function logout() { return props.navigation.navigate('c'); }
     return(<View style={{ flex: 2 }}>
-        <Drawer.Navigator initialRouteName="Inicio" screenOptions={{ headerShown: false }} drawerContent={(props)=><CustomDrawerNavegation {...props} />}>
+        <Drawer.Navigator initialRouteName="Inicio" screenOptions={_screenOptions} drawerContent={(props)=><CustomDrawerNavegation {...props} />}>
             <Drawer.Screen
                 name="Inicio"
                 component={Page1}

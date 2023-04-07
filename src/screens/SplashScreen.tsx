@@ -10,7 +10,7 @@ import RNSplashScreen from "react-native-splash-screen";
 import { ThemeContext } from "../providers/ThemeProvider";
 
 export default React.memo(function SplashScreen(props: { init: ()=>void; }) {
-    const { theme, setThemeStatus } = useContext(ThemeContext);
+    const { setThemeStatus } = useContext(ThemeContext);
     const [visible, setVisible] = useState(true);
     const [startText, setStartText] = useState(false);
 

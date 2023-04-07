@@ -37,6 +37,7 @@ export default React.memo(function App() {
     const [textAnimVerify, setTextAnimVerify] = useState<string|undefined>(undefined);
     const [viewDialogUpdate, setViewDialogUpdate] = useState<boolean>(false);
     const [storeUrl, setStoreUrl] = useState<string>('');
+    const [index, setIndex] = useState(0);
     // State's StatusBar and NavBar
     const [statusColor, setStatusColor] = useState(themeStatus[0].color);
     const [statusStyle, setStatusStyle] = useState<StatusBarStyle>((themeStatus[0].style == 'light')? 'light-content': 'dark-content');
@@ -72,6 +73,7 @@ export default React.memo(function App() {
     }
     function changeScreen({ data }: EventArg<"state", undefined, unknown>) {
         const _index = (data as any).state.index;
+        if (_index == index) return;
         if (_index == 0) return setThemeStatus([{ color: theme.colors.background, style: 'light' }, { color: theme.colors.elevation.level2, style: 'light' }]);
         if (_index == 1) return setThemeStatus([{ color: theme.colors.background, style: 'light' }, { color: theme.colors.background, style: 'light' }]);
     }

@@ -80,7 +80,8 @@ export default React.memo(forwardRef(function ViewClietDetails(props: IProps, re
         props.openEditClient(userData!);
     }
     function _openViewImage() {
-        GlobalRef.current?.showImageViewer(userData!.image);
+        if (!userData) return;
+        GlobalRef.current?.showImageViewer(`${HostServer}/images/accounts/${decode(userData!.image)}`);
     }
 
     // Controller

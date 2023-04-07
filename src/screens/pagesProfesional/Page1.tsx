@@ -211,8 +211,8 @@ export default React.memo(function Page1(props: IProps) {
         <FAB style={styles.fab0} icon={'logout'} onPress={_logout} />
         <ViewClietDetails ref={refViewClietDetails} openAllComment={_openAllComments} openAllTrainings={_openAllTrainings} openEditClient={_openEditClient} />
         <EditClientProfessional ref={refEditClientProfessional} finish={_reopenViewClient} />
-        
         <ViewTraining ref={refViewTraining} goMoreDetails={_goMoreDetails} />
+        
         <ViewComments ref={refViewComments} goLoading={()=>undefined} />
         <ImageViewer ref={refImageViewer} />
         <ViewMoreDetails ref={refViewMoreDetails} />

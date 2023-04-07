@@ -3,10 +3,9 @@ import React, { Component } from "react";
 import { ToastAndroid } from "react-native";
 import { Button, Dialog, TextInput } from "react-native-paper";
 import { Comment } from "../../../scripts/ApiCorporal";
+import { GlobalRef } from "../../../GlobalRef";
 
-type IProps = {
-    goLoading: (show: boolean, text?: string)=>void;
-};
+type IProps = {};
 type IState = {
     visible: boolean;
     text: string;
@@ -33,16 +32,16 @@ export default class SetCommentUser extends Component<IProps, IState> {
         ToastAndroid.show('El comentario por lo menos debe de contener 10 caracteres o más.', ToastAndroid.SHORT);
     }
     send() {
-        this.props.goLoading(true, 'Enviando mensaje...');
+        GlobalRef.current?.loadingController(true, 'Enviando mensaje...');
         this.setState({ visible: false });
         Comment.admin_create(this.state.clientId, encode(this.state.text))
             .then(()=>{
-                this.props.goLoading(false);
+                GlobalRef.current?.loadingController(false);
                 ToastAndroid.show('Comentario enviado correctamente.', ToastAndroid.SHORT);
                 this.setState({ text: '' });
             })
             .catch((error)=>{
-                this.props.goLoading(false);
+                GlobalRef.current?.loadingController(false);
                 ToastAndroid.show(`Ocurrio un error: ${error.cause}`, ToastAndroid.SHORT);
                 this.setState({ visible: true  });
             });

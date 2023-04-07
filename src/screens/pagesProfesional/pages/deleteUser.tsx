@@ -1,10 +1,9 @@
 import React, { forwardRef, useImperativeHandle, useState } from "react";
 import { Button, Dialog, Paragraph } from "react-native-paper";
 import { Account } from "../../../scripts/ApiCorporal";
+import { GlobalRef } from "../../../GlobalRef";
 
 type IProps = {
-    goLoading: (visible: boolean, text?: string)=>void;
-    externalSnackbar: (text: string)=>void;
     reload: ()=>void;
 };
 export type DeleteUserRef = {
@@ -24,16 +23,16 @@ export default React.memo(forwardRef(function DeleteUser(props: IProps, ref: Rea
     }
     function deleteNow() {
         close();
-        props.goLoading(true, 'Borrando información del cliente...');
+        GlobalRef.current?.loadingController(true, 'Borrando información del cliente...');
         Account.admin_delete(IDClient)
             .then(()=>{
-                props.goLoading(false);
-                props.externalSnackbar('Usuario borrado correctamente.');
+                GlobalRef.current?.loadingController(false);
+                GlobalRef.current?.showSimpleAlert('Usuario borrado correctamente', '');
                 props.reload();
             })
             .catch((error)=>{
-                props.goLoading(false);
-                props.externalSnackbar(`Ocurrio un error: ${error.cause}`);
+                GlobalRef.current?.loadingController(false);
+                GlobalRef.current?.showSimpleAlert('Ocurrio un error', error.cause);
             });
     }
 

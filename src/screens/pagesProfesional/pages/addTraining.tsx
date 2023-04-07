@@ -1,19 +1,19 @@
 import React, { Component, PureComponent } from "react";
 import { Dimensions, View, StyleSheet, ToastAndroid, Pressable, StyleProp, ViewStyle } from "react-native";
-import { Appbar, Button, Text, TextInput, Provider as PaperProvider, Portal, Dialog, Snackbar, Paragraph, TouchableRipple } from "react-native-paper";
+import { Appbar, Button, Text, TextInput, Portal, Dialog, Snackbar, Paragraph, TouchableRipple } from "react-native-paper";
 import { Picker } from '@react-native-picker/picker';
-import CombinedTheme from "../../../Theme";
 import { ScrollView } from "react-native-gesture-handler";
 import { CustomPicker1, CustomPicker4 } from "../../components/CustomPicker";
 import { dataExercise, dataListUsers } from "../../../scripts/ApiCorporal/types";
 import { decode, encode } from "base-64";
 import DatePicker from "react-native-date-picker";
 import moment from "moment";
-import 'moment/locale/es';
 import { Comment, Training } from "../../../scripts/ApiCorporal";
 import CustomModal from "../../components/CustomModal";
 import utf8 from 'utf8';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { ThemeContext, ThemeContextType } from "../../../providers/ThemeProvider";
+import 'moment/locale/es';
 
 const { width } = Dimensions.get('window');
 
@@ -84,6 +84,7 @@ export default class AddTraining extends Component<IProps, IState> {
         this.close = this.close.bind(this);
         this.startCalculate = this.startCalculate.bind(this);
     }
+    static contextType: React.Context<ThemeContextType>  = ThemeContext;
     startCalculate() {
         if (this.state.repetitions.length !== 0 && this.state.kilage.length !== 0) {
             var repetitions: number = parseFloat(this.state.repetitions);
@@ -220,165 +221,164 @@ export default class AddTraining extends Component<IProps, IState> {
     }
 
     render(): React.ReactNode {
+        const { theme } = this.context;
         return(<CustomModal visible={this.state.visible} onRequestClose={this.close}>
-            <PaperProvider theme={CombinedTheme}>
-                <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background }}>
-                    <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
-                        <Appbar.BackAction onPress={this.close} />
-                        <Appbar.Content title={'Cargar entrenamiento'}/>
-                    </Appbar.Header>
-                    <ScrollView>
-                        <View style={{ marginLeft: 8, marginRight: 8, flexDirection: 'column', paddingTop: 16, paddingBottom: 16, alignItems: 'center' }}>
+            <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+                <Appbar.Header style={{ backgroundColor: theme.colors.background }}>
+                    <Appbar.BackAction onPress={this.close} />
+                    <Appbar.Content title={'Cargar entrenamiento'}/>
+                </Appbar.Header>
+                <ScrollView>
+                    <View style={{ marginLeft: 8, marginRight: 8, flexDirection: 'column', paddingTop: 16, paddingBottom: 16, alignItems: 'center' }}>
+                        <TextInput
+                            style={styles.textInput}
+                            mode={'outlined'}
+                            label={'Fecha de carga'}
+                            disabled={this.state.isSendResults}
+                            editable={false}
+                            right={<TextInput.Icon icon="calendar-range" disabled={this.state.isSendResults} onPress={()=>this.setState({ viewDialogDate: true })} />}
+                            value={this.state.dateActual}/>
+                        <SelectUser
+                            styles={styles.textInput}
+                            data={this.state.userSelect}
+                            onPress={this.props.openUserSelect}
+                        />
+                        <CustomPicker4 disabled={this.state.isSendResults} style={{ width: Math.floor(width - 24), margin: 8 }} title={"Ejercicio:"} value={this.state.exerciseId} onChange={(value)=>this.setState({ exerciseId: value })}>
+                            <Picker.Item label={'- Seleccionar -'} value={'-1'} />
+                            {this.props.listExercise.map((value)=>{
+                                return(<Picker.Item label={decode(value.name)} value={value.id} key={`addT-admin-${value.id}`} />);
+                            })}
+                        </CustomPicker4>
+                        <View style={{ flexDirection: 'row', marginTop: 8, marginBottom: 8 }}>
+                            <CustomPicker1 disabled={this.state.isSendResults} title={'RDS'} value={this.state.rds} onChange={(value)=>this.setState({ rds: value })} style={{ width: Math.floor((width / 2) - 20), marginLeft: 8, marginRight: 8 }} />
+                            <CustomPicker1 disabled={this.state.isSendResults} title={'RPE'} value={this.state.rpe} onChange={(value)=>this.setState({ rpe: value })} style={{ width: Math.floor((width / 2) - 20), marginLeft: 8, marginRight: 8 }} />
+                        </View>
+                        <TextInput
+                            style={styles.textInput}
+                            mode={'outlined'}
+                            label={'Pulsaciones por minuto'}
+                            keyboardType={'decimal-pad'}
+                            value={this.state.pulse}
+                            disabled={this.state.isSendResults}
+                            onChangeText={(text)=>this.setState({ pulse: this.processTextInput(text) })} />
+                        <TextInput
+                            style={styles.textInput}
+                            mode={'outlined'}
+                            label={'Repeticiones'}
+                            keyboardType={'decimal-pad'}
+                            value={this.state.repetitions}
+                            disabled={this.state.isSendResults}
+                            onChangeText={(text)=>this.setState({ repetitions: this.processTextInput(text) }, this.startCalculate)} />
+                        <TextInput
+                            style={styles.textInput}
+                            mode={'outlined'}
+                            label={'Kilaje'}
+                            keyboardType={'decimal-pad'}
+                            value={this.state.kilage}
+                            disabled={this.state.isSendResults}
+                            onChangeText={(text)=>this.setState({ kilage: this.processTextInput(text) }, this.startCalculate)} />
+                        <Pressable onPress={()=>ToastAndroid.show('Este campo es automático, no hace falta editarlo.', ToastAndroid.SHORT)}>
                             <TextInput
                                 style={styles.textInput}
                                 mode={'outlined'}
-                                label={'Fecha de carga'}
+                                label={'Tonelaje'}
                                 disabled={this.state.isSendResults}
                                 editable={false}
-                                right={<TextInput.Icon name="calendar-range" disabled={this.state.isSendResults} onPress={()=>this.setState({ viewDialogDate: true })} />}
-                                value={this.state.dateActual}/>
-                            <SelectUser
-                                styles={styles.textInput}
-                                data={this.state.userSelect}
-                                onPress={this.props.openUserSelect}
-                            />
-                            <CustomPicker4 disabled={this.state.isSendResults} style={{ width: Math.floor(width - 24), margin: 8 }} title={"Ejercicio:"} value={this.state.exerciseId} onChange={(value)=>this.setState({ exerciseId: value })}>
-                                <Picker.Item label={'- Seleccionar -'} value={'-1'} />
-                                {this.props.listExercise.map((value)=>{
-                                    return(<Picker.Item label={decode(value.name)} value={value.id} key={`addT-admin-${value.id}`} />);
-                                })}
-                            </CustomPicker4>
-                            <View style={{ flexDirection: 'row', marginTop: 8, marginBottom: 8 }}>
-                                <CustomPicker1 disabled={this.state.isSendResults} title={'RDS'} value={this.state.rds} onChange={(value)=>this.setState({ rds: value })} style={{ width: Math.floor((width / 2) - 20), marginLeft: 8, marginRight: 8 }} />
-                                <CustomPicker1 disabled={this.state.isSendResults} title={'RPE'} value={this.state.rpe} onChange={(value)=>this.setState({ rpe: value })} style={{ width: Math.floor((width / 2) - 20), marginLeft: 8, marginRight: 8 }} />
-                            </View>
-                            <TextInput
-                                style={styles.textInput}
-                                mode={'outlined'}
-                                label={'Pulsaciones por minuto'}
-                                keyboardType={'decimal-pad'}
-                                value={this.state.pulse}
-                                disabled={this.state.isSendResults}
-                                onChangeText={(text)=>this.setState({ pulse: this.processTextInput(text) })} />
-                            <TextInput
-                                style={styles.textInput}
-                                mode={'outlined'}
-                                label={'Repeticiones'}
-                                keyboardType={'decimal-pad'}
-                                value={this.state.repetitions}
-                                disabled={this.state.isSendResults}
-                                onChangeText={(text)=>this.setState({ repetitions: this.processTextInput(text) }, this.startCalculate)} />
-                            <TextInput
-                                style={styles.textInput}
-                                mode={'outlined'}
-                                label={'Kilaje'}
-                                keyboardType={'decimal-pad'}
-                                value={this.state.kilage}
-                                disabled={this.state.isSendResults}
-                                onChangeText={(text)=>this.setState({ kilage: this.processTextInput(text) }, this.startCalculate)} />
-                            <Pressable onPress={()=>ToastAndroid.show('Este campo es automático, no hace falta editarlo.', ToastAndroid.SHORT)}>
-                                <TextInput
-                                    style={styles.textInput}
-                                    mode={'outlined'}
-                                    label={'Tonelaje'}
-                                    disabled={this.state.isSendResults}
-                                    editable={false}
-                                    value={this.state.tonnage} />
-                            </Pressable>
-                            <CustomPicker4 disabled={this.state.isSendResults} title={'RIR'} value={this.state.rir} onChange={(value)=>this.setState({ rir: value })} style={styles.textInput}>
-                                <Picker.Item label={'-'} value={'-'}/>
-                                <Picker.Item label={'0'} value={'0'}/>
-                                <Picker.Item label={'1/2'} value={'1/2'}/>
-                                <Picker.Item label={'2/3'} value={'2/3'}/>
-                                <Picker.Item label={'3/4'} value={'3/4'}/>
-                                <Picker.Item label={'4+'} value={'4+'}/>
-                                <Picker.Item label={'Fallo muscular'} value={'fallo muscular'}/>
-                                <Picker.Item label={'Fallo técnica'} value={'fallo técnica'}/>
-                            </CustomPicker4>
-                            <CustomPicker4 disabled={this.state.isSendResults} title={'Agujetas'} value={this.state.shoelaces} onChange={(value)=>this.setState({ shoelaces: value })} style={styles.textInput}>
-                                <Picker.Item label={'-'} value={'-'}/>
-                                <Picker.Item label={'Nada'} value={'nada'}/>
-                                <Picker.Item label={'Leves'} value={'leves'}/>
-                                <Picker.Item label={'Moderadas'} value={'moderadas'}/>
-                                <Picker.Item label={'Altas'} value={'altas'}/>
-                                <Picker.Item label={'Muy altas'} value={'muy altas'}/>
-                                <Picker.Item label={'Lesión'} value={'lesión'}/>
-                            </CustomPicker4>
-                            <CustomPicker1
-                                disabled={this.state.isSendResults}
-                                title={'Técnica'}
-                                value={this.state.technique}
-                                onChange={(value)=>this.setState({ technique: value })}
-                                style={styles.textInput}/>
-                            <TextInput
-                                style={styles.textInput}
-                                mode={'outlined'}
-                                label={'Observaciones'}
-                                multiline={true}
-                                numberOfLines={8}
-                                keyboardType={'default'}
-                                value={this.state.comment}
-                                disabled={this.state.isSendResults}
-                                onChangeText={(text)=>this.setState({ comment: text })} />
-                            <Button
-                                loading={this.state.isSendResults}
-                                mode={'contained'}
-                                style={{ width: (width / 2), marginTop: 8 }}
-                                onPress={()=>(!this.state.isSendResults)? this.sendResults(): ToastAndroid.show('Espere...', ToastAndroid.SHORT)}>{this.state.buttonSendText}</Button>
-                        </View>
-                    </ScrollView>
-                </View>
-                <Portal>
-                    <Dialog visible={this.state.viewDialogDate} dismissable={true} onDismiss={()=>this.setState({ viewDialogDate: false })}>
-                        <Dialog.Title>Fecha de nacimiento</Dialog.Title>
-                        <Dialog.Content style={{ overflow: 'hidden' }}>
-                            {<DatePicker
-                                date={this.state.date}
-                                mode={'date'}
-                                fadeToColor={'#323335'}
-                                textColor={'#FFFFFF'}
-                                onDateChange={(date)=>this.setState({ date: date })}
-                            />}
-                        </Dialog.Content>
-                        <Dialog.Actions>
-                            <Button onPress={()=>this.setState({ viewDialogDate: false })}>Cancelar</Button>
-                            <Button onPress={()=>this.setState({ date: new Date(), dateActual: moment(new Date()).format('DD/MM/YYYY') })}>Resetear</Button>
-                            <Button onPress={()=>this.setState({ dateActual: moment(this.state.date).format('DD/MM/YYYY'), viewDialogDate: false })}>Aceptar</Button>
-                        </Dialog.Actions>
-                    </Dialog>
-                    <Dialog visible={this.state.showError} dismissable={true} onDismiss={()=>this.setState({ showError: false })}>
-                        <Dialog.Title>Ocurrio un error</Dialog.Title>
-                        <Dialog.Content>
-                            <Paragraph>{this.state.messageError}</Paragraph>
-                        </Dialog.Content>
-                        <Dialog.Actions>
-                            <Button onPress={()=>this.setState({ showError: false })}>Aceptar</Button>
-                        </Dialog.Actions>
-                    </Dialog>
-                </Portal>
-                <Snackbar
-                    visible={this.state.successShow}
-                    style={{ backgroundColor: '#1663AB' }}
-                    onDismiss={()=>this.setState({ successShow: false })}
-                    action={{
-                        label: 'OCULTAR',
-                        onPress: ()=>this.setState({ successShow: false })
-                    }}
-                    duration={3000}>
-                    <Text>Carga realizada correctamente.</Text>
-                </Snackbar>
-                <Snackbar
-                    visible={this.state.snackBarView}
-                    style={{ backgroundColor: '#1663AB' }}
-                    onDismiss={()=>this.setState({ snackBarView: false })}
-                    action={{
-                        label: 'OCULTAR',
-                        onPress: ()=>this.setState({ snackBarView: false })
-                    }}
-                    duration={3000}>
-                    <Text>{this.state.snackBarText}</Text>
-                </Snackbar>
-            </PaperProvider>
+                                value={this.state.tonnage} />
+                        </Pressable>
+                        <CustomPicker4 disabled={this.state.isSendResults} title={'RIR'} value={this.state.rir} onChange={(value)=>this.setState({ rir: value })} style={styles.textInput}>
+                            <Picker.Item label={'-'} value={'-'}/>
+                            <Picker.Item label={'0'} value={'0'}/>
+                            <Picker.Item label={'1/2'} value={'1/2'}/>
+                            <Picker.Item label={'2/3'} value={'2/3'}/>
+                            <Picker.Item label={'3/4'} value={'3/4'}/>
+                            <Picker.Item label={'4+'} value={'4+'}/>
+                            <Picker.Item label={'Fallo muscular'} value={'fallo muscular'}/>
+                            <Picker.Item label={'Fallo técnica'} value={'fallo técnica'}/>
+                        </CustomPicker4>
+                        <CustomPicker4 disabled={this.state.isSendResults} title={'Agujetas'} value={this.state.shoelaces} onChange={(value)=>this.setState({ shoelaces: value })} style={styles.textInput}>
+                            <Picker.Item label={'-'} value={'-'}/>
+                            <Picker.Item label={'Nada'} value={'nada'}/>
+                            <Picker.Item label={'Leves'} value={'leves'}/>
+                            <Picker.Item label={'Moderadas'} value={'moderadas'}/>
+                            <Picker.Item label={'Altas'} value={'altas'}/>
+                            <Picker.Item label={'Muy altas'} value={'muy altas'}/>
+                            <Picker.Item label={'Lesión'} value={'lesión'}/>
+                        </CustomPicker4>
+                        <CustomPicker1
+                            disabled={this.state.isSendResults}
+                            title={'Técnica'}
+                            value={this.state.technique}
+                            onChange={(value)=>this.setState({ technique: value })}
+                            style={styles.textInput}/>
+                        <TextInput
+                            style={styles.textInput}
+                            mode={'outlined'}
+                            label={'Observaciones'}
+                            multiline={true}
+                            numberOfLines={8}
+                            keyboardType={'default'}
+                            value={this.state.comment}
+                            disabled={this.state.isSendResults}
+                            onChangeText={(text)=>this.setState({ comment: text })} />
+                        <Button
+                            loading={this.state.isSendResults}
+                            mode={'contained'}
+                            style={{ width: (width / 2), marginTop: 8 }}
+                            onPress={()=>(!this.state.isSendResults)? this.sendResults(): ToastAndroid.show('Espere...', ToastAndroid.SHORT)}>{this.state.buttonSendText}</Button>
+                    </View>
+                </ScrollView>
+            </View>
+            <Portal>
+                <Dialog visible={this.state.viewDialogDate} dismissable={true} onDismiss={()=>this.setState({ viewDialogDate: false })}>
+                    <Dialog.Title>Fecha de nacimiento</Dialog.Title>
+                    <Dialog.Content style={{ overflow: 'hidden' }}>
+                        {<DatePicker
+                            date={this.state.date}
+                            mode={'date'}
+                            fadeToColor={'#323335'}
+                            textColor={'#FFFFFF'}
+                            onDateChange={(date)=>this.setState({ date: date })}
+                        />}
+                    </Dialog.Content>
+                    <Dialog.Actions>
+                        <Button onPress={()=>this.setState({ viewDialogDate: false })}>Cancelar</Button>
+                        <Button onPress={()=>this.setState({ date: new Date(), dateActual: moment(new Date()).format('DD/MM/YYYY') })}>Resetear</Button>
+                        <Button onPress={()=>this.setState({ dateActual: moment(this.state.date).format('DD/MM/YYYY'), viewDialogDate: false })}>Aceptar</Button>
+                    </Dialog.Actions>
+                </Dialog>
+                <Dialog visible={this.state.showError} dismissable={true} onDismiss={()=>this.setState({ showError: false })}>
+                    <Dialog.Title>Ocurrio un error</Dialog.Title>
+                    <Dialog.Content>
+                        <Paragraph>{this.state.messageError}</Paragraph>
+                    </Dialog.Content>
+                    <Dialog.Actions>
+                        <Button onPress={()=>this.setState({ showError: false })}>Aceptar</Button>
+                    </Dialog.Actions>
+                </Dialog>
+            </Portal>
+            <Snackbar
+                visible={this.state.successShow}
+                style={{ backgroundColor: '#1663AB' }}
+                onDismiss={()=>this.setState({ successShow: false })}
+                action={{
+                    label: 'OCULTAR',
+                    onPress: ()=>this.setState({ successShow: false })
+                }}
+                duration={3000}>
+                <Text>Carga realizada correctamente.</Text>
+            </Snackbar>
+            <Snackbar
+                visible={this.state.snackBarView}
+                style={{ backgroundColor: '#1663AB' }}
+                onDismiss={()=>this.setState({ snackBarView: false })}
+                action={{
+                    label: 'OCULTAR',
+                    onPress: ()=>this.setState({ snackBarView: false })
+                }}
+                duration={3000}>
+                <Text>{this.state.snackBarText}</Text>
+            </Snackbar>
         </CustomModal>);
     }
 };

@@ -7,6 +7,7 @@ import { dataListUsers } from "../../../scripts/ApiCorporal/types";
 import CombinedTheme from "../../../Theme";
 import { CustomShowError } from "../../components/Components";
 import CustomModal from "../../components/CustomModal";
+import { ThemeContext } from "../../../providers/ThemeProvider";
 
 type IProps = {
     dataUser: dataListUsers[];
@@ -30,7 +31,9 @@ export default class SelectClient extends Component<IProps, IState> {
         this._renderItem = this._renderItem.bind(this);
         this.loadData = this.loadData.bind(this);
         this.close = this.close.bind(this);
+        this.onChangeSearch = this.onChangeSearch.bind(this);
     }
+    static contextType = ThemeContext;
 
     /*###### Search Control ######*/
     onChangeSearch(Query: string) {
@@ -77,9 +80,10 @@ export default class SelectClient extends Component<IProps, IState> {
     close() { this.setState({ visible: false }); }
 
     render(): React.ReactNode {
-        return(<CustomModal visible={this.state.visible} onShow={this.loadData} onRequestClose={this.close} animationIn={'slideInLeft'} animationOut={'slideOutRight'}>
-            <View style={{ ...styles.content, backgroundColor: CombinedTheme.colors.background }}>
-                <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
+        const { theme } = this.context;
+        return(<CustomModal visible={this.state.visible} onShow={this.loadData} onRequestClose={this.close}>
+            <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+                <Appbar.Header style={{ backgroundColor: theme.colors.background }}>
                     <Appbar.BackAction onPress={this.close} />
                     <Appbar.Content title={'Seleccionar cliente'} />
                 </Appbar.Header>
@@ -93,7 +97,7 @@ export default class SelectClient extends Component<IProps, IState> {
                             value={this.state.searchQuery}
                             style={{ marginTop: 8, marginLeft: 8, marginRight: 8, marginBottom: 12 }}
                             placeholder={'Escribe para buscar...'}
-                            onChangeText={(query: string)=>this.onChangeSearch(query)}
+                            onChangeText={this.onChangeSearch}
                             onSubmitEditing={({ nativeEvent })=>this.goSearch(nativeEvent.text)}
                         />}
                         contentContainerStyle={{ flex: (this.props.dataUser.length == 0)? 3: undefined }}
@@ -106,21 +110,3 @@ export default class SelectClient extends Component<IProps, IState> {
         </CustomModal>);
     }
 }
-
-const styles = StyleSheet.create({
-    content: {
-        marginLeft: 8,
-        marginRight: 8,
-        borderRadius: 8,
-        overflow: 'hidden',
-        shadowColor: "#FFFFFF",
-        shadowOffset: {
-            width: 0,
-            height: 1,
-        },
-        shadowOpacity: 0.22,
-        shadowRadius: 2.22,
-        elevation: 3,
-        maxHeight: '90%'
-    }
-});

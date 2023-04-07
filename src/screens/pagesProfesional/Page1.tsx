@@ -205,32 +205,15 @@ export default React.memo(function Page1(props: IProps) {
         <ViewClietDetails ref={refViewClietDetails} openAllComment={_openAllComments} openAllTrainings={_openAllTrainings} openEditClient={_openEditClient} />
         <EditClientProfessional ref={refEditClientProfessional} finish={_reopenViewClient} />
         <ViewTraining ref={refViewTraining} goMoreDetails={_goMoreDetails} />
-        <ViewComments ref={refViewComments} goLoading={()=>undefined} />
+        <ViewComments ref={refViewComments} />
         <ViewMoreDetails ref={refViewMoreDetails} />
         <AddNewAccount ref={refAddNewAccount} />
-        
-        <SearchClient
-            ref={refSearchClient}
-            goDetailsClient={openViewDetailsClient}
-            showLoading={()=>undefined}
-            showSnackOut={()=>undefined}
-            deleteAccount={_deleteUser}
-            sendComment={_openSetComment}
-        />
-        <AddTraining
-            ref={refAddTraining}
-            listUsers={completeList}
-            listExercise={excList}
-            openUserSelect={_openSelectClient}
-        />
-        <SelectClient
-            ref={refSelectClient}
-            dataUser={completeList}
-            onSelect={_updateUserSelect}
-        />
+        <SearchClient ref={refSearchClient} goDetailsClient={openViewDetailsClient} deleteAccount={_deleteUser} sendComment={_openSetComment} />
+        <AddTraining ref={refAddTraining} listUsers={completeList} listExercise={excList} openUserSelect={_openSelectClient} />
+        <SelectClient ref={refSelectClient} dataUser={completeList} onSelect={_updateUserSelect} />
         <Portal>
-            <SetCommentUser ref={refSetCommentUser} goLoading={()=>undefined} />
-            <DeleteUser ref={refDeleteUser} goLoading={()=>undefined} externalSnackbar={()=>undefined} reload={refreshing} />
+            <SetCommentUser ref={refSetCommentUser} />
+            <DeleteUser ref={refDeleteUser} reload={refreshing} />
         </Portal>
     </View>);
 });

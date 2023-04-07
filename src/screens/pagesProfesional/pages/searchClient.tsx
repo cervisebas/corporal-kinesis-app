@@ -13,10 +13,7 @@ import { ThemeContext } from "../../../providers/ThemeProvider";
 type IProps = {
     deleteAccount: (id: string)=>void;
     sendComment: (id: string)=>void;
-
     goDetailsClient: (idClient: string)=>void;
-    showLoading: (visible: boolean, message?: string)=>void;
-    showSnackOut: (text: string)=>void;
 };
 
 export type SearchClientRef = {

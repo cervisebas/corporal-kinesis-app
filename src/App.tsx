@@ -74,6 +74,7 @@ export default React.memo(function App() {
     function changeScreen({ data }: EventArg<"state", undefined, unknown>) {
         const _index = (data as any).state.index;
         if (_index == index) return;
+        setIndex(_index);
         if (_index == 0) return setThemeStatus([{ color: theme.colors.background, style: 'light' }, { color: theme.colors.elevation.level2, style: 'light' }]);
         if (_index == 1) return setThemeStatus([{ color: theme.colors.background, style: 'light' }, { color: theme.colors.background, style: 'light' }]);
     }

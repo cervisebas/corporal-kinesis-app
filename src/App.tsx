@@ -15,8 +15,9 @@ import SplashScreen from './screens/SplashScreen';
 import { ThemeContext } from './providers/ThemeProvider';
 import GlobalComponents from './GlobalComponents';
 import { GlobalRef } from './GlobalRef';
-import { refSession } from './ExtraContentsRefs';
+import { refChangeLog, refSession } from './ExtraContentsRefs';
 import { refProfesional } from './screens/profesionalRef';
+import { waitTo } from './scripts/Utils';
 
 const Stack = createNativeStackNavigator();
 
@@ -55,15 +56,14 @@ export default React.memo(function App() {
             setTimeout(()=>{
                 if (!value) refSession.current?.open(); else refSession.current?.close();
                 setShowVerify(false);
-                if (value) {
-                    setLoadNow(true);
-                    ChangeLogSystem.getVerify().then((value)=>{
-                        if (value) {
-                            //setChangeLoadView(true);
-                            ChangeLogSystem.setNewVersion();
-                        }
-                    });
-                }
+                if (!value) return;
+                setLoadNow(true);
+                ChangeLogSystem.getVerify().then(async(value)=>{
+                    if (!value) return;
+                    ChangeLogSystem.setNewVersion();
+                    await waitTo(1500);
+                    refChangeLog.current?.open();
+                });
             }, 2500);
         }).catch((error)=>{
             if (error.action == 1) return refSession.current?.open();

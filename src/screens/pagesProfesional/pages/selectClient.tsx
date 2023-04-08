@@ -1,10 +1,9 @@
 import { decode } from "base-64";
 import filter from "lodash.filter";
 import React, { Component } from "react";
-import { FlatList, ListRenderItemInfo, StyleSheet, View } from "react-native";
+import { FlatList, ListRenderItemInfo, View } from "react-native";
 import { Appbar, Divider, List, Searchbar } from "react-native-paper";
 import { dataListUsers } from "../../../scripts/ApiCorporal/types";
-import CombinedTheme from "../../../Theme";
 import { CustomShowError } from "../../components/Components";
 import CustomModal from "../../components/CustomModal";
 import { ThemeContext } from "../../../providers/ThemeProvider";

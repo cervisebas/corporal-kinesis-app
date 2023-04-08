@@ -1,12 +1,12 @@
 import { decode } from "base-64";
-import React, { PureComponent, useState } from "react";
+import React, { PureComponent, useContext, useState } from "react";
 import { StyleProp, View, ViewStyle } from "react-native";
 import { Avatar, Card, MD2Colors, Text, IconButton, Paragraph, Title, List, Menu, Button } from "react-native-paper";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { HostServer } from "../../scripts/ApiCorporal";
-import CombinedTheme from "../../Theme";
 import ImageLazyLoad from "./ImageLazyLoad";
+import { ThemeContext } from "../../providers/ThemeProvider";
 
 type IProps1 = {
     accountName: string;
@@ -222,18 +222,14 @@ class CustomCard5 extends PureComponent<IProps13> {
 }
 
 type CustomType1 = { title: string; value: string; marginLeft?: number; };
-export class MiniCustomCard extends PureComponent<CustomType1> {
-    constructor(props: CustomType1) {
-        super(props);
-    }
-    render(): React.ReactNode {
-        return(<Card style={{ backgroundColor: CombinedTheme.colors.accent, height: 48, marginTop: 4, marginBottom: 4, marginLeft: (this.props.marginLeft)? this.props.marginLeft: 6, marginRight: 6 }}>
-            <Card.Content style={{ padding: 0, margin: 0 }}>
-                <Text><Text style={{ fontWeight: '700' }}>{this.props.title}</Text> {this.props.value}</Text>
-            </Card.Content>
-        </Card>);
-    }
-}
+export const MiniCustomCard = React.memo(function MiniCustomCard(props: CustomType1) {
+    const { theme } = useContext(ThemeContext);
+    return(<Card style={{ backgroundColor: theme.colors.primary, height: 48, marginTop: 4, marginBottom: 4, marginLeft: props.marginLeft??6, marginRight: 6 }}>
+        <Card.Content style={{ padding: 0, margin: 0 }}>
+            <Text><Text style={{ fontWeight: '700' }}>{props.title}</Text> {props.value}</Text>
+        </Card.Content>
+    </Card>);
+});
 
 type IProps15 = {
     style?: StyleProp<ViewStyle>;

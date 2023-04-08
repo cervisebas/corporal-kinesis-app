@@ -1,9 +1,8 @@
 import { decode } from "base-64";
 import React, { Component } from "react";
-import { View, ToastAndroid, Text, StyleSheet, Dimensions, DeviceEventEmitter } from "react-native";
-import { Appbar, TextInput, Button, Snackbar } from "react-native-paper";
+import { View, ToastAndroid, StyleSheet, Dimensions, DeviceEventEmitter } from "react-native";
+import { Appbar, TextInput, Button } from "react-native-paper";
 import { Exercise } from "../../../scripts/ApiCorporal";
-import CombinedTheme from "../../../Theme";
 import CustomModal from "../../components/CustomModal";
 import { GlobalRef } from "../../../GlobalRef";
 import { ThemeContext, ThemeContextType } from "../../../providers/ThemeProvider";

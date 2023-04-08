@@ -1,10 +1,9 @@
-import React, { PureComponent, ReactNode, forwardRef, useContext, useImperativeHandle, useState } from "react";
+import React, { forwardRef, useContext, useImperativeHandle, useState } from "react";
 import { decode } from "base-64";
 import { Keyboard, ListRenderItemInfo, NativeSyntheticEvent, StyleSheet, TextInputSubmitEditingEventData, View } from "react-native";
 import { FlatList, TouchableWithoutFeedback } from "react-native-gesture-handler";
-import { Appbar, Searchbar, Provider as PaperProvider, Divider } from "react-native-paper";
+import { Appbar, Searchbar, Divider } from "react-native-paper";
 import { dataListUsers } from "../../../scripts/ApiCorporal/types";
-import CombinedTheme from "../../../Theme";
 import { CustomItemList2 } from "../../components/Components";
 import filter from 'lodash.filter';
 import CustomModal from "../../components/CustomModal";

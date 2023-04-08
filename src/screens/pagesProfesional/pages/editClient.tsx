@@ -172,8 +172,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#1663AB'
     },
     content: {
-        flex: 1,
-        //backgroundColor: CombinedTheme.colors.background
+        flex: 1
     },
     scrollView: {
         paddingTop: 12,

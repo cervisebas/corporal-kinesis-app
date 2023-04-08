@@ -1,14 +1,12 @@
 import { decode } from "base-64";
-import React, { PureComponent, forwardRef, useContext, useImperativeHandle, useState } from "react";
+import React, { forwardRef, useContext, useImperativeHandle, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { Appbar, MD2Colors, Provider as PaperProvider, Text } from "react-native-paper";
+import { Appbar, MD2Colors, Text } from "react-native-paper";
 import utf8 from "utf8";
 import { HostServer } from "../../../scripts/ApiCorporal";
 import { commentsData, details, DetailsTrainings } from "../../../scripts/ApiCorporal/types";
-import CombinedTheme from "../../../Theme";
 import { CustomCard5, CustomCardComments } from "../../components/Components";
 import CustomModal from "../../components/CustomModal";
-import { calcYears } from "../../../scripts/Utils";
 import CustomCard4 from "../../components/CustomCard4";
 import { ThemeContext } from "../../../providers/ThemeProvider";
 

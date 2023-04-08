@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { EventArg, NavigationContainer } from '@react-navigation/native';
 import { NativeStackNavigationOptions, createNativeStackNavigator } from '@react-navigation/native-stack';
 import SystemNavigationBar from "react-native-system-navigation-bar";
-import { DeviceEventEmitter, EmitterSubscription, StatusBar, StatusBarStyle, View } from 'react-native';
+import { DeviceEventEmitter, EmitterSubscription, Linking, StatusBar, StatusBarStyle, View } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
 import Client from './screens/client';
 import Profesional from './screens/profesional';
@@ -35,17 +35,12 @@ export default React.memo(function App() {
     // State's
     const [showVerify, setShowVerify] = useState<boolean>(false);
     const [textAnimVerify, setTextAnimVerify] = useState<string|undefined>(undefined);
-    const [viewDialogUpdate, setViewDialogUpdate] = useState<boolean>(false);
-    const [storeUrl, setStoreUrl] = useState<string>('');
     const [index, setIndex] = useState(0);
     // State's StatusBar and NavBar
     const [statusColor, setStatusColor] = useState(themeStatus[0].color);
     const [statusStyle, setStatusStyle] = useState<StatusBarStyle>((themeStatus[0].style == 'light')? 'light-content': 'dark-content');
     const [navColor, setNavColor] = useState(themeStatus[1].color);
     const [navStyle, setNavStyle] = useState(themeStatus[1].style);
-
-    // Functions Extra Contentents
-    function _closeDialogUpdate() { setViewDialogUpdate(false); }
 
     // Funtions
     function verifyAccount() {
@@ -82,10 +77,13 @@ export default React.memo(function App() {
         //event2 = DeviceEventEmitter.addListener('openChangeLog', ()=>setChangeLoadView(true));
         Notification.init();
         VersionCheck.needUpdate({ ignoreErrors: true }).then((value)=>{
-            if (value.isNeeded) {
-                setViewDialogUpdate(true);
-                setStoreUrl(value.storeUrl);
-            }
+            if (value.isNeeded) GlobalRef.current?.showDoubleAlert(
+                'Se ha encontrado una nueva actualización',
+                'Se recomienda actualizar a la versión mas reciente de la aplicación para garantizar el buen funcionamiento de la misma y para mantener las novedades al día.\nPara actualizar la aplicación ahora presione en “Aceptar” y lo llevaremos a la tienda, de lo contrario presione en “Cancelar” para recordárselo la próxima vez que entre en la aplicación.',
+                function updateNow() {
+                    Linking.openURL(value.storeUrl);
+                }
+            );
         });
         return ()=>{
             setLoadNow(false);
@@ -113,9 +111,6 @@ export default React.memo(function App() {
                 <ExtraContents
                     showVerify={showVerify}
                     textVerify={textAnimVerify}
-                    viewDialogUpdate={viewDialogUpdate}
-                    closeDialogUpdate={_closeDialogUpdate}
-                    storeUrl={storeUrl}
                     reVerify={verifyAccount}
                 />
                 <GlobalComponents ref={GlobalRef} />

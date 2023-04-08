@@ -17,7 +17,6 @@ import GlobalComponents from './GlobalComponents';
 import { GlobalRef } from './GlobalRef';
 import { refChangeLog, refSession } from './ExtraContentsRefs';
 import { refProfesional } from './screens/profesionalRef';
-import { waitTo } from './scripts/Utils';
 
 const Stack = createNativeStackNavigator();
 

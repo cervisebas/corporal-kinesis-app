@@ -1,552 +1,666 @@
 [
-    {
-      "version": "2.0.1",
-      "date": "28/02/2023",
-      "changes": [
-        {
-          "type": 2,
-          "text": "Se soluciono un problema de cálculo al mostrar los detalles de una actividad (Entrenador)."
-        },
-        {
-          "type": 1,
-          "text": "Se añadió el número de ejercicios a los títulos de las pestañas de ejercicios (Entrenador)."
-        },
-        {
-          "type": 0,
-          "text": "Se quito la edad de los entrenadores de las tarjetas de los comentarios."
-        },
-        {
-          "type": 2,
-          "text": "Se soluciono un problema al cargar la imagen de los usuarios al abrir la vista de más detalles (Entrenador)."
-        },
-        {
-          "type": 3,
-          "text": "Se quitaron partes innecesarias del código fuente de la aplicación para aligerar el consumo de rendimiento."
-        }
-      ]
-    },
-    {
-      "version": "2.0.0",
-      "date": "17/02/2023",
-      "changes": [
-        {
-          "type": 3,
-          "text": "Se actualizaron varias librerías que integra el proyecto."
-        },
-        {
-          "type": 2,
-          "text": "Se soluciono un problema con la experiencia del teclado en la pantalla de inicio de sesión."
-        },
-        {
-          "type": 0,
-          "text": "Se optimizo el rendimiento de los componentes."
-        },
-        {
-          "type": 2,
-          "text": "Se soluciono varios problemas que afectaban a la velocidad de fotogramas."
-        },
-        {
-          "type": 1,
-          "text": "Se añadió la ventana de “Editar perfil” en el apartado del entrenador."
-        },
-        {
-          "type": 0,
-          "text": "Se reprogramo la primera pestaña del apartado del entrenador."
-        },
-        {
-          "type": 1,
-          "text": "Se creo una nueva función dentro de la API del servidor y de la app para modificar los datos de los usuarios con una cuenta de administrador."
-        },
-        {
-          "type": 1,
-          "text": "Se implemento la función de refrescar los datos una vez terminado el proceso de edición de los mismos."
-        },
-        {
-          "type": 2,
-          "text": "Se corrigieron varios errores."
-        },
-        {
-          "type": 0,
-          "text": "Se optimizo la ventana de “Ver detalles del usuario”."
-        },
-        {
-          "type": 0,
-          "text": "Se optimizo la ventana “Ver rendimiento”."
-        },
-        {
-          "type": 0,
-          "text": "Se optimizo los componentes de la ventana “Ver rendimiento”."
-        },
-        {
-          "type": 2,
-          "text": "Se corrigió un problema que hacía que las tarjetas actuaran como botones."
-        },
-        {
-          "type": 0,
-          "text": "Se modifico la ventana “Ver rendimiento” para que filtre los ejercicios por pestañas."
-        },
-        {
-          "type": 2,
-          "text": "Se corrigió el rendimiento del visor de imágenes."
-        },
-        {
-          "type": 2,
-          "text": "Se corrigió el rendimiento de la ventana “Ver todos los comentarios”."
-        },
-        {
-          "type": 0,
-          "text": "Se recreo la entrada de texto flotante para dejar comentarios."
-        },
-        {
-          "type": 2,
-          "text": "Se corrigió un error de experiencia en el listado de clientes en el apartado “Entrenadores”."
-        },
-        {
-          "type": 0,
-          "text": "Se remplazo el botón de “Añadir nuevo usuario” por un botón flotante."
-        },
-        {
-          "type": 2,
-          "text": "Se corrigió el rendimiento de la ventana “Añadir nuevo usuario”."
-        },
-        {
-          "type": 0,
-          "text": "Se recreo y rediseño la función de borrado de usuarios."
-        },
-        {
-          "type": 0,
-          "text": "Se modifico la API para que calcule por ejercicios en la ventana de “Ver rendimiento”."
-        },
-        {
-          "type": 0,
-          "text": "Se reprogramo la ventana de “Buscar cliente” para adaptarse al nuevo entorno."
-        },
-        {
-          "type": 0,
-          "text": "Se adapto la ventana de “Cargar entrenamiento” al nuevo entorno."
-        },
-        {
-          "type": 0,
-          "text": "Se recreo la ventana de “Seleccionar cliente” y se solucionaron los problemas de rendimiento de esta."
-        },
-        {
-          "type": 2,
-          "text": "Se soluciono un problema de rendimiento al renderizar la ventana “Cargar entrenamiento” al abrirse."
-        },
-        {
-          "type": 1,
-          "text": "Se añadió un margen inferior a la lista de la pestaña “Lista de ejercicios”."
-        },
-        {
-          "type": 0,
-          "text": "Se suavizo el cambio de pestañas en el apartado “Cliente”."
-        },
-        {
-          "type": 0,
-          "text": "Se optimizo mínimamente la pestaña “Mi cuenta”."
-        },
-        {
-          "type": 2,
-          "text": "Se corrigió el icono de confirmación al editar los datos de la cuenta como cliente."
-        },
-        {
-          "type": 2,
-          "text": "Se corrigieron varios errores de rendimiento en la pantalla de carga:\n\t- El fondo fue remplazado por un objeto (Antes era una imagen).\n\t- El logo se remplazó por una imagen WEBP (Antes era un SVG con imágenes PNG).\n\t- Se disminuyo el tiempo de carga de los mismos componentes."
-        },
-        {
-          "type": 0,
-          "text": "Se removieron 5 librerías en desuso que ocupaban espacio de almacenamiento."
-        },
-        {
-          "type": 0,
-          "text": "Se removieron, optimizaron y remplazaron varios activos del código fuente."
-        },
-        {
-          "type": 2,
-          "text": "Se corrigieron varios errores de diseño en la pantalla de carga."
-        },
-        {
-          "type": 0,
-          "text": "Se actualizo el componente de ventanas."
-        },
-        {
-          "type": 0,
-          "text": "Se remplazo la pantalla de inicio por una moderna."
-        },
-        {
-          "type": 0,
-          "text": "Se cambio el estilo de la barra de estado y navegación de la pantalla de inicio."
-        },
-        {
-          "type": 1,
-          "text": "Se añadió una animación de entrada en la pantalla de inicio."
-        },
-        {
-          "type": 1,
-          "text": "Se cambio la función de inicialización para que se ejecute luego de terminar la animación de la pantalla de inicio."
-        },
-        {
-          "type": 0,
-          "text": "Se ha reducido el peso de la aplicación considerablemente."
-        }
-      ]
-    },
-    {
-      "version": "1.7.0",
-      "date": "03/07/2022",
-      "changes": [
-        {
-          "type": 0,
-          "text": "Actualización del sistema de archivos del servidor."
-        },
-        {
-          "type": 1,
-          "text": "Nuevo sistema de optimización de imágenes."
-        },
-        {
-          "type": 1,
-          "text": "Opción de ocultar desarrollador añadida en el panel de administrador."
-        },
-        {
-          "type": 1,
-          "text": "Ver foto de perfil de los clientes en el panel de administrador."
-        },
-        {
-          "type": 0,
-          "text": "Actualización de librerías."
-        },
-        {
-          "type": 0,
-          "text": "Actualización del núcleo de la plataforma."
-        },
-        {
-          "type": 0,
-          "text": "Optimización de la API."
-        },
-        {
-          "type": 0,
-          "text": "Optimización de componentes."
-        },
-        {
-          "type": 0,
-          "text": "Optimización de la plataforma."
-        },
-        {
-          "type": 0,
-          "text": "Optimización de la arquitectura."
-        }
-      ]
-    },
-    {
-      "version": "1.6.0",
-      "date": "13/06/2022",
-      "changes": [
-        {
-          "type": 1,
-          "text": "Optimización de imágenes del fondo y perfil por defecto."
-        },
-        {
-          "type": 0,
-          "text": "Rediseño de la pantalla de carga."
-        },
-        {
-          "type": 1,
-          "text": "Solución del color de fondo en la pantalla de inicio de sesión."
-        },
-        {
-          "type": 1,
-          "text": "Nuevo componente nativo añadido “selector de fecha”."
-        },
-        {
-          "type": 2,
-          "text": "Solución de pantalla de carga infinita."
-        },
-        {
-          "type": 0,
-          "text": "Rediseño de componentes del cliente."
-        },
-        {
-          "type": 1,
-          "text": "Optimización de variables."
-        },
-        {
-          "type": 0,
-          "text": "Eliminación de pestañas “en trabajo”."
-        },
-        {
-          "type": 1,
-          "text": "Pestaña añadida “Mi cuenta”."
-        },
-        {
-          "type": 1,
-          "text": "Ventana “Opciones” movida y editada."
-        },
-        {
-          "type": 1,
-          "text": "Nueva ventana “Editar datos”."
-        },
-        {
-          "type": 1,
-          "text": "Nuevo visor de imágenes añadido."
-        },
-        {
-          "type": 2,
-          "text": "Solución de un error ocasionado al cerrar sesión."
-        },
-        {
-          "type": 0,
-          "text": "Rediseño de componentes del administrador."
-        },
-        {
-          "type": 1,
-          "text": "Edición del pie del panel de administrador."
-        },
-        {
-          "type": 1,
-          "text": "Nuevo diseño de ventanas flotantes."
-        },
-        {
-          "type": 1,
-          "text": "Nuevas animaciones de ventanas."
-        },
-        {
-          "type": 0,
-          "text": "Experiencia de usuario mejorada."
-        },
-        {
-          "type": 2,
-          "text": "Solución al verificar datos al cargar entrenamientos."
-        },
-        {
-          "type": 1,
-          "text": "Nueva ventana añadida “Selección de cliente”."
-        },
-        {
-          "type": 1,
-          "text": "Opción de búsqueda al cargar entrenamientos añadida."
-        },
-        {
-          "type": 0,
-          "text": "Finalización de la prueba beta de “Editar ejercicio”."
-        },
-        {
-          "type": 1,
-          "text": "Nueva pestaña añadida “Opciones” en el panel administrador."
-        },
-        {
-          "type": 1,
-          "text": "Nuevo sistema de opciones implementado."
-        },
-        {
-          "type": 1,
-          "text": "Función de ocultar administradores añadida."
-        },
-        {
-          "type": 1,
-          "text": "Funciones adicionales añadidas."
-        },
-        {
-          "type": 2,
-          "text": "Solución de errores generales."
-        },
-        {
-          "type": 0,
-          "text": "Respuestas al servidor optimizadas."
-        },
-        {
-          "type": 0,
-          "text": "Inteligencia del servidor actualizada."
-        },
-        {
-          "type": 1,
-          "text": "Sistema de optimización de imágenes finalizada (servidor)."
-        },
-        {
-          "type": 0,
-          "text": "Filtro de datos de entrenamientos cambiado (por fecha)."
-        },
-        {
-          "type": 0,
-          "text": "Filtro de datos de comentarios cambiado (por fecha de entrenamiento)."
-        }
-      ]
-    },
-    {
-      "version": "1.5.0",
-      "date": "29/05/2022",
-      "changes": [
-        {
-          "type": 2,
-          "text": "Corrección de errores."
-        },
-        {
-          "type": 2,
-          "text": "Corrección de errores de interfaz."
-        },
-        {
-          "type": 0,
-          "text": "Se cambio el sistema de estadísticas (por ejercicio)."
-        },
-        {
-          "type": 0,
-          "text": "Se cambio el sistema de cálculos de la vista “detalles”."
-        },
-        {
-          "type": 1,
-          "text": "Se añadió nuevos elementos en la sección clientes."
-        },
-        {
-          "type": 1,
-          "text": "Se añadió un sistema de notificaciones."
-        },
-        {
-          "type": 0,
-          "text": "Se actualizo la lista de iconos."
-        },
-        {
-          "type": 1,
-          "text": "Nuevos componentes."
-        },
-        {
-          "type": 0,
-          "text": "Actualización de la interfaz de usuario."
-        },
-        {
-          "type": 0,
-          "text": "Actualización de la experiencia de usuario."
-        }
-      ]
-    },
-    {
-      "version": "1.4.1",
-      "date": "21/05/2022",
-      "changes": [
-        {
-          "type": 2,
-          "text": "Solucion de error de conexion."
-        }
-      ]
-    },
-    {
-      "version": "1.4.0",
-      "date": "21/05/2022",
-      "changes": [
-        {
-          "type": 2,
-          "text": "Corrección de errores."
-        },
-        {
-          "type": 2,
-          "text": "Corrección de errores de interfaz."
-        },
-        {
-          "type": 1,
-          "text": "Nuevos componentes."
-        },
-        {
-          "type": 0,
-          "text": "Actualización de componentes."
-        },
-        {
-          "type": 1,
-          "text": "Nueva ventana de información en el menú de opciones."
-        },
-        {
-          "type": 1,
-          "text": "Nuevo cartel de dialogo para actualizar la aplicación."
-        },
-        {
-          "type": 1,
-          "text": "Nueva función para administradores: “Editar ejercicios (Beta)”."
-        },
-        {
-          "type": 1,
-          "text": "Nueva función para administradores: “Filtrar administradores”."
-        },
-        {
-          "type": 1,
-          "text": "Nueva función para administradores: “Ver cantidad de ejercicios de los usuarios”."
-        },
-        {
-          "type": 1,
-          "text": "Nueva función para administradores: “Nueva barra de opciones en el menú plegable”."
-        }
-      ]
-    },
-    {
-      "version": "1.3.0",
-      "date": "17/05/2022",
-      "changes": [
-        {
-          "type": 2,
-          "text": "Corrección de errores."
-        },
-        {
-          "type": 2,
-          "text": "Correcciones de la interfaz administrador."
-        },
-        {
-          "type": 0,
-          "text": "Cambios en el menú de opciones."
-        },
-        {
-          "type": 1,
-          "text": "Nuevos componentes."
-        },
-        {
-          "type": 1,
-          "text": "Nuevo apartado de cambios."
-        }
-      ]
-    },
-    {
-      "version": "1.2.0",
-      "date": "16/05/2022",
-      "changes": [
-        {
-          "type": 2,
-          "text": "Corrección de errores."
-        },
-        {
-          "type": 0,
-          "text": "Correcciones de la interfaz."
-        },
-        {
-          "type": 0,
-          "text": "Adaptación del diseño para pantallas pequeñas."
-        }
-      ]
-    },
-    {
-      "version": "1.1.0",
-      "date": "14/05/2022",
-      "changes": [
-        {
-          "type": 0,
-          "text": "Mejoras de rendimiento."
-        },
-        {
-          "type": 2,
-          "text": "Resolución de varios errores."
-        },
-        {
-          "type": 1,
-          "text": "Nuevos apartados y ventanas."
-        },
-        {
-          "type": 3,
-          "text": "En progreso muchas funciones."
-        }
-      ]
-    },
-    {
-      "version": "1.0.0",
-      "date": "26/04/2022",
-      "changes": [
-        {
-          "type": 3,
-          "text": "Bienvenidos al nuevo lanzamiento de nuestra aplicación."
-        }
-      ]
-    }
+  {
+    "version": "3.0.0-beta0",
+    "date": "10/04/2023",
+    "changes": [
+      {
+        "type": 0,
+        "text": "Se aplico el diseño Material You (Material Design 3)."
+      },
+      {
+        "type": 0,
+        "text": "Se remplazo el tema de la aplicación (MD2 -> MD3)."
+      },
+      {
+        "type": 0,
+        "text": "Se actualizaron todos los componentes de la aplicación para adaptarse al nuevo diseño de Material You."
+      },
+      {
+        "type": 1,
+        "text": "Se implemento un nuevo sistema de inmersión de la pantalla."
+      },
+      {
+        "type": 0,
+        "text": "Se quito el margen de soporte en pantalla."
+      },
+      {
+        "type": 1,
+        "text": "Se implemento un nuevo componente de ventanas."
+      },
+      {
+        "type": 0,
+        "text": "Se adapto la pantalla de bienvenida al nuevo diseño."
+      },
+      {
+        "type": 0,
+        "text": "Se rediseño la pantalla de carga."
+      },
+      {
+        "type": 0,
+        "text": "Se rediseño la pantalla principal del cliente."
+      },
+      {
+        "type": 0,
+        "text": "Se crearon y remplazaron varios componentes:\n\t- Tarjeta de título de ejercicio.\n\t- Tarjetas de rendimiento (RDS, RPE, Pulso, etc).\n\t- Selector de opciones."
+      },
+      {
+        "type": 2,
+        "text": "Se resolvieron varios problemas de optimización en la aplicación."
+      },
+      {
+        "type": 0,
+        "text": "Se recreo la ventana “Más detalles” de las estadísticas de la pantalla principal."
+      },
+      {
+        "type": 0,
+        "text": "Se recreo la ventana “Detalle de estadísticas” junto a su componente de graficos."
+      },
+      {
+        "type": 0,
+        "text": "Se adapto el diseño de las ventanas:\n\t- Editar datos (Clientes)."
+      },
+      {
+        "type": 0,
+        "text": "Se recreo por completo la ventana de lista de cambios."
+      },
+      {
+        "type": 0,
+        "text": "Se adapto el diseño de la ventana de información."
+      },
+      {
+        "type": 0,
+        "text": "Se remasterizo el icono de la aplicación."
+      },
+      {
+        "type": 0,
+        "text": "Se eliminaron viejos componentes:\nt- Controlador de carga (MD2).\nt- Ventana de dialogo (MD2).\nt- Mensaje emergente (MD2)."
+      },
+      {
+        "type": 0,
+        "text": "Se remplazo el controlador de componentes globales por una versión mejorada."
+      },
+      {
+        "type": 0,
+        "text": "Se rediseñaron y reprogramaron todas las pestañas del apartado administrador."
+      },
+      {
+        "type": 0,
+        "text": "Se rediseño y reprogramo la verra lateral del apartado administrador."
+      },
+      {
+        "type": 2,
+        "text": "Se optimizaron las pestañas y ventanas del apartado administrador."
+      },
+      {
+        "type": 2,
+        "text": "Se corrigieron errores en el motor de búsqueda de la venta “Buscar cliente”."
+      },
+      {
+        "type": 0,
+        "text": "En la pestaña “lista de ejercicios” se remplazo el ítem de “añadir ejercicio” por un botón flotante."
+      },
+      {
+        "type": 2,
+        "text": "Se corrigió un error de optimización en el filtrado de administradores en la ventana “Administradores”."
+      },
+      {
+        "type": 0,
+        "text": "Se actualizo el visor de imágenes por una versión adaptada al nuevo tema de la aplicación."
+      },
+      {
+        "type": 1,
+        "text": "Se quito por completo la ventana “Opciones” en el apartado clientes y se movieron sus opciones a la pestaña “Mi cuenta”."
+      }
+    ]
+  },
+  {
+    "version": "2.0.1",
+    "date": "28/02/2023",
+    "changes": [
+      {
+        "type": 2,
+        "text": "Se soluciono un problema de cálculo al mostrar los detalles de una actividad (Entrenador)."
+      },
+      {
+        "type": 1,
+        "text": "Se añadió el número de ejercicios a los títulos de las pestañas de ejercicios (Entrenador)."
+      },
+      {
+        "type": 0,
+        "text": "Se quito la edad de los entrenadores de las tarjetas de los comentarios."
+      },
+      {
+        "type": 2,
+        "text": "Se soluciono un problema al cargar la imagen de los usuarios al abrir la vista de más detalles (Entrenador)."
+      },
+      {
+        "type": 3,
+        "text": "Se quitaron partes innecesarias del código fuente de la aplicación para aligerar el consumo de rendimiento."
+      }
+    ]
+  },
+  {
+    "version": "2.0.0",
+    "date": "17/02/2023",
+    "changes": [
+      {
+        "type": 3,
+        "text": "Se actualizaron varias librerías que integra el proyecto."
+      },
+      {
+        "type": 2,
+        "text": "Se soluciono un problema con la experiencia del teclado en la pantalla de inicio de sesión."
+      },
+      {
+        "type": 0,
+        "text": "Se optimizo el rendimiento de los componentes."
+      },
+      {
+        "type": 2,
+        "text": "Se soluciono varios problemas que afectaban a la velocidad de fotogramas."
+      },
+      {
+        "type": 1,
+        "text": "Se añadió la ventana de “Editar perfil” en el apartado del entrenador."
+      },
+      {
+        "type": 0,
+        "text": "Se reprogramo la primera pestaña del apartado del entrenador."
+      },
+      {
+        "type": 1,
+        "text": "Se creo una nueva función dentro de la API del servidor y de la app para modificar los datos de los usuarios con una cuenta de administrador."
+      },
+      {
+        "type": 1,
+        "text": "Se implemento la función de refrescar los datos una vez terminado el proceso de edición de los mismos."
+      },
+      {
+        "type": 2,
+        "text": "Se corrigieron varios errores."
+      },
+      {
+        "type": 0,
+        "text": "Se optimizo la ventana de “Ver detalles del usuario”."
+      },
+      {
+        "type": 0,
+        "text": "Se optimizo la ventana “Ver rendimiento”."
+      },
+      {
+        "type": 0,
+        "text": "Se optimizo los componentes de la ventana “Ver rendimiento”."
+      },
+      {
+        "type": 2,
+        "text": "Se corrigió un problema que hacía que las tarjetas actuaran como botones."
+      },
+      {
+        "type": 0,
+        "text": "Se modifico la ventana “Ver rendimiento” para que filtre los ejercicios por pestañas."
+      },
+      {
+        "type": 2,
+        "text": "Se corrigió el rendimiento del visor de imágenes."
+      },
+      {
+        "type": 2,
+        "text": "Se corrigió el rendimiento de la ventana “Ver todos los comentarios”."
+      },
+      {
+        "type": 0,
+        "text": "Se recreo la entrada de texto flotante para dejar comentarios."
+      },
+      {
+        "type": 2,
+        "text": "Se corrigió un error de experiencia en el listado de clientes en el apartado “Entrenadores”."
+      },
+      {
+        "type": 0,
+        "text": "Se remplazo el botón de “Añadir nuevo usuario” por un botón flotante."
+      },
+      {
+        "type": 2,
+        "text": "Se corrigió el rendimiento de la ventana “Añadir nuevo usuario”."
+      },
+      {
+        "type": 0,
+        "text": "Se recreo y rediseño la función de borrado de usuarios."
+      },
+      {
+        "type": 0,
+        "text": "Se modifico la API para que calcule por ejercicios en la ventana de “Ver rendimiento”."
+      },
+      {
+        "type": 0,
+        "text": "Se reprogramo la ventana de “Buscar cliente” para adaptarse al nuevo entorno."
+      },
+      {
+        "type": 0,
+        "text": "Se adapto la ventana de “Cargar entrenamiento” al nuevo entorno."
+      },
+      {
+        "type": 0,
+        "text": "Se recreo la ventana de “Seleccionar cliente” y se solucionaron los problemas de rendimiento de esta."
+      },
+      {
+        "type": 2,
+        "text": "Se soluciono un problema de rendimiento al renderizar la ventana “Cargar entrenamiento” al abrirse."
+      },
+      {
+        "type": 1,
+        "text": "Se añadió un margen inferior a la lista de la pestaña “Lista de ejercicios”."
+      },
+      {
+        "type": 0,
+        "text": "Se suavizo el cambio de pestañas en el apartado “Cliente”."
+      },
+      {
+        "type": 0,
+        "text": "Se optimizo mínimamente la pestaña “Mi cuenta”."
+      },
+      {
+        "type": 2,
+        "text": "Se corrigió el icono de confirmación al editar los datos de la cuenta como cliente."
+      },
+      {
+        "type": 2,
+        "text": "Se corrigieron varios errores de rendimiento en la pantalla de carga:\n\t- El fondo fue remplazado por un objeto (Antes era una imagen).\n\t- El logo se remplazó por una imagen WEBP (Antes era un SVG con imágenes PNG).\n\t- Se disminuyo el tiempo de carga de los mismos componentes."
+      },
+      {
+        "type": 0,
+        "text": "Se removieron 5 librerías en desuso que ocupaban espacio de almacenamiento."
+      },
+      {
+        "type": 0,
+        "text": "Se removieron, optimizaron y remplazaron varios activos del código fuente."
+      },
+      {
+        "type": 2,
+        "text": "Se corrigieron varios errores de diseño en la pantalla de carga."
+      },
+      {
+        "type": 0,
+        "text": "Se actualizo el componente de ventanas."
+      },
+      {
+        "type": 0,
+        "text": "Se remplazo la pantalla de inicio por una moderna."
+      },
+      {
+        "type": 0,
+        "text": "Se cambio el estilo de la barra de estado y navegación de la pantalla de inicio."
+      },
+      {
+        "type": 1,
+        "text": "Se añadió una animación de entrada en la pantalla de inicio."
+      },
+      {
+        "type": 1,
+        "text": "Se cambio la función de inicialización para que se ejecute luego de terminar la animación de la pantalla de inicio."
+      },
+      {
+        "type": 0,
+        "text": "Se ha reducido el peso de la aplicación considerablemente."
+      }
+    ]
+  },
+  {
+    "version": "1.7.0",
+    "date": "03/07/2022",
+    "changes": [
+      {
+        "type": 0,
+        "text": "Actualización del sistema de archivos del servidor."
+      },
+      {
+        "type": 1,
+        "text": "Nuevo sistema de optimización de imágenes."
+      },
+      {
+        "type": 1,
+        "text": "Opción de ocultar desarrollador añadida en el panel de administrador."
+      },
+      {
+        "type": 1,
+        "text": "Ver foto de perfil de los clientes en el panel de administrador."
+      },
+      {
+        "type": 0,
+        "text": "Actualización de librerías."
+      },
+      {
+        "type": 0,
+        "text": "Actualización del núcleo de la plataforma."
+      },
+      {
+        "type": 0,
+        "text": "Optimización de la API."
+      },
+      {
+        "type": 0,
+        "text": "Optimización de componentes."
+      },
+      {
+        "type": 0,
+        "text": "Optimización de la plataforma."
+      },
+      {
+        "type": 0,
+        "text": "Optimización de la arquitectura."
+      }
+    ]
+  },
+  {
+    "version": "1.6.0",
+    "date": "13/06/2022",
+    "changes": [
+      {
+        "type": 1,
+        "text": "Optimización de imágenes del fondo y perfil por defecto."
+      },
+      {
+        "type": 0,
+        "text": "Rediseño de la pantalla de carga."
+      },
+      {
+        "type": 1,
+        "text": "Solución del color de fondo en la pantalla de inicio de sesión."
+      },
+      {
+        "type": 1,
+        "text": "Nuevo componente nativo añadido “selector de fecha”."
+      },
+      {
+        "type": 2,
+        "text": "Solución de pantalla de carga infinita."
+      },
+      {
+        "type": 0,
+        "text": "Rediseño de componentes del cliente."
+      },
+      {
+        "type": 1,
+        "text": "Optimización de variables."
+      },
+      {
+        "type": 0,
+        "text": "Eliminación de pestañas “en trabajo”."
+      },
+      {
+        "type": 1,
+        "text": "Pestaña añadida “Mi cuenta”."
+      },
+      {
+        "type": 1,
+        "text": "Ventana “Opciones” movida y editada."
+      },
+      {
+        "type": 1,
+        "text": "Nueva ventana “Editar datos”."
+      },
+      {
+        "type": 1,
+        "text": "Nuevo visor de imágenes añadido."
+      },
+      {
+        "type": 2,
+        "text": "Solución de un error ocasionado al cerrar sesión."
+      },
+      {
+        "type": 0,
+        "text": "Rediseño de componentes del administrador."
+      },
+      {
+        "type": 1,
+        "text": "Edición del pie del panel de administrador."
+      },
+      {
+        "type": 1,
+        "text": "Nuevo diseño de ventanas flotantes."
+      },
+      {
+        "type": 1,
+        "text": "Nuevas animaciones de ventanas."
+      },
+      {
+        "type": 0,
+        "text": "Experiencia de usuario mejorada."
+      },
+      {
+        "type": 2,
+        "text": "Solución al verificar datos al cargar entrenamientos."
+      },
+      {
+        "type": 1,
+        "text": "Nueva ventana añadida “Selección de cliente”."
+      },
+      {
+        "type": 1,
+        "text": "Opción de búsqueda al cargar entrenamientos añadida."
+      },
+      {
+        "type": 0,
+        "text": "Finalización de la prueba beta de “Editar ejercicio”."
+      },
+      {
+        "type": 1,
+        "text": "Nueva pestaña añadida “Opciones” en el panel administrador."
+      },
+      {
+        "type": 1,
+        "text": "Nuevo sistema de opciones implementado."
+      },
+      {
+        "type": 1,
+        "text": "Función de ocultar administradores añadida."
+      },
+      {
+        "type": 1,
+        "text": "Funciones adicionales añadidas."
+      },
+      {
+        "type": 2,
+        "text": "Solución de errores generales."
+      },
+      {
+        "type": 0,
+        "text": "Respuestas al servidor optimizadas."
+      },
+      {
+        "type": 0,
+        "text": "Inteligencia del servidor actualizada."
+      },
+      {
+        "type": 1,
+        "text": "Sistema de optimización de imágenes finalizada (servidor)."
+      },
+      {
+        "type": 0,
+        "text": "Filtro de datos de entrenamientos cambiado (por fecha)."
+      },
+      {
+        "type": 0,
+        "text": "Filtro de datos de comentarios cambiado (por fecha de entrenamiento)."
+      }
+    ]
+  },
+  {
+    "version": "1.5.0",
+    "date": "29/05/2022",
+    "changes": [
+      {
+        "type": 2,
+        "text": "Corrección de errores."
+      },
+      {
+        "type": 2,
+        "text": "Corrección de errores de interfaz."
+      },
+      {
+        "type": 0,
+        "text": "Se cambio el sistema de estadísticas (por ejercicio)."
+      },
+      {
+        "type": 0,
+        "text": "Se cambio el sistema de cálculos de la vista “detalles”."
+      },
+      {
+        "type": 1,
+        "text": "Se añadió nuevos elementos en la sección clientes."
+      },
+      {
+        "type": 1,
+        "text": "Se añadió un sistema de notificaciones."
+      },
+      {
+        "type": 0,
+        "text": "Se actualizo la lista de iconos."
+      },
+      {
+        "type": 1,
+        "text": "Nuevos componentes."
+      },
+      {
+        "type": 0,
+        "text": "Actualización de la interfaz de usuario."
+      },
+      {
+        "type": 0,
+        "text": "Actualización de la experiencia de usuario."
+      }
+    ]
+  },
+  {
+    "version": "1.4.1",
+    "date": "21/05/2022",
+    "changes": [
+      {
+        "type": 2,
+        "text": "Solucion de error de conexion."
+      }
+    ]
+  },
+  {
+    "version": "1.4.0",
+    "date": "21/05/2022",
+    "changes": [
+      {
+        "type": 2,
+        "text": "Corrección de errores."
+      },
+      {
+        "type": 2,
+        "text": "Corrección de errores de interfaz."
+      },
+      {
+        "type": 1,
+        "text": "Nuevos componentes."
+      },
+      {
+        "type": 0,
+        "text": "Actualización de componentes."
+      },
+      {
+        "type": 1,
+        "text": "Nueva ventana de información en el menú de opciones."
+      },
+      {
+        "type": 1,
+        "text": "Nuevo cartel de dialogo para actualizar la aplicación."
+      },
+      {
+        "type": 1,
+        "text": "Nueva función para administradores: “Editar ejercicios (Beta)”."
+      },
+      {
+        "type": 1,
+        "text": "Nueva función para administradores: “Filtrar administradores”."
+      },
+      {
+        "type": 1,
+        "text": "Nueva función para administradores: “Ver cantidad de ejercicios de los usuarios”."
+      },
+      {
+        "type": 1,
+        "text": "Nueva función para administradores: “Nueva barra de opciones en el menú plegable”."
+      }
+    ]
+  },
+  {
+    "version": "1.3.0",
+    "date": "17/05/2022",
+    "changes": [
+      {
+        "type": 2,
+        "text": "Corrección de errores."
+      },
+      {
+        "type": 2,
+        "text": "Correcciones de la interfaz administrador."
+      },
+      {
+        "type": 0,
+        "text": "Cambios en el menú de opciones."
+      },
+      {
+        "type": 1,
+        "text": "Nuevos componentes."
+      },
+      {
+        "type": 1,
+        "text": "Nuevo apartado de cambios."
+      }
+    ]
+  },
+  {
+    "version": "1.2.0",
+    "date": "16/05/2022",
+    "changes": [
+      {
+        "type": 2,
+        "text": "Corrección de errores."
+      },
+      {
+        "type": 0,
+        "text": "Correcciones de la interfaz."
+      },
+      {
+        "type": 0,
+        "text": "Adaptación del diseño para pantallas pequeñas."
+      }
+    ]
+  },
+  {
+    "version": "1.1.0",
+    "date": "14/05/2022",
+    "changes": [
+      {
+        "type": 0,
+        "text": "Mejoras de rendimiento."
+      },
+      {
+        "type": 2,
+        "text": "Resolución de varios errores."
+      },
+      {
+        "type": 1,
+        "text": "Nuevos apartados y ventanas."
+      },
+      {
+        "type": 3,
+        "text": "En progreso muchas funciones."
+      }
+    ]
+  },
+  {
+    "version": "1.0.0",
+    "date": "26/04/2022",
+    "changes": [
+      {
+        "type": 3,
+        "text": "Bienvenidos al nuevo lanzamiento de nuestra aplicación."
+      }
+    ]
+  }
 ]

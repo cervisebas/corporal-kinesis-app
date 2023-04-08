@@ -1,12 +1,11 @@
-import React, { PureComponent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DeviceEventEmitter, EmitterSubscription, StyleSheet, View } from "react-native";
 import { BottomNavigation, FAB } from "react-native-paper";
 import { Permission } from "../scripts/ApiCorporal";
-import Options from "./pages/pages/options";
 import { LoadNow } from "../scripts/Global";
 import { Tab1 } from "./pages/Tab1";
-import { Tab2 } from "./pages/Tab2";
-import { refEditAccount, refOptions, refStatistic, refViewModeDetails } from "./clientRefs";
+import Tab2 from "./pages/Tab2";
+import { refEditAccount, refStatistic, refViewModeDetails } from "./clientRefs";
 import Statistic from "./pages/statistics/statistic";
 import ViewModeDetails from "./pages/pages/viewMoreDetails";
 import EditAccount from "./pages/pages/editAccount";
@@ -33,7 +32,7 @@ export default React.memo(function Client(props: IProps) {
             case 'statistics':
                 return(<Tab1 />);
             case 'account':
-                return(<Tab2 />);
+                return(<Tab2 focused={index == 1} />);
         }
     };
     function verifyAdmin() {
@@ -77,36 +76,9 @@ export default React.memo(function Client(props: IProps) {
         />
         <Statistic ref={refStatistic} />
         <ViewModeDetails ref={refViewModeDetails} />
-        <Options ref={refOptions} />
         <EditAccount ref={refEditAccount} />
     </View>);
 });
-
-type IProps2 = {
-    showLoading: (view: boolean, text: string)=>any;
-};
-type IState2 = { visible: boolean; };
-class OthersComponents extends PureComponent<IProps2, IState2> {
-    constructor(props: IProps2) {
-        super(props);
-        this.state = {
-            visible: false
-        };
-        this.open = this.open.bind(this);
-        this.close = this.close.bind(this);
-    }
-    open() { this.setState({ visible: true }); }
-    close() { this.setState({ visible: false }); }
-    render(): React.ReactNode {
-        return(<>
-            <Options
-                /*show={this.state.visible}
-                close={this.close}
-                showLoading={this.props.showLoading}*/
-            />
-        </>);
-    }
-}
 
 const styles = StyleSheet.create({
     fab: {

@@ -1,67 +1,37 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { decode } from "base-64";
-import React, { Component } from "react";
-import { DeviceEventEmitter, Dimensions, EmitterSubscription, ToastAndroid, TouchableHighlight, View } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import { DeviceEventEmitter, Dimensions, EmitterSubscription, ScrollView, StyleSheet, ToastAndroid, TouchableHighlight, View } from "react-native";
 import FastImage, { Source } from "react-native-fast-image";
 import { ActivityIndicator, Appbar, Divider, Text } from "react-native-paper";
 import { Account, HostServer } from "../../scripts/ApiCorporal";
 import { storageData } from '../../scripts/ApiCorporal/types';
-import { LoadNow } from "../../scripts/Global";
 import { CardButton1 } from "../components/Components";
 import ImageProfile from "../../assets/profile.webp";
 import { ThemeContext } from "../../providers/ThemeProvider";
 import { GlobalRef } from "../../GlobalRef";
-import { refEditAccount, refOptions } from "../clientRefs";
+import { refEditAccount } from "../clientRefs";
+import { refChangeLog, refInformation } from "../../ExtraContentsRefs";
+import DeviceInfo from "react-native-device-info";
 
-type IProps = {};
-type IState = {
-    viewImage: number | Source;
-    viewName: string;
-    viewSurname: string;
-    isLoading: boolean;
-};
+var event: EmitterSubscription | undefined = undefined;
+export default React.memo(function Tab2(props: { focused: boolean; }) {
+    // Context's
+    const { theme } = useContext(ThemeContext);
+    // State's
+    const [viewImage, setViewImage] = useState<Source | number>(ImageProfile);
+    const [viewName, setViewName] = useState<string>('Cargando...');
+    const [viewSurname, setViewSurname] = useState<string>('-');
+    const [loading, setLoading] = useState(true);
+    // Variables
+    const { width } = Dimensions.get('window');
 
-const { width } = Dimensions.get('window');
-
-export class Tab2 extends Component<IProps, IState> {
-    constructor(props: IProps) {
-        super(props);
-        this.state = {
-            viewName: 'Cargando...',
-            viewSurname: '-',
-            viewImage: ImageProfile,
-            isLoading: false
-        };
-        this.openEditAccount = this.openEditAccount.bind(this);
-        this.loadData = this.loadData.bind(this);
+    function openImage() {
+        if (loading) return ToastAndroid.show('Espere por favor...', ToastAndroid.SHORT);
+        if (typeof viewImage == 'number') return ToastAndroid.show('No se puede abrir...', ToastAndroid.SHORT);
+        GlobalRef.current?.showImageViewer(viewImage.uri!);
     }
-    private event: EmitterSubscription | null = null;
-    static contextType = ThemeContext;
-    loadData() {
-        AsyncStorage.getItem('account_session').then((value)=>{
-            if (!value) return this.setState({ viewName: 'Error!!!' });
-            var datas: storageData = JSON.parse(decode(String(value)));
-            this.setState({
-                viewImage: { uri: `${HostServer}/images/accounts/${decode(datas.image)}` },
-                viewName: decode(datas.name),
-                viewSurname: decode(datas.email),
-                isLoading: true
-            });
-        });
-    }
-    componentDidMount() {
-        if (LoadNow && !this.state.isLoading) setTimeout(this.loadData, 500);
-        this.event = DeviceEventEmitter.addListener('tab2reload', ()=>this.setState({ isLoading: false }, this.loadData));
-    }
-    componentWillUnmount() {
-        this.event?.remove();
-    }
-    openImage() {
-        if (!this.state.isLoading) return ToastAndroid.show('Espere por favor...', ToastAndroid.SHORT);
-        if (typeof this.state.viewImage == 'number') return ToastAndroid.show('No se puede abrir...', ToastAndroid.SHORT);
-        GlobalRef.current?.showImageViewer(this.state.viewImage.uri!);
-    }
-    openEditAccount() {
+    function openEditAccount() {
         GlobalRef.current?.loadingController(true, 'Cargando información...');
         Account.getInfo().then((value)=>{
             if (value) refEditAccount.current?.open(value);
@@ -71,40 +41,91 @@ export class Tab2 extends Component<IProps, IState> {
             GlobalRef.current?.loadingController(false);
         });
     }
-    openOptions() { refOptions.current?.open(); }
-    render(): React.ReactNode {
-        const { theme } = this.context;
-        return(<View style={{ flex: 1 }}>
-            <Appbar.Header style={{ backgroundColor: theme.colors.background }}>
-                <Appbar.Content title={"Mi cuenta"} />
-                <Appbar.Action icon={'cog'} onPress={this.openOptions} />
-            </Appbar.Header>
-            <View style={{ flex: 2 }}>
-                <View style={{ width: '100%', height: 120, marginTop: 8, flexDirection: 'row' }}>
-                    <TouchableHighlight underlayColor={'#FFFFFF'} activeOpacity={0.8} onPress={()=>this.openImage()} style={{ margin: 10, height: 100, width: 100, position: 'relative', borderRadius: 10, overflow: 'hidden' }}>
-                        <View>
-                            <FastImage
-                                source={this.state.viewImage}
-                                style={{
-                                    width: '100%',
-                                    height: '100%'
-                                }}
-                            />
-                            {(!this.state.isLoading)&&<View style={{ position: 'absolute', width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, .5)', alignItems: 'center', justifyContent: 'center' }}>
-                                <ActivityIndicator animating size={'small'} />
-                            </View>}
-                        </View>
-                    </TouchableHighlight>
-                    <View style={{ height: '100%', width: (width - 120), justifyContent: 'center', flexDirection: 'column' }}>
-                        <Text numberOfLines={1} style={{ fontSize: 18 }}>{this.state.viewName}</Text>
-                        <Text numberOfLines={1} style={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.6)', marginLeft: 10, marginTop: 4 }}>{this.state.viewSurname}</Text>
+    function loadData(re?: boolean) {
+        if (re !== true) setLoading(true);
+        AsyncStorage.getItem('account_session').then((value)=>{
+            if (!value) return setViewName('Error!!!');
+            var datas: storageData = JSON.parse(decode(String(value)));
+            setViewImage({ uri: `${HostServer}/images/accounts/${decode(datas.image)}` });
+            setViewName(decode(datas.name));
+            setViewSurname(decode(datas.email));
+            setLoading(false);
+        });
+    }
+    function logout() {
+        GlobalRef.current?.loadingController(true, 'Cerrando sesión...');
+        AsyncStorage.removeItem('account_session').then(()=>setTimeout(()=>{
+            DeviceEventEmitter.emit('nowVerify');
+            DeviceEventEmitter.emit('goToHome');
+            GlobalRef.current?.loadingController(false);
+        }, 1200));
+    }
+    function _onLogout() { GlobalRef.current?.showDoubleAlert('¿Estás seguro que quieres cerrar sesión?', '', logout); }
+    function _openChangeLog() { refChangeLog.current?.open(); }
+    function _openInformation() { refInformation.current?.open(); }
+
+    useEffect(()=>{ loadData(true); }, [props.focused]);
+    useEffect(()=>{
+        event = DeviceEventEmitter.addListener('tab2reload', loadData);
+        loadData();
+        return ()=>{
+            event?.remove();
+        };
+    }, []);
+
+    return(<View style={{ flex: 1 }}>
+        <Appbar.Header style={{ backgroundColor: theme.colors.background }}>
+            <Appbar.Content title={"Mi cuenta"} />
+        </Appbar.Header>
+        <View style={{ flex: 1 }}>
+            <View style={styles.contentProfile}>
+                <TouchableHighlight underlayColor={'#FFFFFF'} activeOpacity={0.8} onPress={openImage} style={styles.touchableImage}>
+                    <View style={{ flex: 1 }}>
+                        <FastImage source={viewImage} style={{ width: '100%', height: '100%' }} />
+                        {(loading)&&<View style={styles.loadingContent}>
+                            <ActivityIndicator animating size={'large'} />
+                        </View>}
                     </View>
-                </View>
-                <Divider />
-                <View>
-                    <CardButton1 title={'EDITAR DATOS'} icon={'pencil-outline'} onPress={()=>this.openEditAccount()} />
+                </TouchableHighlight>
+                <View style={{ height: '100%', width: (width - 120), justifyContent: 'center', flexDirection: 'column' }}>
+                    <Text numberOfLines={1} style={{ fontSize: 18 }}>{viewName}</Text>
+                    <Text numberOfLines={1} style={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.6)', marginLeft: 10, marginTop: 4 }}>{viewSurname}</Text>
                 </View>
             </View>
-        </View>);
+            <Divider />
+            <ScrollView contentContainerStyle={{ paddingBottom: 16 }}>
+                <CardButton1 title={'EDITAR DATOS'} icon={'pencil-outline'} onPress={openEditAccount} />
+                <CardButton1 title={'VER LISTA DE CAMBIOS'} icon={'note-text-outline'} onPress={_openChangeLog} />
+                <CardButton1 title={'INFORMACION'} icon={'information-outline'} onPress={_openInformation} />
+                <CardButton1 title={'CERRAR SESIÓN'} icon={'logout'} color="red" onPress={_onLogout} />
+                <Text style={{ width: '100%', textAlign: 'center', marginTop: 32 }}>Version {DeviceInfo.getVersion()}</Text>
+            </ScrollView>
+        </View>
+    </View>);
+});
+
+const styles = StyleSheet.create({
+    contentProfile: {
+        width: '100%',
+        height: 120,
+        marginTop: 8,
+        flexDirection: 'row'
+    },
+    touchableImage: {
+        margin: 10,
+        height: 100,
+        width: 100,
+        position: 'relative',
+        borderRadius: 10,
+        overflow: 'hidden',
+        backgroundColor: '#000000'
+    },
+    loadingContent: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, .5)',
+        alignItems: 'center',
+        justifyContent: 'center'
     }
-}
+});

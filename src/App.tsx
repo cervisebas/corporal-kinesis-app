@@ -61,7 +61,6 @@ export default React.memo(function App() {
                 ChangeLogSystem.getVerify().then(async(value)=>{
                     if (!value) return;
                     ChangeLogSystem.setNewVersion();
-                    await waitTo(1500);
                     refChangeLog.current?.open();
                 });
             }, 2500);
@@ -107,7 +106,6 @@ export default React.memo(function App() {
     SystemNavigationBar.setNavigationColor(navColor, navStyle);
     StatusBar.setBackgroundColor(statusColor, false);
     StatusBar.setBarStyle(statusStyle, false);
-    //console.log(navColor, navStyle, statusColor, statusStyle);
     /* ######################################################### */
 
     return(<View style={{ flex: 1, position: 'relative', backgroundColor: theme.colors.background }}>

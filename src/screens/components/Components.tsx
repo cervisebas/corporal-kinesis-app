@@ -144,23 +144,6 @@ class CustomShowError extends PureComponent<IProps7> {
     }
 }
 
-type IProps8 = { title: string; subtitle: string; type: string; image: string; onPress: ()=>any; };
-class CustomItemList3 extends PureComponent<IProps8> {
-    constructor(props: IProps8) {
-        super(props);
-    }
-    render(): React.ReactNode {
-        return(<List.Item
-            title={this.props.title}
-            description={this.props.subtitle}
-            onPress={()=>this.props.onPress()}
-            style={{ height: 72 }}
-            left={(props)=><Avatar.Image {...props} size={56} source={(!this.props.image)? require('../../assets/profile.webp'): { uri: `${HostServer}/images/accounts/${decode(this.props.image)}` }} />}
-            right={(props)=><List.Icon {...props} icon={(this.props.type == '0')? 'account-outline': 'shield-crown-outline'} />}
-        />);
-    }
-}
-
 type IProps9 = {
     accountName: string;
     date: string;
@@ -304,7 +287,6 @@ export {
     CustomItemList,
     CustomItemList2,
     CustomShowError,
-    CustomItemList3,
     CustomCardComments2,
     CustomItemList4,
     CustomCard5,

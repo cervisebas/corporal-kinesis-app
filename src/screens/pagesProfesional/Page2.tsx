@@ -1,93 +1,65 @@
 import { decode } from "base-64";
-import React, { PureComponent } from "react";
-import { Component, ReactNode } from "react";
-import { DeviceEventEmitter, EmitterSubscription, FlatList, RefreshControl, ToastAndroid, View } from "react-native";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { DeviceEventEmitter, EmitterSubscription, FlatList, ListRenderItemInfo, RefreshControl, View } from "react-native";
 import { ActivityIndicator, Appbar, Divider } from "react-native-paper";
 import { Options, Permission } from "../../scripts/ApiCorporal";
 import { permissionItem } from "../../scripts/ApiCorporal/types";
-import { Global } from "../../scripts/Global";
-import CombinedTheme from "../../Theme";
-import { CustomItemList3, CustomShowError } from "../components/Components";
+import { CustomShowError } from "../components/Components";
 import ChangePermissionsUser from "./pages/changePermissionsUser";
+import { ThemeContext } from "../../providers/ThemeProvider";
+import { waitTo } from "../../scripts/Utils";
+import CustomItemList3 from "../components/CustomItemList3";
 
 type IProps = {
     navigation: any;
     route: any;
 };
-type IState = {
-    userList: permissionItem[];
-    isLoading: boolean;
-    isError: boolean;
-    messageError: string;
-    refreshing: boolean;
 
-    viewChangePermission: boolean;
-    dataChangePermission: {
-        id: string;
-        name: string;
-        image: string;
-        birthday: string;
-        actualStatus: string;
-    } | undefined;
-
-    loadingView: boolean;
-    loadingText: string;
-
-    oldList: permissionItem[];
-    isFilter: boolean;
+type DataChangePermission = {
+    id: string;
+    name: string;
+    image: string;
+    birthday: string;
+    actualStatus: string;
 };
 
+var event: EmitterSubscription | undefined = undefined;
 export default React.memo(function Page2(props: IProps) {
-    return(<></>);
-});
+    // Context's
+    const { theme } = useContext(ThemeContext);
+    // State's
+    const [userList, setUserList] = useState<permissionItem[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isError, setIsError] = useState(false);
+    const [messageError, setMessageError] = useState('');
+    const [refreshing, setRefreshing] = useState(false);
+    const [oldList, setOldList] = useState<permissionItem[]>([]);
+    const [isFilter, setIsFilter] = useState(false);
+    // Ref's
+    const refChangePermissionsUser = useRef<ChangePermissionsUser>(null);
 
-/*export default class Page2 extends Component<IProps, IState> {
-    constructor(props: IProps) {
-        super(props);
-        this.state = {
-            userList: [],
-            isLoading: true,
-            isError: false,
-            messageError: '',
-            refreshing: false,
-            viewChangePermission: false,
-            dataChangePermission: undefined,
-            loadingView: false,
-            loadingText: '',
-            oldList: [],
-            isFilter: false
-        };
+    function _loadData() {
+        setIsLoading(true);
+        setIsFilter(false);
+        setIsError(false);
+        Permission.getAll()
+            .then((list)=>{
+                setUserList(list);
+                setIsLoading(false);
+                Options.getAll().then((vals)=>{
+                    if (vals.activeFilters) _goFilter();
+                });
+                setRefreshing(false);
+            })
+            .catch((error)=>{
+                setIsLoading(false);
+                setIsError(true);
+                setMessageError(error.cause);
+                setRefreshing(false); 
+            });
     }
-    private event: EmitterSubscription | null = null;
-    componentWillUnmount() {
-        this.event?.remove();
-        this.event = null;
-        this.setState({
-            userList: [],
-            isLoading: true,
-            isError: false,
-            messageError: '',
-            refreshing: false,
-            dataChangePermission: undefined,
-            loadingText: '',
-            oldList: [],
-            isFilter: false
-        });
-    }
-    componentDidMount() {
-        this.loadData();
-        this.event = DeviceEventEmitter.addListener('adminPage2Reload', ()=>this.loadData());
-    }
-    loadData() {
-        this.setState({ userList: [], isLoading: true, isFilter: false, isError: false, messageError: '' }, ()=>{
-            Permission.getAll()
-                .then((list)=>this.setState({ userList: list, isLoading: false }, ()=>Options.getAll().then((vals)=>(vals.activeFilters)&&this.goFilter())))
-                .catch((error)=>this.setState({ userList: [], isLoading: false, isError: true, messageError: error.cause }));
-            if (this.state.refreshing) this.setState({ refreshing: false });
-        }); 
-    }
-    adminTag(type: string): string {
-        var tag: string = '';
+    function _adminTag(type: string): string {
+        let tag: string = '';
         switch (type) {
             case '0':
                 tag = 'Cliente';
@@ -107,76 +79,86 @@ export default React.memo(function Page2(props: IProps) {
         }
         return tag;
     }
-    goFilter() {
-        if (this.state.isLoading) return ToastAndroid.show('Espere...', ToastAndroid.SHORT);
-        if (this.state.isFilter) return this.setState({ userList: this.state.oldList }, ()=>this.setState({ oldList: [], isFilter: false }));
-        this.setState({ oldList: this.state.userList }, ()=>this.setState({ isLoading: true, userList: [] }, ()=>{
-            var newUserList: permissionItem[] = [];
-            this.state.oldList.forEach((element)=>(element.permission == '4')&&newUserList.push(element));
-            this.state.oldList.forEach((element)=>(element.permission == '3')&&newUserList.push(element));
-            this.state.oldList.forEach((element)=>(element.permission == '2')&&newUserList.push(element));
-            this.state.oldList.forEach((element)=>(element.permission == '1')&&newUserList.push(element));
-            this.state.oldList.forEach((element)=>(element.permission == '0')&&newUserList.push(element));
-            this.setState({ userList: newUserList, isFilter: true, isLoading: false });
-        }));
+    async function _goFilter() {
+        if (isFilter) {
+            setUserList(oldList);
+            setIsFilter(false);
+            return;
+        }
+        setOldList(userList.slice());
+        setIsLoading(true);
+        setUserList(userList.sort((a, b)=>(parseInt(b.permission) - parseInt(a.permission))));
+        await waitTo(1000);
+        setIsFilter(true);
+        setIsLoading(false);
+    }
+    function openDetails(data: DataChangePermission) {
+        refChangePermissionsUser.current?.open(data);
     }
 
-    _getItemLayout(_i: any, index: number) { return { length: 72, offset: 72 * index, index }; }
-    _keyExtractor(item: permissionItem, _i: number) { return `p2-admin-${item.id}`; }
-
-    render(): ReactNode {
-        return(<View style={{ flex: 1 }}>
-            <Appbar style={{ backgroundColor: '#1663AB', height: 56 }}>
-                <Appbar.Action icon="menu" onPress={()=>this.props.navigation.openDrawer()} />
-                <Appbar.Content title={'Administradores'}  />
-                <Appbar.Action icon={'account-filter-outline'} onPress={()=>this.goFilter()} />
-            </Appbar>
-            <View style={{ flex: 2, overflow: 'hidden' }}>
-                <FlatList
-                    data={this.state.userList}
-                    keyExtractor={this._keyExtractor}
-                    getItemLayout={this._getItemLayout}
-                    removeClippedSubviews={true}
-                    contentContainerStyle={{ flex: (this.state.isLoading || this.state.isError)? 3: undefined }}
-                    ItemSeparatorComponent={(props)=><Divider {...props} />}
-                    refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={this.state.refreshing} onRefresh={()=>this.setState({ refreshing: true }, ()=>this.loadData())} />}
-                    ListEmptyComponent={(this.state.isLoading)? <ShowLoading />: (this.state.isError)? <CustomShowError message={this.state.messageError} />: <></>}
-                    renderItem={({ item })=><CustomItemList3
-                        key={`p2-admin-${item.id}`}
-                        subtitle={this.adminTag(item.permission)}
-                        type={item.permission}
-                        image={item.accountData.image}
-                        title={decode(item.accountData.name)}
-                        onPress={()=>this.setState({
-                            viewChangePermission: true,
-                            dataChangePermission: {
-                                id: item.idUser,
-                                name: item.accountData.name,
-                                image: item.accountData.image,
-                                birthday: item.accountData.birthday,
-                                actualStatus: item.permission
-                            }
-                        })}
-                    />}
-                />
-                <Global loadingView={this.state.loadingView} loadingText={this.state.loadingText} />
-                <ChangePermissionsUser
-                    visible={this.state.viewChangePermission}
-                    infoUser={this.state.dataChangePermission}
-                    close={()=>this.setState({ viewChangePermission: false })}
-                    closeComplete={()=>setTimeout(()=>this.setState({ dataChangePermission: undefined }), 300)}
-                    showLoading={(visible, text, after)=>this.setState({ loadingView: visible, loadingText: text }, ()=>(after)&&after())}
-                />
-            </View>
-        </View>);
+    // FlatList
+    function _getItemLayout(_i: any, index: number) { return { length: 84, offset: 84 * index, index }; }
+    function _keyExtractor(item: permissionItem, _i: number) { return `p2-admin-${item.id}`; }
+    function _ItemSeparatorComponent(props: any) { return(<Divider {...props} />); }
+    function _renderItem({ item }: ListRenderItemInfo<permissionItem>) {
+        return(<CustomItemList3
+            key={`p2-admin-${item.id}`}
+            subtitle={_adminTag(item.permission)}
+            type={item.permission}
+            image={item.accountData.image}
+            title={decode(item.accountData.name)}
+            onPress={()=>openDetails({
+                id: item.idUser,
+                name: item.accountData.name,
+                image: item.accountData.image,
+                birthday: item.accountData.birthday,
+                actualStatus: item.permission
+            })}
+        />);
     }
-}*/
-
-class ShowLoading extends PureComponent {
-    constructor(props: any) { super(props); }
-    render(): React.ReactNode {
-        return(<View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}>
-            <ActivityIndicator size={'large'} color={CombinedTheme.colors.accent} />
-        </View>);
+    
+    function _refresh() {
+        setRefreshing(true);
+        _loadData();
     }
-}
+
+    useEffect(()=>{
+        event = DeviceEventEmitter.addListener('adminPage2Reload', _loadData);
+        _loadData();
+        return ()=>{
+            event?.remove();
+        };
+    }, []);
+
+    return(<View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+        <Appbar style={{ backgroundColor: theme.colors.background }}>
+            <Appbar.Action icon="menu" onPress={props.navigation.openDrawer} />
+            <Appbar.Content title={'Administradores'}  />
+            <Appbar.Action animated={true} icon={(isFilter)? 'filter-outline': 'account-filter-outline'} onPress={(!isLoading)? _goFilter: undefined} />
+        </Appbar>
+        <View style={{ flex: 2, overflow: 'hidden' }}>
+            <FlatList
+                data={userList}
+                keyExtractor={_keyExtractor}
+                getItemLayout={_getItemLayout}
+                contentContainerStyle={{ flex: (isLoading || isError)? 3: undefined }}
+                ItemSeparatorComponent={_ItemSeparatorComponent}
+                refreshControl={<RefreshControl
+                    colors={[theme.colors.primary]}
+                    progressBackgroundColor={theme.colors.elevation.level2}
+                    refreshing={refreshing} onRefresh={_refresh}
+                />}
+                ListEmptyComponent={(isLoading)? <ShowLoading />: (isError)? <CustomShowError message={messageError} />: undefined}
+                renderItem={_renderItem}
+            />
+        </View>
+        <ChangePermissionsUser ref={refChangePermissionsUser} />
+    </View>);
+});
+
+const ShowLoading = React.memo(function ShowLoading() {
+    const { theme } = useContext(ThemeContext);
+    return(<View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator size={'large'} color={theme.colors.primary} />
+    </View>);
+});

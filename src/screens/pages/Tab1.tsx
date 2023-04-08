@@ -2,11 +2,10 @@ import { encode } from "base-64";
 import moment from "moment";
 import React, { Component } from "react";
 import { View, EmitterSubscription, DeviceEventEmitter } from "react-native";
-import { Appbar, Snackbar, Text } from "react-native-paper";
+import { Appbar } from "react-native-paper";
 import { Comment, Training } from "../../scripts/ApiCorporal";
 import { commentsData, DetailsTrainings, statisticData2 } from "../../scripts/ApiCorporal/types";
 import { LoadNow } from "../../scripts/Global";
-import CombinedTheme from "../../Theme";
 import { ThemeContext } from "../../providers/ThemeProvider";
 import Tab1ListComments from "./elements/Tab1ListComments";
 import { refStatistic, refViewModeDetails } from "../clientRefs";
@@ -21,10 +20,6 @@ type IState = {
     titleStatistics: string;
     statistics2: statisticData2[];
     refreshing: boolean;
-
-    // Dialog Error
-    dialogShow: boolean;
-    messageDialog: string;
 
     // Comments
     commentsLoading: boolean;
@@ -42,8 +37,6 @@ export class Tab1 extends Component<IProps, IState> {
             titleStatistics: '',
             statistics2: [],
             refreshing: false,
-            dialogShow: false,
-            messageDialog: '',
             commentsLoading: true,
             dataComments: []
         };
@@ -73,7 +66,7 @@ export class Tab1 extends Component<IProps, IState> {
             refStatistic.current?.open(titleStatistics, this.state.dataShow.exercise.name, value);
         }).catch((error)=>{
             GlobalRef.current?.loadingController(false);
-            this.setState({ dialogShow: true, messageDialog: error.cause });
+            GlobalRef.current?.showSimpleAlert('Ocurrió un error', error.cause);
         });
     }
     goLoading() {
@@ -85,7 +78,8 @@ export class Tab1 extends Component<IProps, IState> {
             });
             (this.state.refreshing)&&this.setState({ refreshing: false });
         }).catch((error)=>{
-            this.setState({ dataShow: this.reserve2, showLoading: false, dialogShow: true, messageDialog: error.cause });
+            GlobalRef.current?.showSimpleAlert('Ocurrió un error', error.cause);
+            this.setState({ dataShow: this.reserve2, showLoading: false });
             (this.state.refreshing)&&this.setState({ refreshing: false });
             clearInterval(this.loading);
             var loadNow = LoadNow;
@@ -106,7 +100,8 @@ export class Tab1 extends Component<IProps, IState> {
                     birthday: ''
                 }
             }];
-            this.setState({ dialogShow: true, messageDialog: error.cause, dataComments: commentError, commentsLoading: false });
+            GlobalRef.current?.showSimpleAlert('Ocurrió un error', error.cause);
+            this.setState({ dataComments: commentError, commentsLoading: false });
         });
     }
     _onRefresing() { this.setState({ refreshing: true }, this.goLoading); }
@@ -131,21 +126,6 @@ export class Tab1 extends Component<IProps, IState> {
                 openDetails={this._openDetails}
                 goStatistics={this.goStatistics}            
             />
-            {/*<ViewMoreDetails
-                visible={this.state.viewMoreDetailsVisible}
-                close={()=>this.setState({ viewMoreDetailsVisible: false })}
-                dataShow={this.state.dataShow}
-                commentData={this.state.dataComments.find((value)=>value.id_training == this.state.dataShow.id)}
-            />*/}
-            <Snackbar
-                visible={this.state.dialogShow}
-                theme={CombinedTheme}
-                duration={7000}
-                style={{ backgroundColor: '#1663AB' }}
-                onDismiss={()=>this.setState({ dialogShow: false })}
-                action={{ label: 'Aceptar', onPress: ()=>this.setState({ dialogShow: false }) }}>
-                <Text>{this.state.messageDialog}</Text>
-            </Snackbar>
         </View>);
     }
 };

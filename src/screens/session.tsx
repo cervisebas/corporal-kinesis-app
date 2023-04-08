@@ -12,7 +12,6 @@ import statusEffect from "../scripts/StatusEffect";
 import { ThemeContext } from "../providers/ThemeProvider";
 
 type IProps = {
-    setLoading: (view: boolean, text: string)=>any;
     reVerify: ()=>void;
 };
 export type SessionRef = {

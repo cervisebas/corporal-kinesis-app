@@ -6,7 +6,6 @@ import ChangeLog from "./screens/ChangeLog";
 import Information from "./screens/information";
 import Session from "./screens/session";
 import VerifyScreen from "./screens/verify";
-import { Global } from "./scripts/Global";
 import CombinedTheme from "./Theme";
 import { refChangeLog, refInformation, refSession } from "./ExtraContentsRefs";
 
@@ -22,22 +21,12 @@ type IProps = {
     closeDialogUpdate: ()=>any;
     storeUrl: string;
 };
-type IState = {
-    // Loading
-    viewLoading: boolean;
-    textLoading: string;
-    // Information
-    showInfoApp: boolean;
-};
+type IState = {};
 
 export class ExtraContents extends Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
-        this.state = {
-            viewLoading: false,
-            textLoading: '',
-            showInfoApp: false
-        };
+        this.state = {};
     }
     render(): React.ReactNode {
         return(<>
@@ -45,15 +34,7 @@ export class ExtraContents extends Component<IProps, IState> {
                 visible={this.props.showVerify}
                 textShow={this.props.textVerify}
             />
-            <Session
-                ref={refSession}
-                setLoading={(view, text)=>this.setState({ viewLoading: view, textLoading: text })}
-                reVerify={this.props.reVerify}
-            />
-            <Global
-                loadingView={this.state.viewLoading}
-                loadingText={this.state.textLoading}
-            />
+            <Session ref={refSession} reVerify={this.props.reVerify} />
             <ChangeLog ref={refChangeLog} />
             <Information ref={refInformation} />
             <MaterialDialog

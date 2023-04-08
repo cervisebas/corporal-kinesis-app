@@ -11,7 +11,8 @@
     "clean": "cd android && ./gradlew clean && cd ..",
     "sync": "node sync-git.js",
     "upsync": "git pull origin main",
-    "buildRelease": "cd android && ./gradlew bundleRelease && cd .."
+    "buildRelease": "cd android && ./gradlew bundleRelease && cd ..",
+    "openapp": "adb shell am start -n com.corporalkinesis/com.corporalkinesis.MainActivity"
   },
   "dependencies": {
     "@notifee/react-native": "^7.6.1",

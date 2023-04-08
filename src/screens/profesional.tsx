@@ -1,5 +1,5 @@
 import { DrawerNavigationOptions, createDrawerNavigator } from "@react-navigation/drawer";
-import React, { forwardRef, useImperativeHandle } from "react";
+import React, { forwardRef, useContext, useImperativeHandle } from "react";
 import { View } from "react-native";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CustomDrawerNavegation from "./components/CustomDrawerNavegation";
@@ -8,6 +8,7 @@ import Page1 from "./pagesProfesional/Page1";
 import Page2 from "./pagesProfesional/Page2";
 import Page3 from "./pagesProfesional/Page3";
 import PageOptions from "./pagesProfesional/PageOptions";
+import { ThemeContext } from "../providers/ThemeProvider";
 
 type IProps = {
     navigation: any;
@@ -17,14 +18,16 @@ export type ProfesionalRef = {
 };
 
 const Drawer = createDrawerNavigator();
-const _screenOptions: DrawerNavigationOptions = {
-    headerShown: false,
-    drawerStyle: {
-        backgroundColor: 'transparent'
-    }
-};
 
 export default React.memo(forwardRef(function Profesional(props: IProps, ref: React.Ref<ProfesionalRef>) {
+    const { theme } = useContext(ThemeContext);
+    const _screenOptions: DrawerNavigationOptions = {
+        headerShown: false,
+        drawerStyle: {
+            backgroundColor: 'transparent'
+        },
+        overlayColor: theme.colors.backdrop
+    };
     function logOut() { return props.navigation.navigate('c'); }
     useImperativeHandle(ref, ()=>({ logOut }));
     return(<View style={{ flex: 2 }}>

@@ -4,6 +4,7 @@ import { Appbar, List, Provider as PaperProvider, Snackbar, Switch, Text } from 
 import { Options } from "../../scripts/ApiCorporal";
 import { TypeOptions } from "../../scripts/ApiCorporal/types";
 import CombinedTheme from "../../Theme";
+import { ThemeContext } from "../../providers/ThemeProvider";
 
 type IProps = {
     navigation: any;
@@ -37,8 +38,10 @@ export default class PageOptions extends Component<IProps, IState> {
             options: undefined,
             isLoading: true
         };
+        this.loadData = this.loadData.bind(this);
         this.onSwitchs = this.onSwitchs.bind(this);
     }
+    static contextType = ThemeContext;
     loadData() {
         Options.getAll().then((value)=>this.setState({
             switch1: value.viewAdmins1,
@@ -71,69 +74,77 @@ export default class PageOptions extends Component<IProps, IState> {
             .catch(()=>this.setState({ showSnackBar: true, textSnackBar: 'Ocurrió un error inesperado.' }));
     }
     render(): React.ReactNode {
-        return(<PaperProvider theme={CombinedTheme}>
-            <View style={{ flex: 1, backgroundColor: CombinedTheme.colors.background }}>
-                <Appbar.Header style={{ backgroundColor: '#1663AB' }}>
-                    <Appbar.Action icon="menu" onPress={this.props.navigation.openDrawer} />
-                    <Appbar.Content title="Opciones" />
-                </Appbar.Header>
-                <View style={{ flex: 2, overflow: 'hidden' }}>
-                    <ScrollView refreshControl={<RefreshControl colors={[CombinedTheme.colors.accent]} refreshing={this.state.isLoading} onRefresh={()=>this.loadData()} />}>
-                        <List.Section>
-                            <List.Subheader>Lista clientes</List.Subheader>
-                            <List.Item
-                                title={"Ocultar admins del inicio"}
-                                description={'Esto ocultara los administradores de la lista del inicio, esto no afecta a la búsqueda.'}
-                                descriptionNumberOfLines={3}
+        const { theme } = this.context;
+        return(<View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+            <Appbar.Header style={{ backgroundColor: theme.colors.background }}>
+                <Appbar.Action icon="menu" onPress={this.props.navigation.openDrawer} />
+                <Appbar.Content title="Opciones" />
+            </Appbar.Header>
+            <View style={{ flex: 2, overflow: 'hidden' }}>
+                <ScrollView refreshControl={<RefreshControl
+                    colors={[theme.colors.primary]}
+                    progressBackgroundColor={theme.colors.elevation.level2}
+                    refreshing={this.state.isLoading}
+                    onRefresh={this.loadData}
+                />}>
+                    <List.Section>
+                        <List.Subheader>Lista clientes</List.Subheader>
+                        <List.Item
+                            title={"Ocultar admins del inicio"}
+                            description={'Esto ocultara los administradores de la lista del inicio, esto no afecta a la búsqueda.'}
+                            descriptionNumberOfLines={3}
+                            disabled={this.state.isLoading}
+                            left={(lProps)=><List.Icon {...lProps} icon="eye-remove-outline" />}
+                            right={(rProps)=><Switch
+                                style={rProps.style}
+                                value={this.state.switch1}
                                 disabled={this.state.isLoading}
-                                left={()=><List.Icon icon="eye-remove-outline" />}
-                                right={()=><Switch
-                                    value={this.state.switch1}
-                                    disabled={this.state.isLoading}
-                                    onValueChange={()=>this.setState({ switch1: !this.state.switch1 }, this.onSwitchs)}
-                                />}
-                            />
-                            <List.Item
-                                title={"Ocultar desarrollador"}
-                                description={'Esto ocultara al desarrolador de la lista del inicio y de la lista de cargas, esto no afecta a la búsqueda.'}
-                                descriptionNumberOfLines={4}
+                                onValueChange={()=>this.setState({ switch1: !this.state.switch1 }, this.onSwitchs)}
+                            />}
+                        />
+                        <List.Item
+                            title={"Ocultar desarrollador"}
+                            description={'Esto ocultara al desarrolador de la lista del inicio y de la lista de cargas, esto no afecta a la búsqueda.'}
+                            descriptionNumberOfLines={4}
+                            disabled={this.state.isLoading}
+                            left={(lProps)=><List.Icon {...lProps} icon="eye-remove-outline" />}
+                            right={(rProps)=><Switch
+                                style={rProps.style}
+                                value={this.state.switch1_2}
                                 disabled={this.state.isLoading}
-                                left={()=><List.Icon icon="eye-remove-outline" />}
-                                right={()=><Switch
-                                    value={this.state.switch1_2}
-                                    disabled={this.state.isLoading}
-                                    onValueChange={()=>this.setState({ switch1_2: !this.state.switch1_2 }, this.onSwitchs)}
-                                />}
-                            />
-                            <List.Item
-                                title={"Ocultar admins de las cargas"}
-                                description={'Esto ocultara los administradores de la lista de cargas. Tener esta opción activa podrá ocasionar lentitud al momento de abrir la ventana.'}
-                                descriptionNumberOfLines={5}
+                                onValueChange={()=>this.setState({ switch1_2: !this.state.switch1_2 }, this.onSwitchs)}
+                            />}
+                        />
+                        <List.Item
+                            title={"Ocultar admins de las cargas"}
+                            description={'Esto ocultara los administradores de la lista de cargas. Tener esta opción activa podrá ocasionar lentitud al momento de abrir la ventana.'}
+                            descriptionNumberOfLines={5}
+                            disabled={this.state.isLoading}
+                            left={(lProps)=><List.Icon {...lProps} icon="eye-remove-outline" />}
+                            right={(rProps)=><Switch
+                                style={rProps.style}
+                                value={this.state.switch2}
                                 disabled={this.state.isLoading}
-                                left={()=><List.Icon icon="eye-remove-outline" />}
-                                right={()=><Switch
-                                    value={this.state.switch2}
-                                    disabled={this.state.isLoading}
-                                    onValueChange={()=>this.setState({ switch2: !this.state.switch2 }, this.onSwitchs)}
-                                />}
-                            />
-                            <List.Item
-                                title={"Activar siempre el filtro"}
-                                description={'Activa siempre el filtro de administradores en la ventana “administradores”.'}
-                                descriptionNumberOfLines={3}
+                                onValueChange={()=>this.setState({ switch2: !this.state.switch2 }, this.onSwitchs)}
+                            />}
+                        />
+                        <List.Item
+                            title={"Activar siempre el filtro"}
+                            description={'Activa siempre el filtro de administradores en la ventana “administradores”.'}
+                            descriptionNumberOfLines={3}
+                            disabled={this.state.isLoading}
+                            left={(lProps)=><List.Icon {...lProps} icon="account-filter-outline" />}
+                            right={(rProps)=><Switch
+                                style={rProps.style}
+                                value={this.state.switch3}
                                 disabled={this.state.isLoading}
-                                left={()=><List.Icon icon="account-filter-outline" />}
-                                right={()=><Switch
-                                    value={this.state.switch3}
-                                    disabled={this.state.isLoading}
-                                    onValueChange={()=>this.setState({ switch3: !this.state.switch3 }, this.onSwitchs)}
-                                />}
-                            />
-                        </List.Section>
-                    </ScrollView>
-                </View>
-                <Snackbar visible={this.state.showSnackBar} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ showSnackBar: false })}><Text>{this.state.textSnackBar}</Text></Snackbar>
+                                onValueChange={()=>this.setState({ switch3: !this.state.switch3 }, this.onSwitchs)}
+                            />}
+                        />
+                    </List.Section>
+                </ScrollView>
             </View>
-        </PaperProvider>);
+            <Snackbar visible={this.state.showSnackBar} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ showSnackBar: false })}><Text>{this.state.textSnackBar}</Text></Snackbar>
+        </View>);
     }
 }

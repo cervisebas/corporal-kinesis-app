@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import { DeviceEventEmitter, RefreshControl, ScrollView, View } from "react-native";
-import { Appbar, List, Provider as PaperProvider, Snackbar, Switch, Text } from "react-native-paper";
+import { Appbar, List, Switch } from "react-native-paper";
 import { Options } from "../../scripts/ApiCorporal";
 import { TypeOptions } from "../../scripts/ApiCorporal/types";
-import CombinedTheme from "../../Theme";
 import { ThemeContext } from "../../providers/ThemeProvider";
+import { GlobalRef } from "../../GlobalRef";
 
 type IProps = {
     navigation: any;
@@ -15,9 +15,6 @@ type IState = {
     switch1_2: boolean;
     switch2: boolean;
     switch3: boolean;
-
-    showSnackBar: boolean;
-    textSnackBar: string;
 
     options: TypeOptions | undefined;
     isLoading: boolean;
@@ -31,9 +28,6 @@ export default class PageOptions extends Component<IProps, IState> {
             switch1_2: false,
             switch2: false,
             switch3: false,
-
-            showSnackBar: false,
-            textSnackBar: '',
 
             options: undefined,
             isLoading: true
@@ -49,11 +43,10 @@ export default class PageOptions extends Component<IProps, IState> {
             switch3: value.activeFilters,
             options: value,
             isLoading: false
-        })).catch(()=>this.setState({
-            showSnackBar: true,
-            textSnackBar: 'Ocurrió un error inesperado.',
-            isLoading: true
-        }));
+        })).catch(()=>{
+            GlobalRef.current?.showSimpleAlert('Ocurrió un error inesperado.', '');
+            this.setState({ isLoading: true })
+        });
     }
     componentDidMount() {
         this.loadData();
@@ -71,7 +64,7 @@ export default class PageOptions extends Component<IProps, IState> {
                 DeviceEventEmitter.emit('adminPage1Reload');
                 DeviceEventEmitter.emit('adminPage2Reload');
             })
-            .catch(()=>this.setState({ showSnackBar: true, textSnackBar: 'Ocurrió un error inesperado.' }));
+            .catch(()=>GlobalRef.current?.showSimpleAlert('Ocurrió un error inesperado.', ''));
     }
     render(): React.ReactNode {
         const { theme } = this.context;
@@ -144,7 +137,6 @@ export default class PageOptions extends Component<IProps, IState> {
                     </List.Section>
                 </ScrollView>
             </View>
-            <Snackbar visible={this.state.showSnackBar} style={{ backgroundColor: '#1663AB' }} onDismiss={()=>this.setState({ showSnackBar: false })}><Text>{this.state.textSnackBar}</Text></Snackbar>
         </View>);
     }
 }

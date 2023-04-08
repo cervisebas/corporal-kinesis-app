@@ -224,7 +224,7 @@ class CustomCard5 extends PureComponent<IProps13> {
 type CustomType1 = { title: string; value: string; marginLeft?: number; };
 export const MiniCustomCard = React.memo(function MiniCustomCard(props: CustomType1) {
     const { theme } = useContext(ThemeContext);
-    return(<Card style={{ backgroundColor: theme.colors.primary, height: 48, marginTop: 4, marginBottom: 4, marginLeft: props.marginLeft??6, marginRight: 6 }}>
+    return(<Card style={{ backgroundColor: theme.colors.elevation.level3, height: 48, marginTop: 4, marginBottom: 4, marginLeft: props.marginLeft??6, marginRight: 6 }}>
         <Card.Content style={{ padding: 0, margin: 0 }}>
             <Text><Text style={{ fontWeight: '700' }}>{props.title}</Text> {props.value}</Text>
         </Card.Content>

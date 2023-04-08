@@ -81,7 +81,6 @@ export default class PageOptions extends Component<IProps, IState> {
                     onRefresh={this.loadData}
                 />}>
                     <List.Section>
-                        <List.Subheader>Lista clientes</List.Subheader>
                         <List.Item
                             title={"Ocultar admins del inicio"}
                             description={'Esto ocultara los administradores de la lista del inicio, esto no afecta a la búsqueda.'}

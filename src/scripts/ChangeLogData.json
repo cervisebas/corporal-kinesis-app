@@ -1,5 +1,13 @@
 [
   {
+    "version": "3.0.0-beta1",
+    "date": "11/01/2024",
+    "changes": [{
+      "type": 2,
+      "text": "Se soluciono un problema al crear un ejercicio en el apartado del administrador."
+    }]
+  },
+  {
     "version": "3.0.0-beta0",
     "date": "10/04/2023",
     "changes": [
@@ -73,7 +81,7 @@
       },
       {
         "type": 0,
-        "text": "Se eliminaron viejos componentes:\nt- Controlador de carga (MD2).\nt- Ventana de dialogo (MD2).\nt- Mensaje emergente (MD2)."
+        "text": "Se eliminaron viejos componentes:\n\t- Controlador de carga (MD2).\n\t- Ventana de dialogo (MD2).\n\t- Mensaje emergente (MD2)."
       },
       {
         "type": 0,

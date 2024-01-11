@@ -32,6 +32,7 @@ export default class AddNewExercise extends Component<IProps, IState> {
             isError: false,
             textButton: 'Enviar'
         };
+        this.sendResults = this.sendResults.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.close = this.close.bind(this);
     }

@@ -1,5 +1,16 @@
 [
   {
+    "version": "3.0.1-beta1",
+    "date": "15/07/2024",
+    "changes": [{
+      "type": 0,
+      "text": "Compatibilidad con Android 14 añadida."
+    }, {
+      "type": 0,
+      "text": "Libreria de navegación actualizada."
+    }]
+  },
+  {
     "version": "3.0.0-beta1",
     "date": "11/01/2024",
     "changes": [{
